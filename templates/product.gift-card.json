@@ -1,0 +1,94 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-product",
+      "blocks": {
+        "title": {
+          "type": "title",
+          "settings": {
+            "size": "h1"
+          }
+        },
+        "price": {
+          "type": "price",
+          "settings": {
+            "show_saving": false,
+            "show_installments": false
+          }
+        },
+        "description": {
+          "type": "description",
+          "settings": {}
+        },
+        "picker": {
+          "type": "variant_picker",
+          "settings": {
+            "picker_style": "buttons",
+            "show_swatches": false
+          }
+        },
+        "quantity": {
+          "type": "quantity",
+          "settings": {}
+        },
+        "buy": {
+          "type": "buy_buttons",
+          "settings": {
+            "show_dynamic_checkout": true,
+            "show_gift_card_recipient": true,
+            "preorder_note": ""
+          }
+        },
+        "how": {
+          "type": "collapsible_tab",
+          "settings": {
+            "heading": "How gift cards work",
+            "icon": "gift",
+            "content": "<p>Gift cards are delivered by email and can be used at checkout. Explain any expiry rules here.</p>",
+            "open": true
+          }
+        }
+      },
+      "block_order": [
+        "title",
+        "price",
+        "description",
+        "picker",
+        "quantity",
+        "buy",
+        "how"
+      ],
+      "settings": {
+        "gallery_layout": "carousel",
+        "media_width": "half",
+        "media_ratio": "adapt",
+        "zoom": "hover",
+        "loop_video": true,
+        "sticky_info": true,
+        "show_breadcrumbs": true,
+        "sticky_add_to_cart": false,
+        "sticky_color_scheme": "noir",
+        "color_scheme": "cream",
+        "padding_top": 32,
+        "padding_bottom": 64
+      }
+    },
+    "recommendations": {
+      "type": "product-recommendations",
+      "settings": {
+        "heading": "You may also like",
+        "intent": "related",
+        "limit": 4,
+        "columns": 4,
+        "desktop_layout": "grid",
+        "color_scheme": "cream",
+        "padding_top": 48,
+        "padding_bottom": 80
+      }
+    }
+  },
+  "order": [
+    "main",
+    "recommendations"
+  ]
+}

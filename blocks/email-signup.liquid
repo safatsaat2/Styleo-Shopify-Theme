@@ -1,0 +1,46 @@
+<div class="tb-signup" style="--max-width: {{ block.settings.max_width }}rem;" {{ block.shopify_attributes }}>
+  {% render 'newsletter-form', id: block.id, button_label: block.settings.button_label %}
+  {%- if block.settings.consent != blank -%}
+    <div class="tb-signup__consent rte">{{ block.settings.consent }}</div>
+  {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "t:names.email_signup",
+  "tag": null,
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "t:content.subscribers_are_saved_as_customers_who_accept_em_21940a"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "t:labels.button_label",
+      "info": "t:info.leave_blank_to_show_an_arrow_411035"
+    },
+    {
+      "type": "richtext",
+      "id": "consent",
+      "label": "t:labels.consent_text",
+      "default": "<p>By signing up, you agree to receive emails. Unsubscribe anytime.</p>"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "min": 16,
+      "max": 40,
+      "step": 2,
+      "unit": "rem",
+      "label": "t:labels.maximum_width",
+      "default": 28
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.email_signup"
+    }
+  ]
+}
+{% endschema %}

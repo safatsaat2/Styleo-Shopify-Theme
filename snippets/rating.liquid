@@ -1,0 +1,29 @@
+{%- comment -%}
+  Star rating from the standard product metafields reviews.rating and
+  reviews.rating_count. Review apps write these values. Nothing renders
+  when the product has no rating.
+
+  Accepts:
+  - product {Product}
+  - show_count {Boolean}: default true
+  - class {String}
+{%- endcomment -%}
+
+{%- assign rating = product.metafields.reviews.rating.value -%}
+{%- if rating != blank and rating.rating > 0 -%}
+  {%- liquid
+    assign rating_value = rating.rating | round: 1
+    assign rating_max = rating.scale_max | default: 5
+    assign rating_count = product.metafields.reviews.rating_count.value | default: 0
+  -%}
+  <div class="rating {{ class }}">
+    <span class="rating__stars" style="--rating: {{ rating_value }}; --rating-max: {{ rating_max }};" aria-hidden="true"></span>
+    <span class="visually-hidden">{{ 'products.rating.label' | t: rating: rating_value, max: rating_max }}</span>
+    {%- if show_count != false and rating_count > 0 -%}
+      <span class="rating__count">
+        <span aria-hidden="true">({{ rating_count }})</span>
+        <span class="visually-hidden">{{ 'products.rating.count' | t: count: rating_count }}</span>
+      </span>
+    {%- endif -%}
+  </div>
+{%- endif -%}

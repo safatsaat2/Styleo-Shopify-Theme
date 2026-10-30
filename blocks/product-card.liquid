@@ -1,0 +1,42 @@
+<div class="tb-card" {{ block.shopify_attributes }}>
+  {% render 'product-card', product: block.settings.product, style: block.settings.style, style_mobile: block.settings.style, section_id: block.id, sizes: '(min-width: 990px) 30vw, 80vw' %}
+</div>
+
+{% schema %}
+{
+  "name": "t:names.product_card",
+  "tag": null,
+  "settings": [
+    {
+      "type": "product",
+      "id": "product",
+      "label": "t:labels.product"
+    },
+    {
+      "type": "select",
+      "id": "style",
+      "label": "t:labels.card_style",
+      "options": [
+        {
+          "value": "portrait",
+          "label": "t:options.portrait"
+        },
+        {
+          "value": "row",
+          "label": "t:options.row"
+        },
+        {
+          "value": "compact",
+          "label": "t:options.compact"
+        }
+      ],
+      "default": "portrait"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.product_card"
+    }
+  ]
+}
+{% endschema %}

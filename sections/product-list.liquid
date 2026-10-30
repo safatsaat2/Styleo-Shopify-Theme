@@ -1,0 +1,329 @@
+{%- comment -%}
+  Product list: featured products, new arrivals, best sellers, or any
+  collection. Desktop and mobile layouts are chosen separately, so a row
+  can be a carousel on large screens and a stacked list on phones.
+{%- endcomment -%}
+
+{%- liquid
+  assign collection = section.settings.collection
+  assign limit = section.settings.limit
+  assign columns = section.settings.columns
+  assign desktop_layout = section.settings.desktop_layout
+  assign mobile_layout = section.settings.mobile_layout
+
+  assign card_style_mobile = settings.card_style_mobile
+  case mobile_layout
+    when 'list'
+      assign card_style_mobile = 'row'
+    when 'compact'
+      assign card_style_mobile = 'compact'
+  endcase
+
+  assign link_url = section.settings.link_url
+  if link_url == blank and collection != blank
+    assign link_url = collection.url
+  endif
+
+  assign card_width = 100 | divided_by: columns
+  capture sizes
+    echo '(min-width: 1280px) '
+    echo 1280 | divided_by: columns
+    echo 'px, (min-width: 990px) '
+    echo card_width
+    echo 'vw, (min-width: 750px) 33vw, '
+    if mobile_layout == 'carousel'
+      echo '75vw'
+    elsif mobile_layout == 'list'
+      echo '96px'
+    else
+      echo '50vw'
+    endif
+  endcapture
+
+  assign use_products = false
+  if section.settings.products.size > 0
+    assign use_products = true
+  endif
+-%}
+
+<div class="product-list-section color-{{ section.settings.color_scheme }} visibility-{{ section.settings.visibility }}">
+  <div class="page-width section-spacing" style="--pt: {{ section.settings.padding_top }}px; --pb: {{ section.settings.padding_bottom }}px;">
+    {% render 'section-heading',
+      subheading: section.settings.subheading,
+      heading: section.settings.heading,
+      link_label: section.settings.link_label,
+      link_url: link_url,
+      align: section.settings.heading_alignment
+    %}
+
+    <lc-carousel
+      class="product-list product-list--desktop-{{ desktop_layout }} product-list--mobile-{{ mobile_layout }}"
+      style="--cols: {{ columns }}; --cols-mobile: {% if mobile_layout == 'list' %}1{% elsif mobile_layout == 'compact' %}3{% else %}2{% endif %};"
+    >
+      <ul class="product-list__track" role="list" data-carousel-track>
+        {%- if use_products -%}
+          {%- for product in section.settings.products limit: limit -%}
+            <li class="product-list__item">
+              {% render 'product-card',
+                product: product,
+                style_mobile: card_style_mobile,
+                sizes: sizes,
+                index: forloop.index0,
+                section_id: section.id
+              %}
+            </li>
+          {%- endfor -%}
+        {%- elsif collection != blank and collection.products_count > 0 -%}
+          {%- for product in collection.products limit: limit -%}
+            <li class="product-list__item">
+              {% render 'product-card',
+                product: product,
+                style_mobile: card_style_mobile,
+                sizes: sizes,
+                index: forloop.index0,
+                section_id: section.id
+              %}
+            </li>
+          {%- endfor -%}
+        {%- else -%}
+          {%- for i in (1..limit) -%}
+            <li class="product-list__item">
+              {% render 'product-card', product: blank, style_mobile: card_style_mobile, index: forloop.index0 %}
+            </li>
+          {%- endfor -%}
+        {%- endif -%}
+      </ul>
+
+      <button type="button" class="carousel__button carousel__button--prev" data-carousel-prev aria-label="{{ 'accessibility.previous' | t }}">
+        {% render 'icon', name: 'chevron-left' %}
+      </button>
+      <button type="button" class="carousel__button carousel__button--next" data-carousel-next aria-label="{{ 'accessibility.next' | t }}">
+        {% render 'icon', name: 'chevron-right' %}
+      </button>
+    </lc-carousel>
+
+    {%- if section.settings.show_button and link_url != blank -%}
+      <div class="product-list__footer">
+        {% render 'button', label: section.settings.button_label, url: link_url, style: 'outline' %}
+      </div>
+    {%- endif -%}
+  </div>
+</div>
+
+{{ 'section-home.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'carousel.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "t:names.product_list",
+  "tag": "section",
+  "class": "section-product-list",
+  "settings": [
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "t:labels.subheading"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "t:labels.heading",
+      "default": "Featured products"
+    },
+    {
+      "type": "select",
+      "id": "heading_alignment",
+      "label": "t:labels.heading_alignment",
+      "options": [
+        {
+          "value": "start",
+          "label": "t:options.left"
+        },
+        {
+          "value": "center",
+          "label": "t:options.center"
+        }
+      ],
+      "default": "start"
+    },
+    {
+      "type": "header",
+      "content": "t:content.products"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "t:labels.collection",
+      "info": "t:info.for_new_arrivals_use_a_collection_sorted_by_date_1dc4c3"
+    },
+    {
+      "type": "product_list",
+      "id": "products",
+      "label": "t:labels.products",
+      "info": "t:info.replaces_the_collection_when_products_are_chosen",
+      "limit": 16
+    },
+    {
+      "type": "range",
+      "id": "limit",
+      "min": 2,
+      "max": 16,
+      "step": 1,
+      "label": "t:labels.number_of_products",
+      "default": 8
+    },
+    {
+      "type": "text",
+      "id": "link_label",
+      "label": "t:labels.link_label",
+      "default": "View all"
+    },
+    {
+      "type": "url",
+      "id": "link_url",
+      "label": "t:labels.link",
+      "info": "t:info.defaults_to_the_collection"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_button",
+      "label": "t:labels.show_button_below_products",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "t:labels.button_label",
+      "default": "Shop all"
+    },
+    {
+      "type": "header",
+      "content": "t:content.layout"
+    },
+    {
+      "type": "select",
+      "id": "desktop_layout",
+      "label": "t:labels.layout_on_large_screens",
+      "options": [
+        {
+          "value": "carousel",
+          "label": "t:options.carousel"
+        },
+        {
+          "value": "grid",
+          "label": "t:options.grid"
+        }
+      ],
+      "default": "carousel"
+    },
+    {
+      "type": "range",
+      "id": "columns",
+      "min": 2,
+      "max": 6,
+      "step": 1,
+      "label": "t:labels.products_per_row_on_large_screens",
+      "default": 4
+    },
+    {
+      "type": "select",
+      "id": "mobile_layout",
+      "label": "t:labels.layout_on_small_screens",
+      "options": [
+        {
+          "value": "carousel",
+          "label": "t:options.carousel"
+        },
+        {
+          "value": "grid",
+          "label": "t:options.two_columns"
+        },
+        {
+          "value": "list",
+          "label": "t:options.list"
+        },
+        {
+          "value": "compact",
+          "label": "t:options.three_compact_columns"
+        }
+      ],
+      "default": "list"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:labels.color_scheme",
+      "default": "cream"
+    },
+    {
+      "type": "select",
+      "id": "visibility",
+      "label": "t:labels.show_on",
+      "options": [
+        {
+          "value": "all",
+          "label": "t:options.all_devices"
+        },
+        {
+          "value": "mobile",
+          "label": "t:options.small_screens_only"
+        },
+        {
+          "value": "desktop",
+          "label": "t:options.large_screens_only"
+        }
+      ],
+      "default": "all"
+    },
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "t:labels.top",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "t:labels.bottom",
+      "default": 80
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.featured_products",
+      "category": "t:categories.products"
+    },
+    {
+      "name": "t:names.new_arrivals",
+      "category": "t:categories.products",
+      "settings": {
+        "heading": "New arrivals",
+        "desktop_layout": "carousel",
+        "mobile_layout": "list"
+      }
+    },
+    {
+      "name": "t:names.best_sellers",
+      "category": "t:categories.products",
+      "settings": {
+        "heading": "Best sellers",
+        "desktop_layout": "grid",
+        "mobile_layout": "compact",
+        "limit": 4
+      }
+    }
+  ]
+}
+{% endschema %}

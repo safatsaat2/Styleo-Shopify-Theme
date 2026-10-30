@@ -1,0 +1,31 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-404",
+      "settings": {
+        "show_search": true,
+        "color_scheme": "cream",
+        "padding_top": 112,
+        "padding_bottom": 64
+      }
+    },
+    "products": {
+      "type": "product-list",
+      "settings": {
+        "heading": "Popular right now",
+        "link_label": "Shop all",
+        "limit": 4,
+        "columns": 4,
+        "desktop_layout": "grid",
+        "mobile_layout": "grid",
+        "color_scheme": "cream",
+        "padding_top": 0,
+        "padding_bottom": 80
+      }
+    }
+  },
+  "order": [
+    "main",
+    "products"
+  ]
+}

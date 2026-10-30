@@ -1,0 +1,135 @@
+{%- comment -%}
+  Legacy customer accounts: sign in, password recovery, and guest checkout.
+  Recovery shows through the #recover target, so it works without JavaScript.
+  Stores using new customer accounts never reach this template.
+{%- endcomment -%}
+
+<div class="customer customer--auth color-{{ section.settings.color_scheme }}">
+  <div class="page-width page-width--narrow section-spacing" style="--pt: {{ section.settings.padding_top }}px; --pb: {{ section.settings.padding_bottom }}px;">
+    <div class="customer__stack">
+      <div class="customer__card customer__recover panel" id="recover" tabindex="-1">
+        <p class="subheading">{{ 'customer.recover.subheading' | t }}</p>
+        <h2 class="h3">{{ 'customer.recover.title' | t }}</h2>
+        <p class="text-muted">{{ 'customer.recover.text' | t }}</p>
+        {%- form 'recover_customer_password', class: 'customer__form' -%}
+          {% render 'customer-form-errors', form: form %}
+          {%- if form.posted_successfully? -%}
+            <p class="form-message form-message--success" role="status" tabindex="-1" autofocus>
+              {% render 'icon', name: 'check' %}
+              <span>{{ 'customer.recover.success' | t }}</span>
+            </p>
+          {%- endif -%}
+          <div class="field">
+            <label class="field__label" for="RecoverEmail">{{ 'customer.fields.email' | t }}</label>
+            <input
+              id="RecoverEmail"
+              class="input"
+              type="email"
+              name="email"
+              autocomplete="email"
+              autocapitalize="off"
+              required
+              {% if form.errors %}aria-invalid="true"{% endif %}
+            >
+          </div>
+          <button type="submit" class="button button--full">{{ 'customer.recover.submit' | t }}</button>
+          <a href="#login" class="link customer__switch">{{ 'customer.recover.cancel' | t }}</a>
+        {%- endform -%}
+      </div>
+
+      <div class="customer__card customer__login panel" id="login" tabindex="-1">
+        <p class="subheading">{{ 'customer.login.subheading' | t }}</p>
+        <h1 class="h2">{{ 'customer.login.title' | t }}</h1>
+        {%- form 'customer_login', novalidate: 'novalidate', class: 'customer__form' -%}
+          {% render 'customer-form-errors', form: form %}
+          <div class="field">
+            <label class="field__label" for="CustomerEmail">{{ 'customer.fields.email' | t }}</label>
+            <input
+              id="CustomerEmail"
+              class="input"
+              type="email"
+              name="customer[email]"
+              autocomplete="email"
+              autocapitalize="off"
+              required
+              {% if form.errors contains 'form' %}aria-invalid="true"{% endif %}
+            >
+          </div>
+          {%- if form.password_needed -%}
+            <div class="field">
+              <div class="customer__label-row">
+                <label class="field__label" for="CustomerPassword">{{ 'customer.fields.password' | t }}</label>
+                <a href="#recover" class="link customer__switch">{{ 'customer.login.forgot' | t }}</a>
+              </div>
+              <input
+                id="CustomerPassword"
+                class="input"
+                type="password"
+                name="customer[password]"
+                autocomplete="current-password"
+                required
+                {% if form.errors contains 'form' %}aria-invalid="true"{% endif %}
+              >
+            </div>
+          {%- endif -%}
+          <button type="submit" class="button button--full">{{ 'customer.login.submit' | t }}</button>
+        {%- endform -%}
+        <p class="customer__alt">
+          {{ 'customer.login.new_customer' | t }}
+          <a href="{{ routes.account_register_url }}" class="link">{{ 'customer.login.create' | t }}</a>
+        </p>
+      </div>
+
+      {%- if shop.checkout.guest_login -%}
+        <div class="customer__card customer__guest panel">
+          <h2 class="h5">{{ 'customer.login.guest_title' | t }}</h2>
+          {%- form 'guest_login' -%}
+            <button type="submit" class="button button--outline button--full">{{ 'customer.login.guest_submit' | t }}</button>
+          {%- endform -%}
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+</div>
+
+{{ 'section-customer.css' | asset_url | stylesheet_tag }}
+
+{% schema %}
+{
+  "name": "t:names.customer_login",
+  "tag": "section",
+  "class": "section-customer-login",
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:labels.color_scheme",
+      "default": "cream"
+    },
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "t:labels.top",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "t:labels.bottom",
+      "default": 80
+    }
+  ]
+}
+{% endschema %}

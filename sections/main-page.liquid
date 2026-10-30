@@ -1,0 +1,102 @@
+<div class="main-page color-{{ section.settings.color_scheme }}">
+  <div class="page-width page-width--{{ section.settings.width }} section-spacing" style="--pt: {{ section.settings.padding_top }}px; --pb: {{ section.settings.padding_bottom }}px;">
+    <header class="main-page__header main-page__header--{{ section.settings.alignment }}">
+      {%- if section.settings.subheading != blank -%}
+        <p class="subheading">{{ section.settings.subheading }}</p>
+      {%- endif -%}
+      {%- if section.settings.show_title -%}
+        <h1 class="h1 text-balance">{{ page.title | escape }}</h1>
+      {%- else -%}
+        <h1 class="visually-hidden">{{ page.title | escape }}</h1>
+      {%- endif -%}
+    </header>
+    {%- if page.content != blank -%}
+      <div class="rte main-page__content">{{ page.content }}</div>
+    {%- endif -%}
+  </div>
+</div>
+
+{{ 'section-content.css' | asset_url | stylesheet_tag }}
+
+{% schema %}
+{
+  "name": "t:names.page",
+  "tag": "section",
+  "class": "section-main-page",
+  "settings": [
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "t:labels.subheading"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_title",
+      "label": "t:labels.show_page_title",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "alignment",
+      "label": "t:labels.title_alignment",
+      "options": [
+        {
+          "value": "start",
+          "label": "t:options.left"
+        },
+        {
+          "value": "center",
+          "label": "t:options.center"
+        }
+      ],
+      "default": "start"
+    },
+    {
+      "type": "select",
+      "id": "width",
+      "label": "t:labels.content_width",
+      "options": [
+        {
+          "value": "narrow",
+          "label": "t:options.narrow"
+        },
+        {
+          "value": "medium",
+          "label": "t:options.medium"
+        }
+      ],
+      "default": "narrow"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:labels.color_scheme",
+      "default": "cream"
+    },
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "t:labels.top",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "t:labels.bottom",
+      "default": 64
+    }
+  ]
+}
+{% endschema %}

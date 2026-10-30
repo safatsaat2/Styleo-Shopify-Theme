@@ -1,0 +1,299 @@
+{%- liquid
+  assign video = section.settings.video
+  assign video_url = section.settings.video_url
+  assign poster = section.settings.poster | default: video.preview_image
+  assign has_video = false
+  if video != blank or video_url != blank
+    assign has_video = true
+  endif
+  assign autoplay = false
+  if section.settings.autoplay and video != blank
+    assign autoplay = true
+  endif
+  if section.index <= 2
+    assign poster_loading = 'eager'
+  else
+    assign poster_loading = 'lazy'
+  endif
+  assign title = section.settings.heading | strip_html | default: section.settings.video_description
+-%}
+
+<div class="video-banner color-{{ section.settings.color_scheme }} visibility-{{ section.settings.visibility }}">
+  <div class="{% if section.settings.full_width %}page-width--full{% else %}page-width{% endif %} section-spacing" style="--pt: {{ section.settings.padding_top }}px; --pb: {{ section.settings.padding_bottom }}px;">
+    <lc-video
+      class="video-banner__frame video-banner__frame--{{ section.settings.height }}{% unless section.settings.full_width %} video-banner__frame--inset{% endunless %}"
+      data-autoplay="{{ autoplay }}"
+      style="--overlay-opacity: {{ section.settings.overlay_opacity | divided_by: 100.0 }};"
+    >
+      <div class="video-banner__poster media">
+        {%- if poster != blank -%}
+          {% render 'image', image: poster, sizes: '100vw', loading: poster_loading %}
+        {%- else -%}
+          {{ 'hero-apparel-2' | placeholder_svg_tag: 'placeholder-svg' }}
+        {%- endif -%}
+      </div>
+
+      <div class="video-banner__target" data-video-target></div>
+
+      {%- if has_video -%}
+        <template>
+          {%- if video != blank -%}
+            {{ video | video_tag: image_size: '1920x', playsinline: true, preload: 'metadata', class: 'video-banner__video' }}
+          {%- elsif video_url.type == 'youtube' -%}
+            <iframe
+              class="video-banner__iframe"
+              src="//www.youtube-nocookie.com/embed/{{ video_url.id }}?autoplay=1&amp;rel=0&amp;playsinline=1"
+              title="{{ title | escape }}"
+              allow="autoplay; encrypted-media; picture-in-picture"
+              allowfullscreen
+            ></iframe>
+          {%- elsif video_url.type == 'vimeo' -%}
+            <iframe
+              class="video-banner__iframe"
+              src="//player.vimeo.com/video/{{ video_url.id }}?autoplay=1&amp;dnt=1"
+              title="{{ title | escape }}"
+              allow="autoplay; fullscreen; picture-in-picture"
+              allowfullscreen
+            ></iframe>
+          {%- endif -%}
+        </template>
+      {%- endif -%}
+
+      <div class="video-banner__content video-banner__content--{{ section.settings.alignment }}">
+        <div class="video-banner__text">
+          {%- if section.settings.subheading != blank -%}
+            <p class="subheading">{{ section.settings.subheading }}</p>
+          {%- endif -%}
+          {%- if section.settings.heading != blank -%}
+            <h2 class="h1 text-balance">{{ section.settings.heading }}</h2>
+          {%- endif -%}
+          {%- if section.settings.text != blank -%}
+            <div class="rte text-lg">{{ section.settings.text }}</div>
+          {%- endif -%}
+          <div class="button-row">
+            {%- if has_video and autoplay == false -%}
+              <button type="button" class="button button--surface button--large" data-video-play>
+                {% render 'icon', name: 'play' %}
+                <span>{{ 'sections.video.play' | t }}</span>
+              </button>
+            {%- endif -%}
+            {% render 'button', label: section.settings.button_label, url: section.settings.button_link, arrow: true, size: 'large' %}
+          </div>
+        </div>
+      </div>
+
+      {%- if autoplay -%}
+        <button
+          type="button"
+          class="video-banner__pause icon-button"
+          data-video-pause
+          hidden
+          aria-label="{{ 'sections.video.pause' | t }}"
+          data-label-pause="{{ 'sections.video.pause' | t }}"
+          data-label-play="{{ 'sections.video.play' | t }}"
+        >
+          <span data-icon-pause>{% render 'icon', name: 'pause' %}</span>
+          <span data-icon-play hidden>{% render 'icon', name: 'play' %}</span>
+        </button>
+        {%- comment -%} Reduced motion: offer a play button instead of autoplay {%- endcomment -%}
+        <button type="button" class="video-banner__reduced-play button button--surface" data-video-play>
+          {% render 'icon', name: 'play' %}
+          <span>{{ 'sections.video.play' | t }}</span>
+        </button>
+      {%- endif -%}
+    </lc-video>
+  </div>
+</div>
+
+{{ 'section-home.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'video.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "t:names.video",
+  "tag": "section",
+  "class": "section-video-banner",
+  "settings": [
+    {
+      "type": "video",
+      "id": "video",
+      "label": "t:labels.video",
+      "info": "t:info.upload_a_video_to_play_it_in_the_background"
+    },
+    {
+      "type": "video_url",
+      "id": "video_url",
+      "label": "t:labels.youtube_or_vimeo_link",
+      "accept": [
+        "youtube",
+        "vimeo"
+      ],
+      "info": "t:info.used_when_no_video_is_uploaded_plays_when_custom_87cc8b"
+    },
+    {
+      "type": "image_picker",
+      "id": "poster",
+      "label": "t:labels.cover_image",
+      "info": "t:info.shown_before_the_video_plays"
+    },
+    {
+      "type": "text",
+      "id": "video_description",
+      "label": "t:labels.video_description",
+      "info": "t:info.describes_the_video_for_customers_using_screen_r_b19635",
+      "default": "Brand film"
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "t:labels.play_uploaded_video_automatically",
+      "info": "t:info.the_video_plays_muted_and_loops_it_doesn_t_autop_17f47e",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "t:content.text"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "t:labels.subheading"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "t:labels.heading",
+      "default": "Tell your story in motion"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "t:labels.text"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "t:labels.button_label"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "t:labels.button_link"
+    },
+    {
+      "type": "select",
+      "id": "alignment",
+      "label": "t:labels.text_position",
+      "options": [
+        {
+          "value": "start",
+          "label": "t:options.left"
+        },
+        {
+          "value": "center",
+          "label": "t:options.center"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "header",
+      "content": "t:content.layout"
+    },
+    {
+      "type": "select",
+      "id": "height",
+      "label": "t:labels.height",
+      "options": [
+        {
+          "value": "medium",
+          "label": "t:options.medium"
+        },
+        {
+          "value": "large",
+          "label": "t:options.large"
+        },
+        {
+          "value": "full",
+          "label": "t:options.full_screen"
+        }
+      ],
+      "default": "large"
+    },
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "t:labels.make_section_full_width",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "%",
+      "label": "t:labels.overlay_opacity",
+      "default": 35
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:labels.color_scheme",
+      "default": "noir"
+    },
+    {
+      "type": "select",
+      "id": "visibility",
+      "label": "t:labels.show_on",
+      "options": [
+        {
+          "value": "all",
+          "label": "t:options.all_devices"
+        },
+        {
+          "value": "mobile",
+          "label": "t:options.small_screens_only"
+        },
+        {
+          "value": "desktop",
+          "label": "t:options.large_screens_only"
+        }
+      ],
+      "default": "all"
+    },
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "t:labels.top",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "t:labels.bottom",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.video",
+      "settings": {
+        "video_url": "https://www.youtube.com/watch?v=_9VUPq3SxOc"
+      }
+    }
+  ]
+}
+{% endschema %}

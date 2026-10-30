@@ -1,0 +1,339 @@
+<div class="multicolumn-section color-{{ section.settings.color_scheme }} visibility-{{ section.settings.visibility }}">
+  <div class="page-width section-spacing" style="--pt: {{ section.settings.padding_top }}px; --pb: {{ section.settings.padding_bottom }}px;">
+    {% render 'section-heading',
+      subheading: section.settings.subheading,
+      heading: section.settings.heading,
+      link_label: section.settings.link_label,
+      link_url: section.settings.link_url,
+      align: section.settings.alignment
+    %}
+
+    <ul
+      class="multicolumn multicolumn--{{ section.settings.alignment }} multicolumn--{{ section.settings.card_style }} multicolumn--mobile-{{ section.settings.mobile_columns }}"
+      role="list"
+      style="--cols: {{ section.settings.columns }};"
+    >
+      {%- for block in section.blocks -%}
+        <li class="multicolumn__item" data-reveal style="--reveal-index: {{ forloop.index0 | modulo: 4 }};" {{ block.shopify_attributes }}>
+          {%- if block.settings.image != blank -%}
+            <div class="multicolumn__image media" style="--ratio: {{ section.settings.image_ratio }};">
+              {% render 'image', image: block.settings.image, sizes: '(min-width: 990px) 25vw, 50vw' %}
+            </div>
+          {%- elsif block.settings.icon != 'none' -%}
+            <span class="multicolumn__icon">{% render 'icon', name: block.settings.icon %}</span>
+          {%- endif -%}
+          {%- if block.settings.heading != blank -%}
+            <h3 class="multicolumn__heading h4">{{ block.settings.heading }}</h3>
+          {%- endif -%}
+          {%- if block.settings.text != blank -%}
+            <div class="rte multicolumn__text">{{ block.settings.text }}</div>
+          {%- endif -%}
+          {%- if block.settings.link_label != blank and block.settings.link != blank -%}
+            <a href="{{ block.settings.link }}" class="link-arrow">
+              {{- block.settings.link_label | escape -}}
+              {% render 'icon', name: 'arrow-right' %}
+            </a>
+          {%- endif -%}
+        </li>
+      {%- endfor -%}
+    </ul>
+  </div>
+</div>
+
+{{ 'section-home.css' | asset_url | stylesheet_tag }}
+
+{% schema %}
+{
+  "name": "t:names.multicolumn",
+  "tag": "section",
+  "class": "section-multicolumn",
+  "max_blocks": 12,
+  "settings": [
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "t:labels.subheading"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "t:labels.heading",
+      "default": "Why customers choose us"
+    },
+    {
+      "type": "text",
+      "id": "link_label",
+      "label": "t:labels.link_label"
+    },
+    {
+      "type": "url",
+      "id": "link_url",
+      "label": "t:labels.link"
+    },
+    {
+      "type": "select",
+      "id": "alignment",
+      "label": "t:labels.alignment",
+      "options": [
+        {
+          "value": "start",
+          "label": "t:options.left"
+        },
+        {
+          "value": "center",
+          "label": "t:options.center"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "columns",
+      "min": 2,
+      "max": 5,
+      "step": 1,
+      "label": "t:labels.columns_on_large_screens",
+      "default": 3
+    },
+    {
+      "type": "select",
+      "id": "mobile_columns",
+      "label": "t:labels.columns_on_small_screens",
+      "options": [
+        {
+          "value": "1",
+          "label": "t:options.one"
+        },
+        {
+          "value": "2",
+          "label": "t:options.two"
+        }
+      ],
+      "default": "1"
+    },
+    {
+      "type": "select",
+      "id": "card_style",
+      "label": "t:labels.column_style",
+      "options": [
+        {
+          "value": "plain",
+          "label": "t:options.plain"
+        },
+        {
+          "value": "card",
+          "label": "t:options.card"
+        }
+      ],
+      "default": "plain"
+    },
+    {
+      "type": "select",
+      "id": "image_ratio",
+      "label": "t:labels.image_proportions",
+      "options": [
+        {
+          "value": "4 / 3",
+          "label": "t:options.landscape"
+        },
+        {
+          "value": "1 / 1",
+          "label": "t:options.square"
+        },
+        {
+          "value": "3 / 4",
+          "label": "t:options.portrait"
+        }
+      ],
+      "default": "4 / 3"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:labels.color_scheme",
+      "default": "mist"
+    },
+    {
+      "type": "select",
+      "id": "visibility",
+      "label": "t:labels.show_on",
+      "options": [
+        {
+          "value": "all",
+          "label": "t:options.all_devices"
+        },
+        {
+          "value": "mobile",
+          "label": "t:options.small_screens_only"
+        },
+        {
+          "value": "desktop",
+          "label": "t:options.large_screens_only"
+        }
+      ],
+      "default": "all"
+    },
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "t:labels.top",
+      "default": 64
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "t:labels.bottom",
+      "default": 64
+    }
+  ],
+  "blocks": [
+    {
+      "type": "column",
+      "name": "t:names.column",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "t:labels.icon",
+          "options": [
+            {
+              "value": "none",
+              "label": "t:options.none"
+            },
+            {
+              "value": "truck",
+              "label": "t:options.delivery_truck"
+            },
+            {
+              "value": "return",
+              "label": "t:options.return_arrow"
+            },
+            {
+              "value": "shield",
+              "label": "t:options.shield"
+            },
+            {
+              "value": "headset",
+              "label": "t:options.headset"
+            },
+            {
+              "value": "gift",
+              "label": "t:options.gift"
+            },
+            {
+              "value": "tag",
+              "label": "t:options.price_tag"
+            },
+            {
+              "value": "star",
+              "label": "t:options.star"
+            },
+            {
+              "value": "check",
+              "label": "t:options.check_mark"
+            },
+            {
+              "value": "heart",
+              "label": "t:options.heart"
+            },
+            {
+              "value": "globe",
+              "label": "t:options.globe"
+            },
+            {
+              "value": "location",
+              "label": "t:options.location_pin"
+            },
+            {
+              "value": "info",
+              "label": "t:options.information"
+            },
+            {
+              "value": "mail",
+              "label": "t:options.envelope"
+            },
+            {
+              "value": "account",
+              "label": "t:options.person"
+            },
+            {
+              "value": "calendar",
+              "label": "t:options.calendar"
+            },
+            {
+              "value": "phone",
+              "label": "t:options.phone"
+            }
+          ],
+          "default": "star"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "t:labels.image",
+          "info": "t:info.replaces_the_icon"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "heading",
+          "label": "t:labels.heading",
+          "default": "Column"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "t:labels.text",
+          "default": "<p>Pair text with an icon or image to highlight a product, service, or value.</p>"
+        },
+        {
+          "type": "text",
+          "id": "link_label",
+          "label": "t:labels.link_label"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "t:labels.link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.multicolumn",
+      "blocks": [
+        {
+          "type": "column",
+          "settings": {
+            "heading": "Thoughtful design"
+          }
+        },
+        {
+          "type": "column",
+          "settings": {
+            "heading": "Confident fit"
+          }
+        },
+        {
+          "type": "column",
+          "settings": {
+            "heading": "Everyday luxury"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

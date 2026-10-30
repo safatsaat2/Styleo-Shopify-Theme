@@ -1,0 +1,28 @@
+{%- comment -%}
+  Rotating circular text badge. Static for customers who prefer reduced motion.
+
+  Accepts:
+  - text {String}: words around the circle
+  - id {String}: unique id for the SVG path
+  - position {String}: 'top-end' (default), 'top-start', 'bottom-end', 'bottom-start'
+{%- endcomment -%}
+
+{%- liquid
+  assign badge_text = text | default: '' | strip | upcase
+  assign path_id = 'OrbitPath-' | append: id
+  assign repeated = badge_text | append: ' • ' | append: badge_text | append: ' • '
+-%}
+
+{%- if badge_text != blank -%}
+  <div class="orbit-badge orbit-badge--{{ position | default: 'top-end' }}" aria-hidden="true">
+    <svg class="orbit-badge__ring" viewBox="0 0 100 100" width="100" height="100" focusable="false">
+      <defs>
+        <path id="{{ path_id }}" d="M 50,50 m -37,0 a 37,37 0 1,1 74,0 a 37,37 0 1,1 -74,0"></path>
+      </defs>
+      <text class="orbit-badge__text">
+        <textPath href="#{{ path_id }}" textLength="230" lengthAdjust="spacing">{{ repeated | escape }}</textPath>
+      </text>
+    </svg>
+    <span class="orbit-badge__dot"></span>
+  </div>
+{%- endif -%}

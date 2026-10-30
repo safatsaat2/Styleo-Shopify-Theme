@@ -1,0 +1,85 @@
+{%- comment -%}
+  Product form with the add to cart button and accelerated checkout
+  buttons. The button reflects real state: coming soon (tag), sold out,
+  unavailable combination, or pre-order (inventory policy "continue" with
+  no stock).
+
+  Accepts:
+  - product {Product}
+  - section_id {String}
+  - form_id {String}
+  - show_dynamic_checkout {Boolean}: accelerated checkout buttons, default true
+  - show_gift_card_recipient {Boolean}: default true
+  - preorder_note {String}
+{%- endcomment -%}
+
+{%- liquid
+  assign variant = product.selected_or_first_available_variant
+  assign coming_soon = false
+  if settings.coming_soon_tag != blank and product.tags contains settings.coming_soon_tag
+    assign coming_soon = true
+  endif
+  assign preorder = false
+  if variant.available and variant.inventory_management == 'shopify' and variant.inventory_quantity <= 0 and variant.inventory_policy == 'continue'
+    assign preorder = true
+  endif
+
+  assign button_disabled = false
+  if coming_soon
+    assign button_label = 'products.buttons.coming_soon' | t
+    assign button_disabled = true
+  elsif variant == blank
+    assign button_label = 'products.buttons.unavailable' | t
+    assign button_disabled = true
+  elsif variant.available == false
+    assign button_label = 'products.buttons.sold_out' | t
+    assign button_disabled = true
+  elsif preorder
+    assign button_label = 'products.buttons.preorder' | t
+  else
+    assign button_label = 'products.add_to_cart' | t
+  endif
+
+  assign show_accelerated = true
+  if show_dynamic_checkout == false or button_disabled
+    assign show_accelerated = false
+  endif
+-%}
+
+<div class="product__buy" data-product-part="buy-buttons">
+  <lc-product-form class="product-form" data-section-id="{{ section_id }}">
+    {%- form 'product', product, id: form_id, class: 'product-form__form', novalidate: 'novalidate', data-product-form: '' -%}
+      <input type="hidden" name="id" value="{{ variant.id }}"{% if variant == blank %} disabled{% endif %}>
+
+      {%- if product.gift_card? and show_gift_card_recipient != false -%}
+        {% render 'gift-card-recipient', form: form, section_id: section_id %}
+      {%- endif -%}
+
+      <p class="form-message form-message--error product-form__error" role="alert" data-form-error hidden>
+        {% render 'icon', name: 'error' %}
+        <span></span>
+      </p>
+
+      <div class="product-form__buttons">
+        <button
+          type="submit"
+          name="add"
+          class="button button--large button--full product-form__submit{% if show_accelerated %} button--secondary{% endif %}"
+          {% if button_disabled %}
+            disabled
+          {% endif %}
+          data-add-button
+        >
+          <span>{{ button_label }}</span>
+        </button>
+        {%- if show_accelerated -%}
+          {{ form | payment_button }}
+        {%- endif -%}
+      </div>
+
+      {%- if preorder and preorder_note != blank -%}
+        <p class="product-form__note">{% render 'icon', name: 'calendar' %} {{ preorder_note }}</p>
+      {%- endif -%}
+    {%- endform -%}
+  </lc-product-form>
+</div>

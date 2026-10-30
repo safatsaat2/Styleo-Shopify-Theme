@@ -1,0 +1,104 @@
+{%- comment -%}
+  Legacy customer accounts: create an account.
+{%- endcomment -%}
+
+<div class="customer customer--auth color-{{ section.settings.color_scheme }}">
+  <div class="page-width page-width--narrow section-spacing" style="--pt: {{ section.settings.padding_top }}px; --pb: {{ section.settings.padding_bottom }}px;">
+    <div class="customer__card panel">
+      <p class="subheading">{{ 'customer.register.subheading' | t }}</p>
+      <h1 class="h2">{{ 'customer.register.title' | t }}</h1>
+      {%- form 'create_customer', novalidate: 'novalidate', class: 'customer__form' -%}
+        {% render 'customer-form-errors', form: form %}
+        <div class="customer__row">
+          <div class="field">
+            <label class="field__label" for="RegisterFirstName">{{ 'customer.fields.first_name' | t }}</label>
+            <input id="RegisterFirstName" class="input" type="text" name="customer[first_name]" value="{{ form.first_name }}" autocomplete="given-name">
+          </div>
+          <div class="field">
+            <label class="field__label" for="RegisterLastName">{{ 'customer.fields.last_name' | t }}</label>
+            <input id="RegisterLastName" class="input" type="text" name="customer[last_name]" value="{{ form.last_name }}" autocomplete="family-name">
+          </div>
+        </div>
+        <div class="field">
+          <label class="field__label" for="RegisterEmail">{{ 'customer.fields.email' | t }}</label>
+          <input
+            id="RegisterEmail"
+            class="input"
+            type="email"
+            name="customer[email]"
+            value="{{ form.email }}"
+            autocomplete="email"
+            autocapitalize="off"
+            required
+            {% if form.errors contains 'email' %}aria-invalid="true"{% endif %}
+          >
+        </div>
+        <div class="field">
+          <label class="field__label" for="RegisterPassword">{{ 'customer.fields.password' | t }}</label>
+          <input
+            id="RegisterPassword"
+            class="input"
+            type="password"
+            name="customer[password]"
+            autocomplete="new-password"
+            aria-describedby="RegisterPasswordHint"
+            required
+            {% if form.errors contains 'password' %}aria-invalid="true"{% endif %}
+          >
+          <span class="field__hint" id="RegisterPasswordHint">{{ 'customer.register.password_hint' | t }}</span>
+        </div>
+        <label class="checkbox">
+          <input type="checkbox" name="customer[accepts_marketing]" value="true">
+          <span>{{ 'customer.register.marketing' | t }}</span>
+        </label>
+        <button type="submit" class="button button--full">{{ 'customer.register.submit' | t }}</button>
+      {%- endform -%}
+      <p class="customer__alt">
+        {{ 'customer.register.have_account' | t }}
+        <a href="{{ routes.account_login_url }}" class="link">{{ 'customer.register.login' | t }}</a>
+      </p>
+    </div>
+  </div>
+</div>
+
+{{ 'section-customer.css' | asset_url | stylesheet_tag }}
+
+{% schema %}
+{
+  "name": "t:names.customer_register",
+  "tag": "section",
+  "class": "section-customer-register",
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:labels.color_scheme",
+      "default": "cream"
+    },
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "t:labels.top",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "t:labels.bottom",
+      "default": 80
+    }
+  ]
+}
+{% endschema %}

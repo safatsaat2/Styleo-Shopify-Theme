@@ -1,0 +1,601 @@
+/*
+  Lilac shared components: dialogs and drawers, accordions, chips,
+  quantity input, notices, skeletons, empty states.
+  Feature-specific styles live in section-*.css files.
+*/
+
+/* ---------------------------------------------------------------
+   Dialogs and drawers (native <dialog> inside <lc-dialog>)
+--------------------------------------------------------------- */
+lc-dialog {
+  display: contents;
+}
+
+.dialog {
+  --_duration: 0.32s;
+  position: fixed;
+  padding: 0;
+  border: 0;
+  max-width: none;
+  max-height: none;
+  overflow: hidden;
+  background: var(--lc-bg);
+  color: var(--lc-fg);
+  box-shadow: 0 25px 50px rgb(0 0 0 / 0.25);
+}
+
+.dialog::backdrop {
+  background: rgb(15 15 16 / 0.5);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  opacity: 0;
+  transition: opacity var(--_duration) ease;
+}
+
+.dialog.is-open::backdrop {
+  opacity: 1;
+}
+
+.dialog__panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  max-height: inherit;
+}
+
+.dialog__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 0.75rem 0.75rem 1.25rem;
+  border-bottom: 1px solid var(--lc-border);
+}
+
+.dialog__title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: var(--lc-text-h4);
+}
+
+.dialog__body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 1.25rem;
+}
+
+.dialog__footer {
+  padding: 1.25rem;
+  border-top: 1px solid var(--lc-border);
+  background: color-mix(in srgb, var(--lc-surface) 50%, var(--lc-bg));
+}
+
+/* Drawer: slides in from the inline end (or start) */
+.dialog--drawer {
+  inset: 0 0 0 auto;
+  width: min(100vw, var(--dialog-width, 28rem));
+  height: 100dvh;
+  margin: 0;
+  transform: translateX(100%);
+  transition: transform var(--_duration) var(--lc-ease);
+}
+
+.dialog--drawer.dialog--start {
+  inset: 0 auto 0 0;
+  transform: translateX(-100%);
+}
+
+[dir='rtl'] .dialog--drawer {
+  inset: 0 auto 0 0;
+  transform: translateX(-100%);
+}
+
+.dialog--drawer.is-open {
+  transform: none;
+}
+
+/* Modal: centered on desktop, bottom sheet on small screens */
+.dialog--modal {
+  inset: auto 0 0;
+  width: 100%;
+  max-height: 92dvh;
+  margin: 0;
+  border-radius: var(--lc-radius-lg) var(--lc-radius-lg) 0 0;
+  transform: translateY(100%);
+  transition: transform var(--_duration) var(--lc-ease), opacity var(--_duration) ease;
+}
+
+.dialog--modal.is-open {
+  transform: none;
+}
+
+@media (min-width: 750px) {
+  .dialog--modal {
+    inset: 0;
+    margin: auto;
+    width: min(calc(100vw - 3rem), var(--dialog-width, 42rem));
+    height: fit-content;
+    max-height: calc(100dvh - 3rem);
+    border-radius: var(--lc-radius-lg);
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+  }
+
+  .dialog--modal.is-open {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.dialog--full {
+  inset: 0;
+  width: 100vw;
+  height: 100dvh;
+  margin: 0;
+  opacity: 0;
+  transition: opacity var(--_duration) ease;
+}
+
+.dialog--full.is-open {
+  opacity: 1;
+}
+
+html.is-locked {
+  overflow: hidden;
+}
+
+/* ---------------------------------------------------------------
+   Accordion (details/summary)
+--------------------------------------------------------------- */
+.accordion {
+  border-bottom: 1px solid var(--lc-border);
+}
+
+.accordion__summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 3.5rem;
+  padding: 1rem 0;
+  font-weight: 500;
+  list-style: none;
+  cursor: pointer;
+}
+
+.accordion__summary::-webkit-details-marker {
+  display: none;
+}
+
+.accordion__summary .icon--chevron-down {
+  color: var(--lc-muted);
+  transition: transform 0.3s var(--lc-ease);
+}
+
+.accordion[open] > .accordion__summary .icon--chevron-down {
+  transform: rotate(180deg);
+}
+
+.accordion__content {
+  padding-bottom: 1.25rem;
+  color: var(--lc-muted);
+  font-size: var(--lc-text-sm);
+  line-height: 1.7;
+}
+
+.accordion-group {
+  border-radius: var(--lc-radius-lg);
+  background: var(--lc-surface);
+  color: var(--lc-surface-fg);
+  border: 1px solid var(--lc-border);
+}
+
+.accordion-group > .accordion {
+  padding-inline: clamp(1.25rem, 1rem + 1vw, 1.75rem);
+}
+
+.accordion-group > .accordion:last-child {
+  border-bottom: 0;
+}
+
+@supports selector(::details-content) {
+  .accordion::details-content {
+    block-size: 0;
+    overflow: clip;
+    transition: block-size 0.3s var(--lc-ease), content-visibility 0.3s allow-discrete;
+  }
+
+  .accordion[open]::details-content {
+    block-size: auto;
+  }
+}
+
+@supports (interpolate-size: allow-keywords) {
+  :root {
+    interpolate-size: allow-keywords;
+  }
+}
+
+/* ---------------------------------------------------------------
+   Chips (filters, tags, suggestions)
+--------------------------------------------------------------- */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  min-height: 36px;
+  padding: 0.375rem 1rem;
+  border: 1px solid rgb(var(--lc-fg-rgb) / 0.12);
+  border-radius: 999px;
+  background: var(--lc-surface);
+  color: var(--lc-surface-fg);
+  font-size: var(--lc-text-sm);
+  font-weight: 500;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+}
+
+.chip:hover {
+  border-color: var(--lc-accent);
+  background: color-mix(in srgb, var(--lc-accent) 35%, var(--lc-surface));
+}
+
+.chip[aria-pressed='true'],
+.chip[aria-current='page'],
+.chip.is-active {
+  border-color: var(--lc-fg);
+  background: var(--lc-fg);
+  color: var(--lc-bg);
+}
+
+.chip .icon {
+  width: 0.875rem;
+  height: 0.875rem;
+}
+
+/* ---------------------------------------------------------------
+   Quantity input
+--------------------------------------------------------------- */
+.quantity {
+  display: inline-flex;
+  align-items: center;
+  height: var(--lc-input-height);
+  border: var(--lc-input-border-width) solid rgb(var(--lc-fg-rgb) / var(--lc-input-border-opacity));
+  border-radius: var(--lc-input-radius);
+  background: var(--lc-surface);
+  color: var(--lc-surface-fg);
+}
+
+.quantity--small {
+  height: 36px;
+}
+
+.quantity__button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+  transition: background-color 0.2s;
+}
+
+.quantity__button:hover {
+  background: var(--lc-hover);
+}
+
+.quantity__button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.quantity__button .icon {
+  width: 0.875rem;
+  height: 0.875rem;
+}
+
+.quantity__input {
+  width: 2.5rem;
+  height: 100%;
+  border: 0;
+  background: transparent;
+  text-align: center;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.quantity__input::-webkit-outer-spin-button,
+.quantity__input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.quantity__input:focus-visible {
+  outline-offset: -2px;
+  box-shadow: none;
+}
+
+/* ---------------------------------------------------------------
+   Notices and status
+--------------------------------------------------------------- */
+.notice {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--lc-radius-md);
+  background: color-mix(in srgb, var(--lc-accent) 40%, var(--lc-bg));
+  color: var(--lc-fg);
+  font-size: var(--lc-text-sm);
+}
+
+.notice .icon {
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
+.status-dot {
+  display: inline-block;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: currentColor;
+  flex: none;
+}
+
+.status-dot--success { color: #2e7d4f; }
+.status-dot--warning { color: #b5651d; }
+.status-dot--muted { color: var(--lc-muted); }
+
+.spinner {
+  display: inline-block;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  animation: lc-spin 0.7s linear infinite;
+}
+
+/* ---------------------------------------------------------------
+   Skeletons and empty states
+--------------------------------------------------------------- */
+.skeleton {
+  border-radius: var(--lc-radius-sm);
+  background: linear-gradient(
+    90deg,
+    var(--lc-media-well) 25%,
+    color-mix(in srgb, var(--lc-media-well) 60%, var(--lc-bg)) 50%,
+    var(--lc-media-well) 75%
+  );
+  background-size: 200% 100%;
+  animation: lc-shimmer 1.4s ease-in-out infinite;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding-block: clamp(3rem, 2rem + 4vw, 6rem);
+  text-align: center;
+}
+
+.empty-state__icon {
+  width: 3.5rem;
+  height: 3.5rem;
+  color: rgb(var(--lc-fg-rgb) / 0.22);
+}
+
+.empty-state__text {
+  max-width: 28rem;
+  color: var(--lc-muted);
+}
+
+/* ---------------------------------------------------------------
+   Panels and dividers
+--------------------------------------------------------------- */
+.panel {
+  padding: clamp(1.25rem, 1rem + 1vw, 2rem);
+  border: 1px solid var(--lc-border);
+  border-radius: var(--lc-radius-lg);
+  background: var(--lc-surface);
+  color: var(--lc-surface-fg);
+}
+
+.divider {
+  height: 1px;
+  border: 0;
+  background: var(--lc-border);
+}
+
+/* ---------------------------------------------------------------
+   Tabs (role="tablist")
+--------------------------------------------------------------- */
+.tabs__list {
+  display: flex;
+  gap: 0.25rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+  border-bottom: 1px solid var(--lc-border);
+}
+
+.tabs__tab {
+  position: relative;
+  min-height: 44px;
+  padding: 0.5rem 1rem;
+  border: 0;
+  background: none;
+  color: var(--lc-muted);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.tabs__tab[aria-selected='true'] {
+  color: var(--lc-fg);
+}
+
+.tabs__tab[aria-selected='true']::after {
+  content: '';
+  position: absolute;
+  inset: auto 1rem -1px;
+  height: 2px;
+  background: var(--lc-fg);
+}
+
+.tabs__panel {
+  padding-top: 1.5rem;
+}
+
+/* ---------------------------------------------------------------
+   Social media icons (shared with footer)
+--------------------------------------------------------------- */
+.social-icons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.social-icons__link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid rgb(var(--lc-fg-rgb) / 0.18);
+  border-radius: 50%;
+  color: rgb(var(--lc-fg-rgb) / 0.75);
+  transition: background-color 0.25s, border-color 0.25s, color 0.25s;
+}
+
+.social-icons__link:hover {
+  border-color: var(--lc-button-bg);
+  background: var(--lc-button-bg);
+  color: var(--lc-button-fg);
+}
+
+.social-icons__link .icon {
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
+/* ---------------------------------------------------------------
+   Conditional message (product block and theme block)
+--------------------------------------------------------------- */
+.conditional-message {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.625rem;
+  width: 100%;
+  font-size: var(--lc-text-sm);
+}
+
+.conditional-message > .icon {
+  flex: none;
+  width: 1.125rem;
+  height: 1.125rem;
+  margin-top: 0.1em;
+}
+
+.conditional-message--highlight {
+  padding: 0.75rem 1rem;
+  border-radius: var(--lc-radius-md);
+  background: rgb(var(--lc-accent-rgb) / 0.18);
+}
+
+.conditional-message__text > :first-child {
+  margin-top: 0;
+}
+
+.conditional-message__text > :last-child {
+  margin-bottom: 0;
+}
+
+/* Theme editor only: a message whose conditions don't match right now */
+.conditional-message--hidden {
+  flex-wrap: wrap;
+  opacity: 0.55;
+  outline: 1px dashed var(--lc-border);
+}
+
+.conditional-message__editor-note {
+  flex-basis: 100%;
+  margin: 0;
+  font-size: var(--lc-text-xs);
+  color: var(--lc-muted);
+}
+
+/* ---------------------------------------------------------------
+   Age verification
+--------------------------------------------------------------- */
+.age-gate__content {
+  display: grid;
+  justify-items: center;
+  gap: 1rem;
+  padding: clamp(1.5rem, 1rem + 2vw, 2.5rem);
+  text-align: center;
+}
+
+.age-gate__content h2,
+.age-gate__text > * {
+  margin: 0;
+}
+
+.age-gate__logo {
+  width: 10rem;
+  height: auto;
+}
+
+.age-gate__buttons {
+  justify-content: center;
+}
+
+/* ---------------------------------------------------------------
+   Windows high contrast and other forced color modes
+--------------------------------------------------------------- */
+@media (forced-colors: active) {
+  .button,
+  .chip,
+  .badge,
+  .input,
+  .select,
+  .textarea,
+  .panel,
+  .dialog,
+  .drawer,
+  .card,
+  .quantity {
+    border: 1px solid CanvasText;
+  }
+
+  .button:focus-visible,
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible,
+  summary:focus-visible {
+    outline: 2px solid Highlight;
+    outline-offset: 2px;
+  }
+
+  .icon {
+    forced-color-adjust: auto;
+  }
+
+  .glow,
+  .halo__orb {
+    display: none;
+  }
+}

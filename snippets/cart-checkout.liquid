@@ -1,0 +1,116 @@
+{%- comment -%}
+  Totals, notes about taxes and shipping, minimum order message, terms
+  agreement, checkout button, and accelerated checkout buttons.
+
+  Accepts:
+  - id {String}: unique prefix
+  - form_id {String}: the cart form the checkout button submits
+  - show_accelerated {Boolean}
+  - show_view_cart {Boolean}
+{%- endcomment -%}
+
+{%- liquid
+  if settings.currency_code_enabled
+    assign total = cart.total_price | money_with_currency
+  else
+    assign total = cart.total_price | money
+  endif
+
+  assign minimum = settings.cart_minimum_subtotal | default: 0 | times: 100 | round
+  assign convert_minimum = true
+  if cart.currency.iso_code == shop.currency
+    assign convert_minimum = false
+  endif
+  assign below_minimum = false
+  if minimum > 0 and convert_minimum == false and cart.total_price < minimum
+    assign below_minimum = true
+  endif
+  assign minimum_money = minimum | money
+-%}
+
+<div class="cart-checkout" data-cart-checkout>
+  {%- if cart.cart_level_discount_applications.size > 0 -%}
+    <ul class="cart-summary__discounts" role="list" aria-label="{{ 'cart.discounts' | t }}">
+      {%- for discount in cart.cart_level_discount_applications -%}
+        <li>
+          <span>{% render 'icon', name: 'tag' %} {{ discount.title | escape }}</span>
+          <span>-{{ discount.total_allocated_amount | money }}</span>
+        </li>
+      {%- endfor -%}
+    </ul>
+  {%- endif -%}
+
+  <div class="cart-summary__row cart-summary__row--total">
+    <span>{{ 'cart.subtotal' | t }}</span>
+    <span class="cart-summary__total">{{ total }}</span>
+  </div>
+
+  <p class="cart-summary__note">
+    {%- if cart.taxes_included and shop.shipping_policy.body != blank -%}
+      {{ 'cart.taxes_included_shipping_at_checkout_with_policy_html' | t: link: shop.shipping_policy.url }}
+    {%- elsif cart.taxes_included -%}
+      {{ 'cart.taxes_included_shipping_at_checkout' | t }}
+    {%- elsif shop.shipping_policy.body != blank -%}
+      {{ 'cart.taxes_and_shipping_at_checkout_with_policy_html' | t: link: shop.shipping_policy.url }}
+    {%- else -%}
+      {{ 'cart.taxes_and_shipping_at_checkout' | t }}
+    {%- endif -%}
+  </p>
+
+  {%- if minimum > 0 -%}
+    <p
+      class="notice cart-checkout__minimum"
+      data-cart-minimum="{{ minimum }}"
+      data-cart-total="{{ cart.total_price }}"
+      data-convert="{{ convert_minimum }}"
+      data-template="{{ 'cart.minimum.message' | t: amount: '[amount]' | escape }}"
+      {% unless below_minimum %}
+        hidden
+      {% endunless %}
+    >
+      {% render 'icon', name: 'info' %}
+      <span data-cart-minimum-text>{{ 'cart.minimum.message' | t: amount: minimum_money }}</span>
+    </p>
+  {%- endif -%}
+
+  {%- if settings.cart_terms_required -%}
+    <div class="cart-checkout__terms">
+      <label class="checkbox" for="{{ id }}-terms">
+        <input type="checkbox" id="{{ id }}-terms" data-cart-terms aria-describedby="{{ id }}-terms-error">
+        <span>
+          {%- if settings.cart_terms_page != blank -%}
+            {{ 'cart.terms.label_with_link_html' | t: link: settings.cart_terms_page.url, title: settings.cart_terms_page.title }}
+          {%- else -%}
+            {{ 'cart.terms.label' | t }}
+          {%- endif -%}
+        </span>
+      </label>
+      <p id="{{ id }}-terms-error" class="cart-checkout__terms-error" role="alert" data-cart-terms-error hidden>
+        {{ 'cart.terms.error' | t }}
+      </p>
+    </div>
+  {%- endif -%}
+
+  <div class="cart-checkout__actions">
+    <button
+      type="submit"
+      name="checkout"
+      form="{{ form_id }}"
+      class="button button--full button--large"
+      data-checkout-button
+      {% if below_minimum %}
+        disabled
+      {% endif %}
+    >
+      {{- 'cart.checkout' | t -}}
+    </button>
+    {%- if show_view_cart -%}
+      <a href="{{ routes.cart_url }}" class="button button--outline button--full">{{ 'cart.view_cart' | t }}</a>
+    {%- endif -%}
+    {%- if show_accelerated and additional_checkout_buttons -%}
+      <div class="cart-checkout__accelerated">
+        {{ content_for_additional_checkout_buttons }}
+      </div>
+    {%- endif -%}
+  </div>
+</div>

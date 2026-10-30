@@ -1,0 +1,46 @@
+{%- comment -%}
+  Quantity selector that follows the variant's quantity rules and shows how
+  many are already in the cart.
+
+  Accepts:
+  - product {Product}
+  - section_id {String}
+  - form_id {String}
+{%- endcomment -%}
+
+{%- liquid
+  assign variant = product.selected_or_first_available_variant
+  assign rule = variant.quantity_rule
+  assign in_cart = cart.items | where: 'variant_id', variant.id | map: 'quantity' | sum
+-%}
+
+<div class="product__quantity" data-product-part="quantity">
+  <label class="field__label" for="Quantity-{{ section_id }}">
+    {{- 'products.quantity.label' | t -}}
+    {%- if in_cart > 0 -%}
+      <span class="product__in-cart">{{ 'products.quantity.in_cart' | t: quantity: in_cart }}</span>
+    {%- endif -%}
+  </label>
+  <lc-quantity class="quantity">
+    <button type="button" class="quantity__button" data-quantity-step="-1" aria-label="{{ 'products.quantity.decrease' | t }}">
+      {% render 'icon', name: 'minus' %}
+    </button>
+    <input
+      id="Quantity-{{ section_id }}"
+      class="quantity__input"
+      type="number"
+      inputmode="numeric"
+      name="quantity"
+      value="{{ rule.min }}"
+      min="{{ rule.min }}"
+      step="{{ rule.increment }}"
+      {% if rule.max %}
+        max="{{ rule.max }}"
+      {% endif %}
+      form="{{ form_id }}"
+    >
+    <button type="button" class="quantity__button" data-quantity-step="1" aria-label="{{ 'products.quantity.increase' | t }}">
+      {% render 'icon', name: 'plus' %}
+    </button>
+  </lc-quantity>
+</div>

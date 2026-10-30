@@ -1,0 +1,45 @@
+{%- comment -%}
+  Shipping rate estimator using the Cart Ajax API
+  (prepare_shipping_rates and async_shipping_rates). Rates come from the
+  store's shipping settings for the customer's address.
+
+  Accepts:
+  - id {String}: unique prefix
+{%- endcomment -%}
+
+{%- if cart.requires_shipping -%}
+  <lc-shipping-estimator class="shipping-estimator" data-default-country="{{ localization.country.name | escape }}">
+    <details class="accordion">
+      <summary class="accordion__summary">
+        <span class="accordion__title">{% render 'icon', name: 'truck' %} {{ 'cart.shipping_estimator.title' | t }}</span>
+        {% render 'icon', name: 'chevron-down' %}
+      </summary>
+      <form class="accordion__content shipping-estimator__form" data-estimator-form novalidate>
+        <div class="field">
+          <label class="field__label" for="{{ id }}-country">{{ 'cart.shipping_estimator.country' | t }}</label>
+          <div class="select-wrapper">
+            <select id="{{ id }}-country" class="select" name="country" data-estimator-country autocomplete="country">
+              {{ country_option_tags }}
+            </select>
+            {% render 'icon', name: 'chevron-down' %}
+          </div>
+        </div>
+        <div class="field" data-estimator-province-field hidden>
+          <label class="field__label" for="{{ id }}-province">{{ 'cart.shipping_estimator.province' | t }}</label>
+          <div class="select-wrapper">
+            <select id="{{ id }}-province" class="select" name="province" data-estimator-province autocomplete="address-level1"></select>
+            {% render 'icon', name: 'chevron-down' %}
+          </div>
+        </div>
+        <div class="field">
+          <label class="field__label" for="{{ id }}-zip">{{ 'cart.shipping_estimator.zip' | t }}</label>
+          <input id="{{ id }}-zip" class="input" type="text" name="zip" autocomplete="postal-code" data-estimator-zip>
+        </div>
+        <button type="submit" class="button button--secondary button--full" data-estimator-submit>
+          {{- 'cart.shipping_estimator.submit' | t -}}
+        </button>
+        <div class="shipping-estimator__results" role="status" aria-live="polite" data-estimator-results></div>
+      </form>
+    </details>
+  </lc-shipping-estimator>
+{%- endif -%}

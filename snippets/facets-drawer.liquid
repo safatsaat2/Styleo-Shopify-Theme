@@ -1,0 +1,48 @@
+{%- comment -%}
+  Filter and sort drawer for small screens (and large screens when the
+  section uses the drawer layout).
+
+  Accepts:
+  - results {Collection|Search}
+  - section {Section}
+  - action {String}
+  - sort_options {Array}
+  - sort_by {String}
+  - terms {String}
+  - count {Number}
+  - clear_url {String}
+{%- endcomment -%}
+
+<lc-dialog id="FacetsDrawer-{{ section.id }}">
+  <dialog class="dialog dialog--drawer dialog--start facets-drawer color-{{ settings.overlay_color_scheme }}" aria-labelledby="FacetsDrawerTitle-{{ section.id }}" style="--dialog-width: 24rem;">
+    <div class="dialog__panel">
+      <div class="dialog__header">
+        <h2 id="FacetsDrawerTitle-{{ section.id }}" class="dialog__title">
+          {% render 'icon', name: 'filter' %}
+          {{ 'collections.filters.title_with_sort' | t }}
+        </h2>
+        <button type="button" class="icon-button" data-dialog-close aria-label="{{ 'general.close' | t }}">{% render 'icon', name: 'close' %}</button>
+      </div>
+      <div class="dialog__body facets-drawer__body" data-facets-region="drawer">
+        {%- render 'facets',
+          results: results,
+          form_id: 'FacetsDrawerForm',
+          id_prefix: 'FacetsDrawer',
+          action: action,
+          sort_options: sort_options,
+          sort_by: sort_by,
+          show_sort: section.settings.enable_sorting,
+          show_filters: section.settings.enable_filtering,
+          terms: terms,
+          open_count: 2
+        -%}
+      </div>
+      <div class="dialog__footer facets-drawer__footer" data-facets-region="drawer-footer">
+        <a href="{{ clear_url }}" class="button button--outline" data-facet-link>{{ 'collections.filters.clear_all' | t }}</a>
+        <button type="button" class="button" data-dialog-close>
+          {{- 'collections.filters.show_results' | t: count: count -}}
+        </button>
+      </div>
+    </div>
+  </dialog>
+</lc-dialog>

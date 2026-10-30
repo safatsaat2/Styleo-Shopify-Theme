@@ -1,0 +1,55 @@
+{%- assign menu = block.settings.menu -%}
+<nav class="tb-menu" aria-label="{{ block.settings.heading | default: menu.title | escape }}" {{ block.shopify_attributes }}>
+  {%- if block.settings.heading != blank -%}
+    <p class="subheading tb-menu__heading">{{ block.settings.heading }}</p>
+  {%- endif -%}
+  {%- if menu.links.size > 0 -%}
+    <ul class="tb-menu__list tb-menu__list--{{ block.settings.layout }}" role="list">
+      {%- for link in menu.links -%}
+        <li><a href="{{ link.url }}" class="link"{% if link.current %} aria-current="page"{% endif %}>{{ link.title | escape }}</a></li>
+      {%- endfor -%}
+    </ul>
+  {%- endif -%}
+</nav>
+
+{% schema %}
+{
+  "name": "t:names.menu",
+  "tag": null,
+  "settings": [
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "t:labels.menu",
+      "default": "footer"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "t:labels.heading",
+      "default": "Explore"
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "t:labels.layout",
+      "options": [
+        {
+          "value": "vertical",
+          "label": "t:options.vertical"
+        },
+        {
+          "value": "horizontal",
+          "label": "t:options.horizontal"
+        }
+      ],
+      "default": "vertical"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.menu"
+    }
+  ]
+}
+{% endschema %}

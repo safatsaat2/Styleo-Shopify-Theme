@@ -1,0 +1,129 @@
+{%- comment -%}
+  Quick order list for wholesale and B2B buyers: every variant of a
+  collection's products in one table, added to the cart together.
+{%- endcomment -%}
+
+<div class="quick-order-section color-{{ section.settings.color_scheme }}">
+  <div class="page-width section-spacing" style="--pt: {{ section.settings.padding_top }}px; --pb: {{ section.settings.padding_bottom }}px;">
+    {% render 'section-heading',
+      subheading: section.settings.subheading,
+      heading: section.settings.heading,
+      text: section.settings.text
+    %}
+
+    {%- assign collection = section.settings.collection -%}
+    {%- if collection != blank and collection.products_count > 0 -%}
+      {%- paginate collection.products by section.settings.products_per_page -%}
+        {% render 'quick-order-table',
+          products: collection.products,
+          id: section.id,
+          show_images: section.settings.show_images,
+          show_sku: section.settings.show_sku,
+          show_product_title: true
+        %}
+        {% render 'pagination', paginate: paginate %}
+      {%- endpaginate -%}
+    {%- elsif request.design_mode -%}
+      <div class="quick-order__placeholder panel">
+        {% render 'icon', name: 'list' %}
+        <p>{{ 'quick_order.placeholder' | t }}</p>
+      </div>
+    {%- endif -%}
+  </div>
+</div>
+
+{{ 'section-customer.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'quick-order.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "t:names.quick_order_list",
+  "tag": "section",
+  "class": "section-quick-order-list",
+  "settings": [
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "t:labels.subheading",
+      "default": "Wholesale"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "t:labels.heading",
+      "default": "Quick order"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "t:labels.text",
+      "default": "<p>Enter quantities for each item, then add everything to your bag at once.</p>"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "t:labels.collection"
+    },
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "min": 5,
+      "max": 50,
+      "step": 5,
+      "label": "t:labels.products_per_page",
+      "default": 20
+    },
+    {
+      "type": "checkbox",
+      "id": "show_images",
+      "label": "t:labels.show_images",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_sku",
+      "label": "t:labels.show_sku",
+      "default": true
+    },
+    {
+      "type": "paragraph",
+      "content": "t:content.prices_quantity_rules_and_volume_pricing_follow_b2b"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:labels.color_scheme",
+      "default": "cream"
+    },
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "t:labels.top",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "t:labels.bottom",
+      "default": 80
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.quick_order_list"
+    }
+  ]
+}
+{% endschema %}

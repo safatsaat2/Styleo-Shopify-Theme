@@ -1,0 +1,90 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-page",
+      "settings": {
+        "show_title": true,
+        "alignment": "start",
+        "width": "medium",
+        "color_scheme": "cream",
+        "padding_top": 48,
+        "padding_bottom": 32,
+        "subheading": "Contact"
+      }
+    },
+    "form": {
+      "type": "contact-form",
+      "blocks": {
+        "phone": {
+          "type": "text_field",
+          "settings": {
+            "label": "Phone",
+            "input_type": "tel",
+            "width": "half",
+            "required": false
+          }
+        },
+        "topic": {
+          "type": "select",
+          "settings": {
+            "label": "Topic",
+            "options": "Order question, Product question, Returns, Other",
+            "width": "half",
+            "required": false
+          }
+        },
+        "message": {
+          "type": "message",
+          "settings": {
+            "label": "Message",
+            "required": true
+          }
+        },
+        "email_info": {
+          "type": "info",
+          "settings": {
+            "icon": "mail",
+            "heading": "Email",
+            "text": "<p>Add your support email address.</p>"
+          }
+        },
+        "phone_info": {
+          "type": "info",
+          "settings": {
+            "icon": "phone",
+            "heading": "Phone",
+            "text": "<p>Add a phone number and the hours you answer.</p>"
+          }
+        },
+        "visit_info": {
+          "type": "info",
+          "settings": {
+            "icon": "location",
+            "heading": "Visit",
+            "text": "<p>Add a store or studio address if customers can visit.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "phone",
+        "topic",
+        "message",
+        "email_info",
+        "phone_info",
+        "visit_info"
+      ],
+      "settings": {
+        "color_scheme": "cream",
+        "padding_top": 16,
+        "padding_bottom": 80,
+        "heading": "",
+        "form_name": "Contact",
+        "button_label": "Send message"
+      }
+    }
+  },
+  "order": [
+    "main",
+    "form"
+  ]
+}

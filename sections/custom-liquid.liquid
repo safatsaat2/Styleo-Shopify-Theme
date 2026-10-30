@@ -1,0 +1,65 @@
+<div class="color-{{ section.settings.color_scheme }}">
+  <div
+    class="custom-liquid{% if section.settings.full_width %} page-width--full{% else %} page-width{% endif %} section-spacing"
+    style="--pt: {{ section.settings.padding_top }}px; --pb: {{ section.settings.padding_bottom }}px;"
+  >
+    {{ section.settings.custom_liquid }}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "t:names.custom_liquid",
+  "tag": "section",
+  "class": "section-custom-liquid",
+  "settings": [
+    {
+      "type": "liquid",
+      "id": "custom_liquid",
+      "label": "t:labels.custom_liquid",
+      "info": "t:info.add_app_snippets_or_other_liquid_code_to_create_d14466"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:labels.color_scheme",
+      "default": "cream"
+    },
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "t:labels.make_section_full_width",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "t:labels.top",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "t:labels.bottom",
+      "default": 40
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.custom_liquid"
+    }
+  ]
+}
+{% endschema %}

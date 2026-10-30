@@ -1,0 +1,44 @@
+<div class="tb-orbit tb-align-{{ block.settings.alignment }}" {{ block.shopify_attributes }}>
+  {% render 'orbit-badge', text: block.settings.text, id: block.id, position: 'inline' %}
+</div>
+
+{% schema %}
+{
+  "name": "t:names.orbit_badge",
+  "tag": null,
+  "settings": [
+    {
+      "type": "text",
+      "id": "text",
+      "label": "t:labels.text",
+      "default": "New season • New season •",
+      "info": "t:info.keep_it_short_so_the_words_fit_around_the_circle"
+    },
+    {
+      "type": "select",
+      "id": "alignment",
+      "label": "t:labels.alignment",
+      "options": [
+        {
+          "value": "start",
+          "label": "t:options.left"
+        },
+        {
+          "value": "center",
+          "label": "t:options.center"
+        },
+        {
+          "value": "end",
+          "label": "t:options.right"
+        }
+      ],
+      "default": "start"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.orbit_badge"
+    }
+  ]
+}
+{% endschema %}

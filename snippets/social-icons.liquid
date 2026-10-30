@@ -1,0 +1,53 @@
+{%- comment -%}
+  Social media icons for every account URL filled in under
+  Theme settings > Social media.
+
+  Accepts:
+  - class {String}: extra class on the list
+{%- endcomment -%}
+
+{%- liquid
+  assign platforms = 'instagram,facebook,tiktok,pinterest,youtube,twitter,threads,snapchat,linkedin,tumblr,vimeo' | split: ','
+  assign has_any = false
+  for platform in platforms
+    assign setting_key = 'social_' | append: platform | append: '_link'
+    if settings[setting_key] != blank
+      assign has_any = true
+      break
+    endif
+  endfor
+-%}
+
+{%- if has_any -%}
+  <ul class="social-icons {{ class }}" role="list">
+    {%- for platform in platforms -%}
+      {%- assign setting_key = 'social_' | append: platform | append: '_link' -%}
+      {%- if settings[setting_key] != blank -%}
+        {%- case platform -%}
+          {%- when 'instagram' -%}{%- assign platform_name = 'social.instagram' | t -%}
+          {%- when 'facebook' -%}{%- assign platform_name = 'social.facebook' | t -%}
+          {%- when 'tiktok' -%}{%- assign platform_name = 'social.tiktok' | t -%}
+          {%- when 'pinterest' -%}{%- assign platform_name = 'social.pinterest' | t -%}
+          {%- when 'youtube' -%}{%- assign platform_name = 'social.youtube' | t -%}
+          {%- when 'twitter' -%}{%- assign platform_name = 'social.twitter' | t -%}
+          {%- when 'threads' -%}{%- assign platform_name = 'social.threads' | t -%}
+          {%- when 'snapchat' -%}{%- assign platform_name = 'social.snapchat' | t -%}
+          {%- when 'linkedin' -%}{%- assign platform_name = 'social.linkedin' | t -%}
+          {%- when 'tumblr' -%}{%- assign platform_name = 'social.tumblr' | t -%}
+          {%- when 'vimeo' -%}{%- assign platform_name = 'social.vimeo' | t -%}
+        {%- endcase -%}
+        <li>
+          <a
+            href="{{ settings[setting_key] }}"
+            class="social-icons__link"
+            target="_blank"
+            rel="noopener"
+            aria-label="{{ platform_name }} ({{ 'accessibility.opens_new_window' | t }})"
+          >
+            {%- render 'icon-social', name: platform -%}
+          </a>
+        </li>
+      {%- endif -%}
+    {%- endfor -%}
+  </ul>
+{%- endif -%}

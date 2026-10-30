@@ -1,0 +1,231 @@
+{%- comment -%}
+  Bento grid: tiles of different sizes on a 4-column grid. Each tile holds
+  its own blocks (headings, text, buttons, cards) over an image or color.
+{%- endcomment -%}
+
+<div class="bento-section color-{{ section.settings.color_scheme }}">
+  <div class="page-width section-spacing" style="--pt: {{ section.settings.padding_top }}px; --pb: {{ section.settings.padding_bottom }}px;">
+    {% render 'section-heading',
+      subheading: section.settings.subheading,
+      heading: section.settings.heading,
+      link_label: section.settings.link_label,
+      link_url: section.settings.link_url
+    %}
+    <div class="bento" style="--row-h: {{ section.settings.row_height }}px; --gap: {{ section.settings.gap }}px;">
+      {% content_for 'blocks' %}
+    </div>
+  </div>
+</div>
+
+{{ 'section-blocks.css' | asset_url | stylesheet_tag }}
+
+{% schema %}
+{
+  "name": "t:names.bento_grid",
+  "tag": "section",
+  "class": "section-bento",
+  "blocks": [
+    {
+      "type": "_bento-tile"
+    }
+  ],
+  "settings": [
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "t:labels.subheading",
+      "default": "The edit"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "t:labels.heading",
+      "default": "Shop by <em>mood</em>"
+    },
+    {
+      "type": "text",
+      "id": "link_label",
+      "label": "t:labels.link_label"
+    },
+    {
+      "type": "url",
+      "id": "link_url",
+      "label": "t:labels.link"
+    },
+    {
+      "type": "range",
+      "id": "row_height",
+      "min": 160,
+      "max": 400,
+      "step": 20,
+      "unit": "px",
+      "label": "t:labels.row_height",
+      "default": 260
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "min": 4,
+      "max": 40,
+      "step": 4,
+      "unit": "px",
+      "label": "t:labels.gap",
+      "default": 16
+    },
+    {
+      "type": "paragraph",
+      "content": "t:content.on_mobile_tiles_stack_in_one_column_at_their_own_6ed15e"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:labels.color_scheme",
+      "default": "cream"
+    },
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "label": "t:labels.top",
+      "default": 64
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "label": "t:labels.bottom",
+      "default": 64
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.bento_grid",
+      "category": "t:categories.collections",
+      "blocks": {
+        "large": {
+          "type": "_bento-tile",
+          "settings": {
+            "columns": 2,
+            "rows": 2,
+            "color_scheme": "dusk"
+          },
+          "blocks": {
+            "subheading": {
+              "type": "text",
+              "settings": {
+                "text": "<p>New season</p>",
+                "style": "subheading"
+              }
+            },
+            "heading": {
+              "type": "heading",
+              "settings": {
+                "heading": "Soft <em>tailoring</em>",
+                "size": "h2",
+                "tag": "h3"
+              }
+            },
+            "button": {
+              "type": "button",
+              "settings": {
+                "label": "Shop now",
+                "style": "secondary"
+              }
+            }
+          },
+          "block_order": [
+            "subheading",
+            "heading",
+            "button"
+          ]
+        },
+        "wide": {
+          "type": "_bento-tile",
+          "settings": {
+            "columns": 2,
+            "color_scheme": "lavender"
+          },
+          "blocks": {
+            "heading": {
+              "type": "heading",
+              "settings": {
+                "heading": "Everyday knits",
+                "size": "h3",
+                "tag": "h3"
+              }
+            },
+            "button": {
+              "type": "button",
+              "settings": {
+                "label": "Explore",
+                "style": "outline",
+                "size": "small"
+              }
+            }
+          },
+          "block_order": [
+            "heading",
+            "button"
+          ]
+        },
+        "small_one": {
+          "type": "_bento-tile",
+          "settings": {
+            "color_scheme": "paper"
+          },
+          "blocks": {
+            "icon": {
+              "type": "icon",
+              "settings": {
+                "icon": "gift",
+                "label": "Gift cards",
+                "layout": "stacked",
+                "size": 32
+              }
+            }
+          },
+          "block_order": [
+            "icon"
+          ]
+        },
+        "small_two": {
+          "type": "_bento-tile",
+          "settings": {
+            "color_scheme": "mist"
+          },
+          "blocks": {
+            "icon": {
+              "type": "icon",
+              "settings": {
+                "icon": "star",
+                "label": "Best sellers",
+                "layout": "stacked",
+                "size": 32
+              }
+            }
+          },
+          "block_order": [
+            "icon"
+          ]
+        }
+      },
+      "block_order": [
+        "large",
+        "wide",
+        "small_one",
+        "small_two"
+      ]
+    }
+  ]
+}
+{% endschema %}

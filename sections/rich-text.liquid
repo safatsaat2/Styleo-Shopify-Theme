@@ -1,0 +1,263 @@
+<div class="rich-text-section color-{{ section.settings.color_scheme }} visibility-{{ section.settings.visibility }}">
+  <div class="page-width section-spacing" style="--pt: {{ section.settings.padding_top }}px; --pb: {{ section.settings.padding_bottom }}px;">
+    <div class="rich-text rich-text--{{ section.settings.alignment }} rich-text--{{ section.settings.width }}" data-reveal>
+      {%- for block in section.blocks -%}
+        {%- case block.type -%}
+          {%- when 'subheading' -%}
+            <p class="subheading" {{ block.shopify_attributes }}>{{ block.settings.text }}</p>
+          {%- when 'heading' -%}
+            <h2 class="{{ block.settings.size }} text-balance" {{ block.shopify_attributes }}>
+              {{- block.settings.heading -}}
+              {%- if block.settings.accent_line != blank -%}
+                <span class="accent-line">{{ block.settings.accent_line }}</span>
+              {%- endif -%}
+            </h2>
+          {%- when 'text' -%}
+            <div class="rte rich-text__text" {{ block.shopify_attributes }}>{{ block.settings.text }}</div>
+          {%- when 'buttons' -%}
+            <div class="button-row" {{ block.shopify_attributes }}>
+              {% render 'button', label: block.settings.label, url: block.settings.link, style: block.settings.style, arrow: true %}
+              {% render 'button', label: block.settings.label_2, url: block.settings.link_2, style: 'outline' %}
+            </div>
+          {%- when 'custom_liquid' -%}
+            <div {{ block.shopify_attributes }}>{{ block.settings.custom_liquid }}</div>
+        {%- endcase -%}
+      {%- endfor -%}
+    </div>
+  </div>
+</div>
+
+{{ 'section-home.css' | asset_url | stylesheet_tag }}
+
+{% schema %}
+{
+  "name": "t:names.rich_text",
+  "tag": "section",
+  "class": "section-rich-text",
+  "max_blocks": 8,
+  "settings": [
+    {
+      "type": "select",
+      "id": "alignment",
+      "label": "t:labels.alignment",
+      "options": [
+        {
+          "value": "start",
+          "label": "t:options.left"
+        },
+        {
+          "value": "center",
+          "label": "t:options.center"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "width",
+      "label": "t:labels.width",
+      "options": [
+        {
+          "value": "narrow",
+          "label": "t:options.narrow"
+        },
+        {
+          "value": "medium",
+          "label": "t:options.medium"
+        },
+        {
+          "value": "wide",
+          "label": "t:options.wide"
+        }
+      ],
+      "default": "narrow"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:labels.color_scheme",
+      "default": "cream"
+    },
+    {
+      "type": "select",
+      "id": "visibility",
+      "label": "t:labels.show_on",
+      "options": [
+        {
+          "value": "all",
+          "label": "t:options.all_devices"
+        },
+        {
+          "value": "mobile",
+          "label": "t:options.small_screens_only"
+        },
+        {
+          "value": "desktop",
+          "label": "t:options.large_screens_only"
+        }
+      ],
+      "default": "all"
+    },
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "t:labels.top",
+      "default": 64
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "t:labels.bottom",
+      "default": 64
+    }
+  ],
+  "blocks": [
+    {
+      "type": "subheading",
+      "name": "t:names.subheading",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "t:labels.text",
+          "default": "Subheading"
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "name": "t:names.heading",
+      "settings": [
+        {
+          "type": "inline_richtext",
+          "id": "heading",
+          "label": "t:labels.heading",
+          "default": "Talk about your brand"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "accent_line",
+          "label": "t:labels.accent_line",
+          "info": "t:info.shown_on_its_own_line_in_the_accent_color"
+        },
+        {
+          "type": "select",
+          "id": "size",
+          "label": "t:labels.size",
+          "options": [
+            {
+              "value": "h0",
+              "label": "t:options.extra_large"
+            },
+            {
+              "value": "h1",
+              "label": "t:options.large"
+            },
+            {
+              "value": "h2",
+              "label": "t:options.medium"
+            }
+          ],
+          "default": "h1"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "name": "t:names.text",
+      "settings": [
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "t:labels.text",
+          "default": "<p>Share information about your brand with customers. Describe a product, make announcements, or welcome customers to your store.</p>"
+        }
+      ]
+    },
+    {
+      "type": "buttons",
+      "name": "t:names.buttons",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "t:labels.first_button_label",
+          "default": "Shop now"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "t:labels.first_button_link"
+        },
+        {
+          "type": "select",
+          "id": "style",
+          "label": "t:labels.first_button_style",
+          "options": [
+            {
+              "value": "primary",
+              "label": "t:options.primary"
+            },
+            {
+              "value": "secondary",
+              "label": "t:options.secondary"
+            }
+          ],
+          "default": "primary"
+        },
+        {
+          "type": "text",
+          "id": "label_2",
+          "label": "t:labels.second_button_label"
+        },
+        {
+          "type": "url",
+          "id": "link_2",
+          "label": "t:labels.second_button_link"
+        }
+      ]
+    },
+    {
+      "type": "custom_liquid",
+      "name": "t:names.custom_liquid",
+      "settings": [
+        {
+          "type": "liquid",
+          "id": "custom_liquid",
+          "label": "t:labels.custom_liquid",
+          "info": "t:info.add_app_snippets_or_other_liquid_code"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.rich_text",
+      "blocks": [
+        {
+          "type": "heading"
+        },
+        {
+          "type": "text"
+        },
+        {
+          "type": "buttons"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

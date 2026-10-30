@@ -1,0 +1,128 @@
+{%- liquid
+  assign ratio = block.settings.ratio
+  if ratio == 'adapt' and block.settings.image
+    assign ratio = block.settings.image.aspect_ratio
+  elsif ratio == 'adapt'
+    assign ratio = '4 / 5'
+  endif
+  assign width = block.settings.width | append: '%'
+  assign half_width = block.settings.width | divided_by: 2
+  assign sizes = '(min-width: 990px) ' | append: half_width | append: 'vw, ' | append: block.settings.width | append: 'vw'
+-%}
+<div class="tb-image tb-align-{{ block.settings.alignment }}" style="--width: {{ width }};" {{ block.shopify_attributes }}>
+  {%- if block.settings.link != blank -%}<a href="{{ block.settings.link }}" class="tb-image__link">{%- endif -%}
+  {% render 'media-halo',
+    image: block.settings.image,
+    shape: block.settings.shape,
+    ratio: ratio,
+    sizes: sizes,
+    loading: 'lazy'
+  %}
+  {%- if block.settings.link != blank -%}</a>{%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "t:names.image",
+  "tag": null,
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "t:labels.image"
+    },
+    {
+      "type": "select",
+      "id": "shape",
+      "label": "t:labels.shape",
+      "options": [
+        {
+          "value": "none",
+          "label": "t:options.none"
+        },
+        {
+          "value": "arch",
+          "label": "t:options.arch"
+        },
+        {
+          "value": "orb",
+          "label": "t:options.orb"
+        },
+        {
+          "value": "frame",
+          "label": "t:options.frame"
+        }
+      ],
+      "default": "arch"
+    },
+    {
+      "type": "select",
+      "id": "ratio",
+      "label": "t:labels.aspect_ratio",
+      "options": [
+        {
+          "value": "adapt",
+          "label": "t:options.adapt_to_image"
+        },
+        {
+          "value": "1 / 1",
+          "label": "t:options.square"
+        },
+        {
+          "value": "4 / 5",
+          "label": "t:options.portrait"
+        },
+        {
+          "value": "3 / 2",
+          "label": "t:options.landscape"
+        },
+        {
+          "value": "16 / 9",
+          "label": "t:options.wide"
+        }
+      ],
+      "default": "4 / 5"
+    },
+    {
+      "type": "range",
+      "id": "width",
+      "min": 20,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "label": "t:labels.width",
+      "default": 100
+    },
+    {
+      "type": "select",
+      "id": "alignment",
+      "label": "t:labels.alignment",
+      "options": [
+        {
+          "value": "start",
+          "label": "t:options.left"
+        },
+        {
+          "value": "center",
+          "label": "t:options.center"
+        },
+        {
+          "value": "end",
+          "label": "t:options.right"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "url",
+      "id": "link",
+      "label": "t:labels.link"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.image"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,16 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-page",
+      "settings": {}
+    },
+    "quick_order": {
+      "type": "quick-order-list",
+      "settings": {}
+    }
+  },
+  "order": [
+    "main",
+    "quick_order"
+  ]
+}

@@ -1,0 +1,178 @@
+{%- comment -%}
+  Legacy customer accounts: dashboard with order history, the default
+  address, B2B company details, and app blocks (loyalty, subscriptions,
+  wishlists from apps).
+{%- endcomment -%}
+
+<div class="customer customer--account color-{{ section.settings.color_scheme }}">
+  <div class="page-width page-width--medium section-spacing" style="--pt: {{ section.settings.padding_top }}px; --pb: {{ section.settings.padding_bottom }}px;">
+    <header class="customer__header">
+      <div>
+        <p class="subheading">{{ 'customer.account.subheading' | t }}</p>
+        <h1 class="h2">
+          {%- if customer.first_name != blank -%}
+            {{ 'customer.account.greeting' | t: name: customer.first_name }}
+          {%- else -%}
+            {{ 'customer.account.title' | t }}
+          {%- endif -%}
+        </h1>
+      </div>
+      <a href="{{ routes.account_logout_url }}" class="button button--outline button--small">
+        {% render 'icon', name: 'logout' %}
+        {{ 'customer.account.logout' | t }}
+      </a>
+    </header>
+
+    <div class="customer__layout">
+      <div class="customer__main">
+        <h2 class="h4 customer__section-title">{{ 'customer.orders.title' | t }}</h2>
+        {%- paginate customer.orders by 10 -%}
+          {%- if customer.orders.size > 0 -%}
+            <div class="customer__table-wrap">
+              <table class="customer__table">
+                <caption class="visually-hidden">{{ 'customer.orders.title' | t }}</caption>
+                <thead>
+                  <tr>
+                    <th scope="col">{{ 'customer.orders.order' | t }}</th>
+                    <th scope="col">{{ 'customer.orders.date' | t }}</th>
+                    <th scope="col">{{ 'customer.orders.payment' | t }}</th>
+                    <th scope="col">{{ 'customer.orders.fulfillment' | t }}</th>
+                    <th scope="col" class="customer__num">{{ 'customer.orders.total' | t }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {%- for order in customer.orders -%}
+                    <tr>
+                      <th scope="row" data-label="{{ 'customer.orders.order' | t }}">
+                        <a href="{{ order.customer_url }}" class="link" aria-label="{{ 'customer.orders.view' | t: name: order.name }}">{{ order.name }}</a>
+                      </th>
+                      <td data-label="{{ 'customer.orders.date' | t }}">{{ order.created_at | time_tag: format: 'date' }}</td>
+                      <td data-label="{{ 'customer.orders.payment' | t }}">{{ order.financial_status_label }}</td>
+                      <td data-label="{{ 'customer.orders.fulfillment' | t }}">
+                        {%- if order.cancelled -%}
+                          <span class="badge badge--muted">{{ 'customer.order.cancelled_badge' | t }}</span>
+                        {%- else -%}
+                          {{ order.fulfillment_status_label }}
+                        {%- endif -%}
+                      </td>
+                      <td class="customer__num" data-label="{{ 'customer.orders.total' | t }}">{{ order.total_price | money_with_currency }}</td>
+                    </tr>
+                  {%- endfor -%}
+                </tbody>
+              </table>
+            </div>
+            {% render 'pagination', paginate: paginate %}
+          {%- else -%}
+            <div class="customer__empty panel">
+              {% render 'icon', name: 'package' %}
+              <p>{{ 'customer.orders.none' | t }}</p>
+              <a href="{{ routes.all_products_collection_url }}" class="button">{{ 'customer.orders.shop' | t }}</a>
+            </div>
+          {%- endif -%}
+        {%- endpaginate -%}
+      </div>
+
+      <aside class="customer__aside">
+        {%- if customer.b2b? and customer.current_company -%}
+          <div class="customer__box panel">
+            <h2 class="h5">{{ 'customer.account.company' | t }}</h2>
+            <p class="customer__company">{{ customer.current_company.name }}</p>
+            {%- if customer.current_location -%}
+              <p class="text-muted">{{ 'customer.account.location' | t: name: customer.current_location.name }}</p>
+              {%- if customer.current_location.shipping_address -%}
+                <address class="customer__address">{{ customer.current_location.shipping_address | format_address }}</address>
+              {%- endif -%}
+            {%- endif -%}
+            {%- if customer.company_available_locations_count > 1 -%}
+              <p class="field__hint">{{ 'customer.account.switch_location' | t }}</p>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+
+        <div class="customer__box panel">
+          <h2 class="h5">{{ 'customer.account.details' | t }}</h2>
+          <p>{{ customer.name }}</p>
+          <p class="text-muted">{{ customer.email }}</p>
+          {%- if customer.default_address -%}
+            <address class="customer__address">{{ customer.default_address | format_address }}</address>
+          {%- endif -%}
+          <a href="{{ routes.account_addresses_url }}" class="link customer__box-link">
+            {% render 'icon', name: 'location' %}
+            {{ 'customer.account.addresses' | t: count: customer.addresses_count }}
+          </a>
+        </div>
+      </aside>
+    </div>
+
+    {%- if section.blocks.size > 0 -%}
+      <div class="customer__apps">
+        {%- for block in section.blocks -%}
+          {%- if block.type == 'custom_liquid' -%}
+            <div class="customer__custom-liquid" {{ block.shopify_attributes }}>{{ block.settings.custom_liquid }}</div>
+          {%- else -%}
+            {% render block %}
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+  </div>
+</div>
+
+{{ 'section-customer.css' | asset_url | stylesheet_tag }}
+
+{% schema %}
+{
+  "name": "t:names.customer_account",
+  "tag": "section",
+  "class": "section-customer-account",
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:labels.color_scheme",
+      "default": "cream"
+    },
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "t:labels.top",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "t:labels.bottom",
+      "default": 80
+    }
+  ],
+  "blocks": [
+    {
+      "type": "@app"
+    },
+    {
+      "type": "custom_liquid",
+      "name": "t:names.custom_liquid",
+      "settings": [
+        {
+          "type": "liquid",
+          "id": "custom_liquid",
+          "label": "t:labels.liquid_code",
+          "info": "t:info.add_app_snippets_or_other_code_code_here_is_your_e2a3d2"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

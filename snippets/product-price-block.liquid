@@ -1,0 +1,56 @@
+{%- comment -%}
+  Price, tax and shipping note, and Shop Pay Installments for the selected
+  variant (or the selected selling plan).
+
+  Accepts:
+  - product {Product}
+  - section_id {String}
+  - show_saving {Boolean}: show the percentage saved
+  - show_installments {Boolean}: default true
+{%- endcomment -%}
+
+{%- liquid
+  assign variant = product.selected_or_first_available_variant
+  assign plan_allocation = product.selected_selling_plan_allocation
+  assign digital = false
+  if variant.requires_shipping == false
+    assign digital = true
+  endif
+-%}
+
+<div class="product__price" data-product-part="price">
+  {%- if plan_allocation -%}
+    <div class="price price--large">
+      <span class="price__current">{{ plan_allocation.price | money }}</span>
+      {%- if plan_allocation.compare_at_price > plan_allocation.price -%}
+        <span class="visually-hidden">{{ 'products.price.regular_price' | t }}</span>
+        <s class="price__compare">{{ plan_allocation.compare_at_price | money }}</s>
+      {%- endif -%}
+    </div>
+  {%- else -%}
+    {% render 'price', product: product, variant: variant, class: 'price--large' %}
+  {%- endif -%}
+  {%- if show_saving and variant.compare_at_price > variant.price -%}
+    {%- assign saving = variant.compare_at_price | minus: variant.price | times: 100.0 | divided_by: variant.compare_at_price | round -%}
+    <span class="badge color-{{ settings.sale_badge_color_scheme }}">{{ 'products.badges.save_percent' | t: percent: saving }}</span>
+  {%- endif -%}
+</div>
+
+<p class="product__tax">
+  {%- if cart.taxes_included -%}
+    {{ 'products.price.taxes_included' | t }}
+  {%- endif -%}
+  {%- if digital == false and shop.shipping_policy.body != blank -%}
+    {{ 'products.price.shipping_at_checkout_html' | t: link: shop.shipping_policy.url }}
+  {%- endif -%}
+</p>
+
+{%- if show_installments != false -%}
+  <div class="product__installments" data-product-part="installments">
+    {%- assign installments_form_id = 'Installments-' | append: section_id -%}
+    {%- form 'product', product, id: installments_form_id, class: 'product__installments-form' -%}
+      <input type="hidden" name="id" value="{{ variant.id }}">
+      {{ form | payment_terms }}
+    {%- endform -%}
+  </div>
+{%- endif -%}

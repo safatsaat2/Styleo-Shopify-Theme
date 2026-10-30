@@ -1,0 +1,52 @@
+{%- comment -%}
+  Discount code field and applied codes. Codes are created in Shopify
+  admin; the theme applies them through the Cart Ajax API "discount"
+  parameter. Codes that don't apply to the cart are listed with a message.
+
+  Accepts:
+  - id {String}: unique prefix
+{%- endcomment -%}
+
+{%- if settings.cart_discount_codes -%}
+  {%- assign applied_codes = cart.discount_codes | map: 'code' | join: ',' -%}
+  <div class="cart-discounts" data-discounts data-codes="{{ applied_codes | escape }}">
+    <form class="cart-discounts__form" data-discount-form novalidate>
+      <label class="field__label" for="{{ id }}-discount">{{ 'cart.discount.label' | t }}</label>
+      <div class="inline-field cart-discounts__field">
+        <input
+          id="{{ id }}-discount"
+          class="input"
+          type="text"
+          name="discount"
+          autocomplete="off"
+          autocapitalize="characters"
+          spellcheck="false"
+          placeholder="{{ 'cart.discount.placeholder' | t }}"
+          aria-describedby="{{ id }}-discount-error"
+          data-discount-input
+        >
+        <button type="submit" class="button button--small button--secondary">{{ 'cart.discount.apply' | t }}</button>
+      </div>
+      <p id="{{ id }}-discount-error" class="cart-discounts__error" role="alert" data-discount-error hidden></p>
+    </form>
+
+    {%- if cart.discount_codes.size > 0 -%}
+      <ul class="cart-discounts__list" role="list">
+        {%- for discount_code in cart.discount_codes -%}
+          <li class="cart-discounts__code{% unless discount_code.applicable %} is-invalid{% endunless %}">
+            <span class="chip">
+              {% render 'icon', name: 'tag' %}
+              {{ discount_code.code | escape }}
+              <button type="button" class="cart-discounts__remove" data-discount-remove="{{ discount_code.code | escape }}" aria-label="{{ 'cart.discount.remove' | t: code: discount_code.code | escape }}">
+                {% render 'icon', name: 'close' %}
+              </button>
+            </span>
+            {%- unless discount_code.applicable -%}
+              <span class="cart-discounts__note">{{ 'cart.discount.not_applicable' | t }}</span>
+            {%- endunless -%}
+          </li>
+        {%- endfor -%}
+      </ul>
+    {%- endif -%}
+  </div>
+{%- endif -%}

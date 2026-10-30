@@ -1,0 +1,204 @@
+{%- comment -%}
+  Top bar with one or more announcements.
+  More than one announcement rotates (with a pause control) or can be
+  browsed with arrows. Customers can dismiss the bar; the choice is kept
+  until the announcement text changes.
+{%- endcomment -%}
+
+{%- liquid
+  assign count = section.blocks.size
+  assign content_signature = ''
+  for block in section.blocks
+    assign content_signature = content_signature | append: block.settings.text
+  endfor
+  assign dismiss_key = content_signature | md5 | slice: 0, 10
+-%}
+
+{%- if count > 0 -%}
+  <lc-announcements
+    class="announcement-bar color-{{ section.settings.color_scheme }}"
+    data-autoplay="{% if section.settings.autoplay and count > 1 %}{{ section.settings.autoplay_speed | times: 1000 }}{% else %}0{% endif %}"
+    {% if section.settings.dismissible %}
+      data-dismiss-key="lilac-announcement-{{ dismiss_key }}"
+    {% endif %}
+    role="region"
+    aria-label="{{ 'header.announcements.label' | t }}"
+  >
+    <div class="announcement-bar__inner page-width">
+      {%- if count > 1 -%}
+        <button
+          type="button"
+          class="announcement-bar__control announcement-bar__arrow"
+          data-announcement-prev
+          aria-label="{{ 'accessibility.previous' | t }}"
+        >
+          {% render 'icon', name: 'chevron-left' %}
+        </button>
+      {%- endif -%}
+
+      <div class="announcement-bar__track" aria-live="off">
+        {%- for block in section.blocks -%}
+          <div
+            class="announcement-bar__slide{% if forloop.first %} is-active{% endif %}"
+            data-index="{{ forloop.index0 }}"
+            {% unless forloop.first %}
+              hidden
+            {% endunless %}
+            {{ block.shopify_attributes }}
+          >
+            {%- case block.type -%}
+              {%- when 'announcement' -%}
+                {%- if block.settings.link != blank -%}
+                  <a class="announcement-bar__message announcement-bar__link" href="{{ block.settings.link }}">
+                    <span>{{ block.settings.text }}</span>
+                    {%- if block.settings.show_arrow -%}
+                      {% render 'icon', name: 'arrow-right' %}
+                    {%- endif -%}
+                  </a>
+                {%- else -%}
+                  <p class="announcement-bar__message">{{ block.settings.text }}</p>
+                {%- endif -%}
+              {%- when 'custom_liquid' -%}
+                <div class="announcement-bar__message">{{ block.settings.custom_liquid }}</div>
+            {%- endcase -%}
+          </div>
+        {%- endfor -%}
+      </div>
+
+      {%- if count > 1 -%}
+        <button
+          type="button"
+          class="announcement-bar__control announcement-bar__arrow"
+          data-announcement-next
+          aria-label="{{ 'accessibility.next' | t }}"
+        >
+          {% render 'icon', name: 'chevron-right' %}
+        </button>
+        {%- if section.settings.autoplay -%}
+          <button
+            type="button"
+            class="announcement-bar__control announcement-bar__pause"
+            data-announcement-pause
+            aria-label="{{ 'accessibility.pause' | t }}"
+            data-label-pause="{{ 'accessibility.pause' | t }}"
+            data-label-play="{{ 'accessibility.play' | t }}"
+          >
+            <span class="announcement-bar__pause-icon">{% render 'icon', name: 'pause' %}</span>
+            <span class="announcement-bar__play-icon" hidden>{% render 'icon', name: 'play' %}</span>
+          </button>
+        {%- endif -%}
+      {%- endif -%}
+
+      {%- if section.settings.dismissible -%}
+        <button
+          type="button"
+          class="announcement-bar__control announcement-bar__dismiss"
+          data-announcement-dismiss
+          aria-label="{{ 'header.announcements.dismiss' | t }}"
+        >
+          {% render 'icon', name: 'close' %}
+        </button>
+      {%- endif -%}
+    </div>
+  </lc-announcements>
+
+  {%- if section.settings.dismissible -%}
+    <script>
+      try {
+        if (localStorage.getItem('lilac-announcement-{{ dismiss_key }}') === '1' && !{{ request.design_mode | json }}) {
+          document.currentScript.previousElementSibling.hidden = true;
+        }
+      } catch (error) {}
+    </script>
+  {%- endif -%}
+{%- endif -%}
+
+{{ 'section-announcement-bar.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'announcement-bar.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "t:names.announcement_bar",
+  "tag": "aside",
+  "class": "section-announcement-bar",
+  "max_blocks": 6,
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:labels.color_scheme",
+      "default": "lavender"
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "t:labels.rotate_announcements_automatically",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "autoplay_speed",
+      "min": 3,
+      "max": 10,
+      "step": 1,
+      "unit": "s",
+      "label": "t:labels.change_every",
+      "default": 5
+    },
+    {
+      "type": "checkbox",
+      "id": "dismissible",
+      "label": "t:labels.let_customers_close_the_bar",
+      "info": "t:info.the_bar_comes_back_when_you_change_the_announcem_e0dc26",
+      "default": false
+    }
+  ],
+  "blocks": [
+    {
+      "type": "announcement",
+      "name": "t:names.announcement",
+      "settings": [
+        {
+          "type": "inline_richtext",
+          "id": "text",
+          "label": "t:labels.text",
+          "default": "Share a promotion or store news"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "t:labels.link"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_arrow",
+          "label": "t:labels.show_arrow",
+          "default": true
+        }
+      ]
+    },
+    {
+      "type": "custom_liquid",
+      "name": "t:names.custom_liquid",
+      "settings": [
+        {
+          "type": "liquid",
+          "id": "custom_liquid",
+          "label": "t:labels.custom_liquid",
+          "info": "t:info.add_app_snippets_or_other_liquid_code"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.announcement_bar",
+      "blocks": [
+        {
+          "type": "announcement"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

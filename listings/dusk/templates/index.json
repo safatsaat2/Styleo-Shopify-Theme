@@ -1,0 +1,283 @@
+{
+  "sections": {
+    "video": {
+      "type": "video-banner",
+      "settings": {
+        "video_url": "https://www.youtube.com/watch?v=_9VUPq3SxOc",
+        "video_description": "Brand film",
+        "autoplay": true,
+        "subheading": "After dark",
+        "heading": "Evening pieces with presence",
+        "text": "<p>Set the mood for your collection with a short film.</p>",
+        "button_label": "Shop the edit",
+        "alignment": "center",
+        "height": "full",
+        "full_width": true,
+        "overlay_opacity": 40,
+        "color_scheme": "noir",
+        "padding_top": 0,
+        "padding_bottom": 0
+      }
+    },
+    "collections": {
+      "type": "featured-collections",
+      "blocks": {
+        "c1": {
+          "type": "collection"
+        },
+        "c2": {
+          "type": "collection"
+        },
+        "c3": {
+          "type": "collection"
+        },
+        "c4": {
+          "type": "collection"
+        }
+      },
+      "block_order": [
+        "c1",
+        "c2",
+        "c3",
+        "c4"
+      ],
+      "settings": {
+        "heading": "Explore the edit",
+        "heading_alignment": "center",
+        "link_label": "",
+        "card_style": "orb",
+        "mobile_card_style": "same",
+        "desktop_layout": "grid",
+        "columns": 4,
+        "mobile_layout": "grid",
+        "color_scheme": "noir",
+        "padding_top": 80,
+        "padding_bottom": 64
+      }
+    },
+    "products": {
+      "type": "product-list",
+      "settings": {
+        "heading": "Best sellers",
+        "link_label": "View all",
+        "limit": 8,
+        "columns": 4,
+        "desktop_layout": "carousel",
+        "mobile_layout": "carousel",
+        "color_scheme": "noir",
+        "padding_top": 0,
+        "padding_bottom": 80
+      }
+    },
+    "countdown": {
+      "type": "countdown-banner",
+      "settings": {
+        "subheading": "Limited time",
+        "heading": "Announce a sale or launch",
+        "end_time": "23:59",
+        "button_label": "Shop the sale",
+        "color_scheme": "dusk",
+        "padding_top": 56,
+        "padding_bottom": 56
+      }
+    },
+    "promo": {
+      "type": "promo-banner",
+      "settings": {
+        "heading": "Timeless looks.",
+        "accent_line": "Endless confidence.",
+        "text": "<p>Point customers to a campaign or collection.</p>",
+        "button_label": "Explore now",
+        "halo_shape": "arch",
+        "media_position": "start",
+        "full_width": false,
+        "color_scheme": "mist",
+        "padding_top": 80,
+        "padding_bottom": 80
+      }
+    },
+    "social": {
+      "type": "social-gallery",
+      "blocks": {
+        "i1": {
+          "type": "image"
+        },
+        "i2": {
+          "type": "image"
+        },
+        "i3": {
+          "type": "image"
+        },
+        "i4": {
+          "type": "image"
+        },
+        "i5": {
+          "type": "image"
+        },
+        "i6": {
+          "type": "image"
+        }
+      },
+      "block_order": [
+        "i1",
+        "i2",
+        "i3",
+        "i4",
+        "i5",
+        "i6"
+      ],
+      "settings": {
+        "subheading": "Seen on social media",
+        "heading": "Styled by you",
+        "columns": 6,
+        "color_scheme": "noir",
+        "padding_top": 0,
+        "padding_bottom": 80
+      }
+    },
+    "newsletter": {
+      "type": "newsletter",
+      "settings": {
+        "heading": "Join our style circle",
+        "text": "<p>Private previews and new arrivals, straight to your inbox.</p>",
+        "layout": "centered",
+        "full_width": false,
+        "color_scheme": "lavender",
+        "padding_top": 0,
+        "padding_bottom": 96
+      }
+    },
+    "bento": {
+      "type": "bento-grid",
+      "blocks": {
+        "large": {
+          "type": "_bento-tile",
+          "settings": {
+            "columns": 2,
+            "rows": 2,
+            "color_scheme": "dusk"
+          },
+          "blocks": {
+            "sub": {
+              "type": "text",
+              "settings": {
+                "text": "<p>After dark</p>",
+                "style": "subheading"
+              }
+            },
+            "heading": {
+              "type": "heading",
+              "settings": {
+                "heading": "Evening <em>layers</em>",
+                "size": "h2",
+                "tag": "h3"
+              }
+            },
+            "button": {
+              "type": "button",
+              "settings": {
+                "label": "Shop evening",
+                "style": "secondary"
+              }
+            }
+          },
+          "block_order": [
+            "sub",
+            "heading",
+            "button"
+          ]
+        },
+        "wide": {
+          "type": "_bento-tile",
+          "settings": {
+            "columns": 2,
+            "color_scheme": "lavender"
+          },
+          "blocks": {
+            "heading": {
+              "type": "heading",
+              "settings": {
+                "heading": "Soft knits",
+                "size": "h3",
+                "tag": "h3"
+              }
+            },
+            "button": {
+              "type": "button",
+              "settings": {
+                "label": "Explore",
+                "style": "outline",
+                "size": "small"
+              }
+            }
+          },
+          "block_order": [
+            "heading",
+            "button"
+          ]
+        },
+        "one": {
+          "type": "_bento-tile",
+          "settings": {
+            "color_scheme": "noir"
+          },
+          "blocks": {
+            "icon": {
+              "type": "icon",
+              "settings": {
+                "icon": "gift",
+                "label": "Gift cards",
+                "layout": "stacked",
+                "size": 32
+              }
+            }
+          },
+          "block_order": [
+            "icon"
+          ]
+        },
+        "two": {
+          "type": "_bento-tile",
+          "settings": {
+            "color_scheme": "mist"
+          },
+          "blocks": {
+            "icon": {
+              "type": "icon",
+              "settings": {
+                "icon": "star",
+                "label": "Best sellers",
+                "layout": "stacked",
+                "size": 32
+              }
+            }
+          },
+          "block_order": [
+            "icon"
+          ]
+        }
+      },
+      "block_order": [
+        "large",
+        "wide",
+        "one",
+        "two"
+      ],
+      "settings": {
+        "color_scheme": "noir",
+        "subheading": "The edit",
+        "heading": "Shop by <em>mood</em>"
+      }
+    }
+  },
+  "order": [
+    "video",
+    "collections",
+    "products",
+    "bento",
+    "countdown",
+    "promo",
+    "social",
+    "newsletter"
+  ]
+}

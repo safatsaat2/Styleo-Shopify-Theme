@@ -1,0 +1,185 @@
+{%- liquid
+  assign show_image = false
+  if section.settings.show_image and collection.image
+    assign show_image = true
+  endif
+
+  comment
+    Category chips: children of the menu item that links to this collection,
+    otherwise the menu's top-level links.
+  endcomment
+  assign chip_links = section.settings.menu.links
+  for link in section.settings.menu.links
+    if link.url == collection.url and link.links.size > 0
+      assign chip_links = link.links
+      break
+    endif
+    for child in link.links
+      if child.url == collection.url and child.links.size > 0
+        assign chip_links = child.links
+        break
+      endif
+    endfor
+  endfor
+-%}
+
+<div class="collection-banner collection-banner--{{ section.settings.layout }}{% if show_image %} collection-banner--has-image{% endif %} color-{{ section.settings.color_scheme }}">
+  {%- if show_image and section.settings.layout == 'overlay' -%}
+    <div class="collection-banner__backdrop media">
+      {% render 'image', image: collection.image, sizes: '100vw', loading: 'eager', fetchpriority: 'high' %}
+    </div>
+  {%- endif -%}
+
+  <div class="page-width section-spacing collection-banner__inner" style="--pt: {{ section.settings.padding_top }}px; --pb: {{ section.settings.padding_bottom }}px;">
+    {%- if section.settings.show_breadcrumbs -%}
+      {% render 'breadcrumbs', class: 'collection-banner__breadcrumbs' %}
+    {%- endif -%}
+
+    <div class="collection-banner__grid">
+      <div class="collection-banner__text">
+        {%- if section.settings.subheading != blank -%}
+          <p class="subheading">{{ section.settings.subheading }}</p>
+        {%- endif -%}
+        <h1 class="collection-banner__title h1">
+          {%- if collection.handle == 'all' and collection.title == blank -%}
+            {{ 'collections.all_products' | t }}
+          {%- else -%}
+            {{ collection.title | escape }}
+          {%- endif -%}
+        </h1>
+        {%- if section.settings.show_description and collection.description != blank -%}
+          <div class="collection-banner__description rte">{{ collection.description }}</div>
+        {%- endif -%}
+      </div>
+
+      {%- if show_image and section.settings.layout == 'split' -%}
+        <div class="collection-banner__media">
+          {% render 'media-halo',
+            image: collection.image,
+            shape: section.settings.image_shape,
+            ratio: '4 / 3',
+            sizes: '(min-width: 990px) 40vw, 100vw',
+            loading: 'eager',
+            fetchpriority: 'high'
+          %}
+        </div>
+      {%- endif -%}
+    </div>
+
+    {%- if chip_links.size > 0 -%}
+      <nav class="collection-banner__chips" aria-label="{{ 'collections.categories' | t }}">
+        <ul class="collection-banner__chip-list" role="list">
+          {%- for link in chip_links -%}
+            <li>
+              <a href="{{ link.url }}" class="chip"{% if link.active or link.url == collection.url %} aria-current="page"{% endif %}>{{ link.title | escape }}</a>
+            </li>
+          {%- endfor -%}
+        </ul>
+      </nav>
+    {%- endif -%}
+  </div>
+</div>
+
+{{ 'section-collection.css' | asset_url | stylesheet_tag }}
+
+{% schema %}
+{
+  "name": "t:names.collection_banner",
+  "tag": "section",
+  "class": "section-collection-banner",
+  "settings": [
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "t:labels.subheading",
+      "default": "Catalog"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_description",
+      "label": "t:labels.show_collection_description",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_image",
+      "label": "t:labels.show_collection_image",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "t:labels.layout",
+      "options": [
+        {
+          "value": "split",
+          "label": "t:options.image_beside_text"
+        },
+        {
+          "value": "overlay",
+          "label": "t:options.image_behind_text"
+        }
+      ],
+      "default": "split"
+    },
+    {
+      "type": "select",
+      "id": "image_shape",
+      "label": "t:labels.image_shape",
+      "options": [
+        {
+          "value": "frame",
+          "label": "t:options.rounded_frame"
+        },
+        {
+          "value": "arch",
+          "label": "t:options.arch"
+        }
+      ],
+      "default": "frame"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_breadcrumbs",
+      "label": "t:labels.show_breadcrumbs",
+      "default": false
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "t:labels.category_links",
+      "info": "t:info.shows_links_nested_under_this_collection_in_the_038cb1"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:labels.color_scheme",
+      "default": "cream"
+    },
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "t:labels.top",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "t:labels.bottom",
+      "default": 24
+    }
+  ]
+}
+{% endschema %}

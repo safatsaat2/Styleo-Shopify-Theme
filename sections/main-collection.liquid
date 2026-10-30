@@ -1,0 +1,392 @@
+{%- liquid
+  assign sort_by = collection.sort_by | default: collection.default_sort_by
+  assign clear_url = collection.url | append: '?sort_by=' | append: sort_by
+  assign filter_layout = section.settings.filter_layout
+  if section.settings.enable_filtering == false
+    assign filter_layout = 'none'
+  endif
+
+  assign active_count = 0
+  for filter in collection.filters
+    assign active_count = active_count | plus: filter.active_values.size
+    if filter.type == 'price_range'
+      if filter.min_value.value != blank or filter.max_value.value != blank
+        assign active_count = active_count | plus: 1
+      endif
+    endif
+  endfor
+
+  assign columns = section.settings.columns_desktop
+  assign mobile_columns = section.settings.columns_mobile | plus: 0
+  if filter_layout == 'sidebar'
+    assign sizes_desktop = 1100 | divided_by: columns
+  else
+    assign sizes_desktop = 1280 | divided_by: columns
+  endif
+  capture card_sizes
+    echo '(min-width: 1280px) '
+    echo sizes_desktop
+    echo 'px, (min-width: 990px) '
+    echo 100 | divided_by: columns
+    echo 'vw, (min-width: 750px) 33vw, '
+    echo 100 | divided_by: mobile_columns
+    echo 'vw'
+  endcapture
+
+  assign promos = section.blocks | where: 'type', 'promo'
+  assign show_filter_button = false
+  if section.settings.enable_filtering or section.settings.enable_sorting
+    assign show_filter_button = true
+  endif
+  assign filter_button_desktop = false
+  if filter_layout == 'drawer'
+    assign filter_button_desktop = true
+  endif
+-%}
+
+{%- paginate collection.products by section.settings.products_per_page -%}
+  <lc-facets
+    class="results color-{{ section.settings.color_scheme }}"
+    data-section-id="{{ section.id }}"
+    data-pagination="{{ section.settings.pagination }}"
+    data-columns="{{ columns }}"
+    data-columns-mobile="{{ mobile_columns }}"
+  >
+    <div class="page-width section-spacing" style="--pt: {{ section.settings.padding_top }}px; --pb: {{ section.settings.padding_bottom }}px;">
+      {% render 'results-toolbar',
+        results: collection,
+        section: section,
+        action: collection.url,
+        count: collection.products_count,
+        show_filter_button: show_filter_button,
+        filter_button_desktop: filter_button_desktop,
+        active_count: active_count,
+        sort_options: collection.sort_options,
+        sort_by: sort_by
+      %}
+
+      {% render 'active-filters', results: collection, clear_url: clear_url %}
+
+      <div class="results__layout results__layout--{{ filter_layout }}">
+        {%- if filter_layout == 'sidebar' or filter_layout == 'horizontal' -%}
+          <div class="results__filters results__filters--{{ filter_layout }}" data-facets-region="sidebar">
+            {%- render 'facets',
+              results: collection,
+              form_id: 'FacetsForm',
+              id_prefix: 'Facets',
+              action: collection.url,
+              sort_options: collection.sort_options,
+              sort_by: sort_by,
+              show_sort: false,
+              show_filters: true,
+              layout: filter_layout
+            -%}
+          </div>
+        {%- endif -%}
+
+        <div class="results__main">
+          {%- if collection.all_products_count == 0 -%}
+            <div class="empty-state" data-facets-region="grid">
+              {% render 'icon', name: 'bag', class: 'empty-state__icon' %}
+              <h2 class="h3">{{ 'collections.empty.heading' | t }}</h2>
+              <p class="empty-state__text">{{ 'collections.empty.text' | t }}</p>
+              <a href="{{ routes.all_products_collection_url }}" class="button">{{ 'general.continue_shopping' | t }}</a>
+            </div>
+          {%- elsif collection.products.size == 0 -%}
+            <div class="empty-state" data-facets-region="grid">
+              {% render 'icon', name: 'filter', class: 'empty-state__icon' %}
+              <h2 class="h3">{{ 'collections.empty.filtered_heading' | t }}</h2>
+              <p class="empty-state__text">{{ 'collections.empty.filtered_text' | t }}</p>
+              <a href="{{ clear_url }}" class="button" data-facet-link>{{ 'collections.filters.clear_all' | t }}</a>
+            </div>
+          {%- else -%}
+            <ul
+              id="ResultsGrid-{{ section.id }}"
+              class="results-grid"
+              role="list"
+              data-facets-region="grid"
+              data-results-grid
+              style="--cols: {{ columns }}; --cols-mobile: {{ mobile_columns }};"
+            >
+              {%- for product in collection.products -%}
+                {%- if paginate.current_page == 1 -%}
+                  {%- for promo in promos -%}
+                    {%- if promo.settings.position == forloop.parentloop.index -%}
+                      <li class="results-grid__promo results-grid__promo--span-{{ promo.settings.span }} color-{{ promo.settings.color_scheme }}" {{ promo.shopify_attributes }}>
+                        {%- if promo.settings.link != blank -%}<a href="{{ promo.settings.link }}" class="results-grid__promo-link">{%- else -%}<div class="results-grid__promo-link">{%- endif -%}
+                          {%- if promo.settings.image != blank -%}
+                            <span class="results-grid__promo-media media">
+                              {% render 'image', image: promo.settings.image, sizes: '(min-width: 990px) 50vw, 100vw' %}
+                            </span>
+                          {%- endif -%}
+                          <span class="results-grid__promo-text">
+                            {%- if promo.settings.subheading != blank -%}<span class="subheading">{{ promo.settings.subheading }}</span>{%- endif -%}
+                            {%- if promo.settings.heading != blank -%}<span class="h3">{{ promo.settings.heading }}</span>{%- endif -%}
+                            {%- if promo.settings.text != blank -%}<span class="results-grid__promo-body">{{ promo.settings.text }}</span>{%- endif -%}
+                            {%- if promo.settings.button_label != blank -%}<span class="button button--small">{{ promo.settings.button_label }}</span>{%- endif -%}
+                          </span>
+                        {%- if promo.settings.link != blank -%}</a>{%- else -%}</div>{%- endif -%}
+                      </li>
+                    {%- endif -%}
+                  {%- endfor -%}
+                {%- endif -%}
+                {%- liquid
+                  assign card_loading = 'lazy'
+                  if forloop.index <= columns and paginate.current_page == 1
+                    assign card_loading = 'eager'
+                  endif
+                -%}
+                <li class="results-grid__item" data-grid-item>
+                  {% render 'product-card',
+                    product: product,
+                    sizes: card_sizes,
+                    loading: card_loading,
+                    index: forloop.index0,
+                    section_id: section.id
+                  %}
+                </li>
+              {%- endfor -%}
+            </ul>
+          {%- endif -%}
+
+          {%- assign products_noun = 'collections.products_noun' | t -%}
+          {% render 'pagination', paginate: paginate, style: section.settings.pagination, item_label: products_noun %}
+        </div>
+      </div>
+    </div>
+
+    {%- if show_filter_button -%}
+      {% render 'facets-drawer',
+        results: collection,
+        section: section,
+        action: collection.url,
+        sort_options: collection.sort_options,
+        sort_by: sort_by,
+        count: collection.products_count,
+        clear_url: clear_url
+      %}
+    {%- endif -%}
+  </lc-facets>
+{%- endpaginate -%}
+
+{{ 'section-collection.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'facets.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "t:names.product_grid",
+  "tag": "section",
+  "class": "section-main-collection",
+  "max_blocks": 6,
+  "settings": [
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "min": 8,
+      "max": 48,
+      "step": 4,
+      "label": "t:labels.products_per_page",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "min": 2,
+      "max": 5,
+      "step": 1,
+      "label": "t:labels.columns_on_large_screens",
+      "default": 3
+    },
+    {
+      "type": "select",
+      "id": "columns_mobile",
+      "label": "t:labels.columns_on_small_screens",
+      "options": [
+        {
+          "value": "1",
+          "label": "t:options.one"
+        },
+        {
+          "value": "2",
+          "label": "t:options.two"
+        }
+      ],
+      "default": "2"
+    },
+    {
+      "type": "select",
+      "id": "pagination",
+      "label": "t:labels.pagination",
+      "options": [
+        {
+          "value": "pages",
+          "label": "t:options.page_numbers"
+        },
+        {
+          "value": "load_more",
+          "label": "t:options.load_more_button"
+        },
+        {
+          "value": "infinite",
+          "label": "t:options.infinite_scroll"
+        }
+      ],
+      "default": "load_more"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_count",
+      "label": "t:labels.show_product_count",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_density",
+      "label": "t:labels.show_grid_size_buttons",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "t:content.filtering_and_sorting"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_filtering",
+      "label": "t:labels.enable_filtering",
+      "info": "t:info.customize_filters_with_the_search_and_discovery_0fc2d5",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "filter_layout",
+      "label": "t:labels.filter_layout_on_large_screens",
+      "options": [
+        {
+          "value": "sidebar",
+          "label": "t:options.sidebar"
+        },
+        {
+          "value": "horizontal",
+          "label": "t:options.above_products"
+        },
+        {
+          "value": "drawer",
+          "label": "t:options.drawer"
+        }
+      ],
+      "default": "sidebar"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_sorting",
+      "label": "t:labels.enable_sorting",
+      "default": true
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:labels.color_scheme",
+      "default": "cream"
+    },
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "t:labels.top",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "t:labels.bottom",
+      "default": 80
+    }
+  ],
+  "blocks": [
+    {
+      "type": "promo",
+      "name": "t:names.promotion_tile",
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "t:content.shown_inside_the_grid_on_the_first_page"
+        },
+        {
+          "type": "range",
+          "id": "position",
+          "min": 1,
+          "max": 24,
+          "step": 1,
+          "label": "t:labels.position_in_grid",
+          "default": 5
+        },
+        {
+          "type": "select",
+          "id": "span",
+          "label": "t:labels.width",
+          "options": [
+            {
+              "value": "1",
+              "label": "t:options.one_column"
+            },
+            {
+              "value": "2",
+              "label": "t:options.two_columns"
+            }
+          ],
+          "default": "1"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "t:labels.image"
+        },
+        {
+          "type": "text",
+          "id": "subheading",
+          "label": "t:labels.subheading"
+        },
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "t:labels.heading",
+          "default": "Highlight a story"
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "label": "t:labels.text"
+        },
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "t:labels.button_label",
+          "default": "Discover"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "t:labels.link"
+        },
+        {
+          "type": "color_scheme",
+          "id": "color_scheme",
+          "label": "t:labels.color_scheme",
+          "default": "dusk"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,94 @@
+.announcement-bar {
+  display: block;
+  font-size: var(--lc-text-xs);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+@media (min-width: 750px) {
+  .announcement-bar {
+    font-size: var(--lc-text-sm);
+  }
+}
+
+.announcement-bar__inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  min-height: 2.25rem;
+}
+
+.announcement-bar__track {
+  flex: 1 1 auto;
+  display: grid;
+  min-width: 0;
+  text-align: center;
+}
+
+.announcement-bar__slide {
+  grid-area: 1 / 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-block: 0.375rem;
+}
+
+.announcement-bar__slide.is-active {
+  animation: lc-fade-in 0.4s ease both;
+}
+
+.announcement-bar__message {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  margin: 0;
+}
+
+.announcement-bar__message p {
+  margin: 0;
+}
+
+.announcement-bar__link {
+  min-height: 24px;
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+.announcement-bar__link:hover {
+  opacity: 0.8;
+}
+
+.announcement-bar__link .icon {
+  width: 0.875rem;
+  height: 0.875rem;
+}
+
+.announcement-bar__control {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  flex: none;
+}
+
+.announcement-bar__control:hover {
+  background: rgb(var(--lc-fg-rgb) / 0.08);
+}
+
+.announcement-bar__control .icon {
+  width: 1rem;
+  height: 1rem;
+}
+
+@media (max-width: 749px) {
+  .announcement-bar__arrow {
+    display: none;
+  }
+}

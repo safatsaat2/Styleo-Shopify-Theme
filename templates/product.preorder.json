@@ -1,0 +1,123 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-product",
+      "blocks": {
+        "badges": {
+          "type": "badges",
+          "settings": {}
+        },
+        "title": {
+          "type": "title",
+          "settings": {
+            "size": "h1"
+          }
+        },
+        "price": {
+          "type": "price",
+          "settings": {
+            "show_saving": false,
+            "show_installments": true
+          }
+        },
+        "description": {
+          "type": "description",
+          "settings": {}
+        },
+        "picker": {
+          "type": "variant_picker",
+          "settings": {
+            "picker_style": "buttons",
+            "show_swatches": true
+          }
+        },
+        "plans": {
+          "type": "selling_plans",
+          "settings": {}
+        },
+        "inventory": {
+          "type": "inventory",
+          "settings": {
+            "show_count": false
+          }
+        },
+        "quantity": {
+          "type": "quantity",
+          "settings": {}
+        },
+        "buy": {
+          "type": "buy_buttons",
+          "settings": {
+            "show_dynamic_checkout": false,
+            "show_gift_card_recipient": false,
+            "preorder_note": "Reserve yours now. We ship as soon as it arrives."
+          }
+        },
+        "shipping": {
+          "type": "collapsible_tab",
+          "settings": {
+            "heading": "When will it ship",
+            "icon": "info",
+            "content": "<p>Explain the expected ship date and how you will keep customers updated.</p>",
+            "open": true
+          }
+        },
+        "notify": {
+          "type": "notify_me",
+          "settings": {
+            "heading": "Get an email when it's available"
+          }
+        },
+        "share": {
+          "type": "share",
+          "settings": {}
+        }
+      },
+      "block_order": [
+        "badges",
+        "title",
+        "price",
+        "description",
+        "picker",
+        "plans",
+        "inventory",
+        "quantity",
+        "buy",
+        "shipping",
+        "notify",
+        "share"
+      ],
+      "settings": {
+        "gallery_layout": "thumbnails_bottom",
+        "media_width": "half",
+        "media_ratio": "portrait",
+        "zoom": "hover",
+        "loop_video": true,
+        "sticky_info": true,
+        "show_breadcrumbs": true,
+        "sticky_add_to_cart": true,
+        "sticky_color_scheme": "noir",
+        "color_scheme": "cream",
+        "padding_top": 32,
+        "padding_bottom": 64
+      }
+    },
+    "recommendations": {
+      "type": "product-recommendations",
+      "settings": {
+        "heading": "You may also like",
+        "intent": "related",
+        "limit": 4,
+        "columns": 4,
+        "desktop_layout": "grid",
+        "color_scheme": "cream",
+        "padding_top": 48,
+        "padding_bottom": 80
+      }
+    }
+  },
+  "order": [
+    "main",
+    "recommendations"
+  ]
+}

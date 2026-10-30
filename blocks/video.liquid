@@ -1,0 +1,151 @@
+{%- comment -%}
+  Uploaded or YouTube and Vimeo video. Loads only on play, or when it scrolls
+  into view for muted background loops. Background loops don't autoplay for
+  customers who prefer reduced motion, and always have a pause button.
+{%- endcomment -%}
+{%- liquid
+  assign video = block.settings.video
+  assign video_url = block.settings.video_url
+  assign has_video = false
+  if video != blank or video_url != blank
+    assign has_video = true
+  endif
+  assign autoplay = false
+  if block.settings.autoplay and video != blank
+    assign autoplay = true
+  endif
+  assign poster = block.settings.poster | default: video.preview_image
+  assign ratio = block.settings.ratio
+  if ratio == 'adapt' and video != blank
+    assign ratio = video.aspect_ratio
+  elsif ratio == 'adapt'
+    assign ratio = '16 / 9'
+  endif
+  assign title = block.settings.title | default: shop.name
+-%}
+<lc-video class="tb-video" data-autoplay="{{ autoplay }}" style="--ratio: {{ ratio }};" {{ block.shopify_attributes }}>
+  <div class="tb-video__poster media">
+    {%- if poster != blank -%}
+      {% render 'image', image: poster, sizes: '(min-width: 990px) 60vw, 100vw' %}
+    {%- else -%}
+      {{ 'lifestyle-2' | placeholder_svg_tag: 'placeholder-svg' }}
+    {%- endif -%}
+  </div>
+  <div class="tb-video__target" data-video-target></div>
+
+  {%- if has_video -%}
+    <template>
+      {%- if video != blank -%}
+        {{ video | video_tag: image_size: '1440x', playsinline: true, preload: 'metadata', class: 'tb-video__media' }}
+      {%- elsif video_url.type == 'youtube' -%}
+        <iframe
+          class="tb-video__media"
+          src="//www.youtube-nocookie.com/embed/{{ video_url.id }}?autoplay=1&amp;rel=0&amp;playsinline=1"
+          title="{{ title | escape }}"
+          allow="autoplay; encrypted-media; picture-in-picture"
+          allowfullscreen
+        ></iframe>
+      {%- elsif video_url.type == 'vimeo' -%}
+        <iframe
+          class="tb-video__media"
+          src="//player.vimeo.com/video/{{ video_url.id }}?autoplay=1&amp;dnt=1"
+          title="{{ title | escape }}"
+          allow="autoplay; fullscreen; picture-in-picture"
+          allowfullscreen
+        ></iframe>
+      {%- endif -%}
+    </template>
+
+    <button type="button" class="tb-video__play button button--surface" data-video-play{% if autoplay %} data-reduced-only{% endif %}>
+      {% render 'icon', name: 'play' %}
+      <span>{{ 'sections.video.play' | t }}</span>
+    </button>
+    {%- if autoplay -%}
+      <button
+        type="button"
+        class="tb-video__pause icon-button"
+        data-video-pause
+        hidden
+        aria-label="{{ 'sections.video.pause' | t }}"
+        data-label-pause="{{ 'sections.video.pause' | t }}"
+        data-label-play="{{ 'sections.video.play' | t }}"
+      >
+        <span data-icon-pause>{% render 'icon', name: 'pause' %}</span>
+        <span data-icon-play hidden>{% render 'icon', name: 'play' %}</span>
+      </button>
+    {%- endif -%}
+  {%- endif -%}
+</lc-video>
+<script src="{{ 'video.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "t:names.video",
+  "tag": null,
+  "settings": [
+    {
+      "type": "video",
+      "id": "video",
+      "label": "t:labels.video"
+    },
+    {
+      "type": "video_url",
+      "id": "video_url",
+      "label": "t:labels.youtube_or_vimeo_link",
+      "accept": [
+        "youtube",
+        "vimeo"
+      ],
+      "info": "t:info.used_when_no_video_is_uploaded"
+    },
+    {
+      "type": "image_picker",
+      "id": "poster",
+      "label": "t:labels.cover_image",
+      "info": "t:info.shown_until_the_video_plays"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "t:labels.video_title",
+      "info": "t:info.describes_the_embedded_video_for_screen_readers"
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "t:labels.play_as_a_muted_background_loop",
+      "default": false,
+      "info": "t:info.uploaded_videos_only_customers_who_prefer_reduce_6367dc"
+    },
+    {
+      "type": "select",
+      "id": "ratio",
+      "label": "t:labels.aspect_ratio",
+      "options": [
+        {
+          "value": "adapt",
+          "label": "t:options.adapt_to_video"
+        },
+        {
+          "value": "16 / 9",
+          "label": "t:options.wide"
+        },
+        {
+          "value": "1 / 1",
+          "label": "t:options.square"
+        },
+        {
+          "value": "4 / 5",
+          "label": "t:options.portrait"
+        }
+      ],
+      "default": "adapt"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.video"
+    }
+  ]
+}
+{% endschema %}

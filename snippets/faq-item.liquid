@@ -1,0 +1,16 @@
+{%- comment -%}
+  One FAQ question as an accordion.
+
+  Accepts:
+  - block {Block}: a question block with question, answer, and open settings
+{%- endcomment -%}
+
+{%- if block.type == 'question' -%}
+  <details class="accordion faq__item" data-faq-item{% if block.settings.open %} open{% endif %} {{ block.shopify_attributes }}>
+    <summary class="accordion__summary">
+      <span>{{ block.settings.question }}</span>
+      {% render 'icon', name: 'chevron-down' %}
+    </summary>
+    <div class="accordion__content rte">{{ block.settings.answer }}</div>
+  </details>
+{%- endif -%}

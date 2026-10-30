@@ -1,0 +1,36 @@
+{
+  "type": "custom.overlay",
+  "name": "t:names.overlays",
+  "sections": {
+    "cart-drawer": {
+      "type": "cart-drawer",
+      "settings": {}
+    },
+    "popup": {
+      "type": "popup",
+      "settings": {
+        "enabled": false,
+        "type": "newsletter",
+        "pages": "all",
+        "delay": 8,
+        "exit_intent": false,
+        "frequency": 14,
+        "heading": "Join our list",
+        "text": "<p>Hear about new arrivals and offers first.</p>",
+        "button_label": "Subscribe",
+        "color_scheme": "paper"
+      }
+    },
+    "age-verification": {
+      "type": "age-verification",
+      "settings": {
+        "enabled": false
+      }
+    }
+  },
+  "order": [
+    "cart-drawer",
+    "popup",
+    "age-verification"
+  ]
+}

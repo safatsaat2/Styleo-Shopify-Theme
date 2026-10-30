@@ -1,0 +1,67 @@
+<div class="tb-card" {{ block.shopify_attributes }}>
+  {% render 'collection-card',
+    collection: block.settings.collection,
+    style: block.settings.style,
+    image: block.settings.image,
+    title: block.settings.title,
+    button_label: block.settings.button_label,
+    sizes: '(min-width: 990px) 30vw, 80vw'
+  %}
+</div>
+
+{% schema %}
+{
+  "name": "t:names.collection_card",
+  "tag": null,
+  "settings": [
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "t:labels.collection"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "t:labels.image",
+      "info": "t:info.replaces_the_collection_image_3ce994"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "t:labels.title",
+      "info": "t:info.replaces_the_collection_title_151315"
+    },
+    {
+      "type": "select",
+      "id": "style",
+      "label": "t:labels.card_style",
+      "options": [
+        {
+          "value": "arch",
+          "label": "t:options.arch"
+        },
+        {
+          "value": "orb",
+          "label": "t:options.orb"
+        },
+        {
+          "value": "minimal",
+          "label": "t:options.minimal"
+        }
+      ],
+      "default": "arch"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "t:labels.button_label",
+      "default": "Explore"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.collection_card"
+    }
+  ]
+}
+{% endschema %}

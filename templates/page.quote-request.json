@@ -1,0 +1,94 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-page",
+      "settings": {
+        "show_title": true,
+        "alignment": "start",
+        "width": "medium",
+        "color_scheme": "cream",
+        "padding_top": 48,
+        "padding_bottom": 32,
+        "subheading": "Quotes"
+      }
+    },
+    "form": {
+      "type": "contact-form",
+      "blocks": {
+        "company": {
+          "type": "text_field",
+          "settings": {
+            "label": "Company",
+            "input_type": "text",
+            "width": "half",
+            "required": false
+          }
+        },
+        "phone": {
+          "type": "text_field",
+          "settings": {
+            "label": "Phone",
+            "input_type": "tel",
+            "width": "half",
+            "required": false
+          }
+        },
+        "product": {
+          "type": "text_field",
+          "settings": {
+            "label": "Product",
+            "input_type": "text",
+            "width": "full",
+            "required": true,
+            "prefill_param": "product,variant"
+          }
+        },
+        "quantity": {
+          "type": "text_field",
+          "settings": {
+            "label": "Quantity",
+            "input_type": "number",
+            "width": "half",
+            "required": true
+          }
+        },
+        "date": {
+          "type": "text_field",
+          "settings": {
+            "label": "Needed by",
+            "input_type": "date",
+            "width": "half",
+            "required": false
+          }
+        },
+        "message": {
+          "type": "message",
+          "settings": {
+            "label": "Details",
+            "required": false
+          }
+        }
+      },
+      "block_order": [
+        "company",
+        "phone",
+        "product",
+        "quantity",
+        "date",
+        "message"
+      ],
+      "settings": {
+        "color_scheme": "cream",
+        "padding_top": 16,
+        "padding_bottom": 80,
+        "heading": "Request a quote",
+        "form_name": "Quote request",
+        "button_label": "Request quote"
+      }
+    }
+  },
+  "order": [
+    "main",
+    "form"
+  ]
+}

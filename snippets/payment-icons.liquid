@@ -1,0 +1,14 @@
+{%- comment -%}
+  Full-color icons for the payment methods enabled in the store.
+{%- endcomment -%}
+
+{%- if shop.enabled_payment_types.size > 0 -%}
+  <div class="payment-icons">
+    <h2 class="visually-hidden">{{ 'footer.payment_methods' | t }}</h2>
+    <ul class="payment-icons__list" role="list">
+      {%- for type in shop.enabled_payment_types -%}
+        <li>{{ type | payment_type_svg_tag: class: 'payment-icon' }}</li>
+      {%- endfor -%}
+    </ul>
+  </div>
+{%- endif -%}

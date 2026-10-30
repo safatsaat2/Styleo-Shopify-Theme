@@ -1,0 +1,208 @@
+{%- comment -%}
+  Cart page. Line items on the left, an order summary built from blocks on
+  the right. Works without JavaScript: quantities post with the cart form
+  and an update button appears.
+{%- endcomment -%}
+
+{%- assign form_id = 'CartForm-' | append: section.id -%}
+
+<lc-cart-items class="cart-page color-{{ section.settings.color_scheme }}" data-cart-section="{{ section.id }}" data-section-id="{{ section.id }}">
+  <div class="page-width section-spacing" style="--pt: {{ section.settings.padding_top }}px; --pb: {{ section.settings.padding_bottom }}px;">
+    <div class="cart-page__content" data-cart-content>
+      {%- if cart.item_count > 0 -%}
+        <div class="cart-page__header">
+          <div>
+            <h1 class="h1">{{ 'cart.title' | t }}</h1>
+            <p class="cart-page__count">{{ 'cart.item_count' | t: count: cart.item_count }}</p>
+          </div>
+          <a href="{{ routes.all_products_collection_url }}" class="link-arrow">
+            {{- 'general.continue_shopping' | t -}}
+            {% render 'icon', name: 'arrow-right' %}
+          </a>
+        </div>
+
+        {% render 'cart-free-shipping' %}
+
+        <div class="cart-page__layout">
+          <form action="{{ routes.cart_url }}" method="post" id="{{ form_id }}" class="cart-page__items" novalidate>
+            <ul class="cart-items cart-items--page" role="list" aria-label="{{ 'cart.items' | t }}">
+              {%- for item in cart.items -%}
+                {% render 'cart-line-item', item: item, index: forloop.index, section_id: section.id, image_width: 112 %}
+              {%- endfor -%}
+            </ul>
+            <noscript>
+              <button type="submit" name="update" class="button button--outline cart-page__update">{{ 'cart.update' | t }}</button>
+            </noscript>
+          </form>
+
+          <aside class="cart-page__summary" aria-labelledby="CartSummaryTitle-{{ section.id }}">
+            <div class="cart-page__summary-inner panel">
+              <h2 id="CartSummaryTitle-{{ section.id }}" class="h4">{{ 'cart.summary' | t }}</h2>
+              {%- for block in section.blocks -%}
+                <div class="cart-page__block cart-page__block--{{ block.type | remove: '@' }}" {{ block.shopify_attributes }}>
+                  {%- case block.type -%}
+                    {%- when 'discounts' -%}
+                      {% render 'cart-discounts', id: section.id %}
+                    {%- when 'options' -%}
+                      {% render 'cart-options', id: section.id, form_id: form_id, show_gift_message: block.settings.show_gift_message %}
+                    {%- when 'shipping_estimator' -%}
+                      {% render 'shipping-estimator', id: section.id %}
+                    {%- when 'checkout' -%}
+                      {% render 'cart-checkout', id: section.id, form_id: form_id, show_accelerated: block.settings.show_accelerated %}
+                    {%- when 'payment_icons' -%}
+                      {% render 'payment-icons' %}
+                    {%- when 'text' -%}
+                      <div class="rte text-sm">{{ block.settings.text }}</div>
+                    {%- when 'custom_liquid' -%}
+                      {{ block.settings.custom_liquid }}
+                    {%- when '@app' -%}
+                      {% render block %}
+                  {%- endcase -%}
+                </div>
+              {%- endfor -%}
+            </div>
+          </aside>
+        </div>
+      {%- else -%}
+        <div class="empty-state cart-page__empty">
+          {% render 'icon', name: 'bag', class: 'empty-state__icon' %}
+          <h1 class="h1">{{ 'cart.empty' | t }}</h1>
+          <p class="empty-state__text">{{ 'cart.empty_text' | t }}</p>
+          <a href="{{ routes.all_products_collection_url }}" class="button button--large">{{ 'general.continue_shopping' | t }}</a>
+          {%- if shop.customer_accounts_enabled and customer == nil -%}
+            <p class="cart-page__login">
+              {{ 'cart.login_html' | t: link: routes.account_login_url }}
+            </p>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+    </div>
+
+    <template
+      data-cart-meta
+      data-count="{{ cart.item_count }}"
+      data-label="{{ 'header.cart_count' | t: count: cart.item_count | escape }}"
+    ></template>
+  </div>
+</lc-cart-items>
+
+{{ 'section-cart.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'cart.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "t:names.cart",
+  "tag": "section",
+  "class": "section-main-cart",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "t:content.turn_on_notes_discount_codes_gift_wrapping_and_c_df4104"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:labels.color_scheme",
+      "default": "cream"
+    },
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "t:labels.top",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "t:labels.bottom",
+      "default": 40
+    }
+  ],
+  "blocks": [
+    {
+      "type": "discounts",
+      "name": "t:names.discount_code",
+      "limit": 1,
+      "settings": []
+    },
+    {
+      "type": "options",
+      "name": "t:names.notes_and_gift_options",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "checkbox",
+          "id": "show_gift_message",
+          "label": "t:labels.show_gift_message_field",
+          "default": true
+        }
+      ]
+    },
+    {
+      "type": "shipping_estimator",
+      "name": "t:names.shipping_estimate",
+      "limit": 1,
+      "settings": []
+    },
+    {
+      "type": "checkout",
+      "name": "t:names.subtotal_and_checkout",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "checkbox",
+          "id": "show_accelerated",
+          "label": "t:labels.show_accelerated_checkout_buttons",
+          "info": "t:info.shows_the_payment_methods_available_in_your_stor_cf1464",
+          "default": true
+        }
+      ]
+    },
+    {
+      "type": "payment_icons",
+      "name": "t:names.payment_icons",
+      "limit": 1,
+      "settings": []
+    },
+    {
+      "type": "text",
+      "name": "t:names.text",
+      "settings": [
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "t:labels.text",
+          "default": "<p>Add a note about delivery times or returns.</p>"
+        }
+      ]
+    },
+    {
+      "type": "custom_liquid",
+      "name": "t:names.custom_liquid",
+      "settings": [
+        {
+          "type": "liquid",
+          "id": "custom_liquid",
+          "label": "t:labels.custom_liquid",
+          "info": "t:info.add_app_snippets_or_other_liquid_code"
+        }
+      ]
+    },
+    {
+      "type": "@app"
+    }
+  ]
+}
+{% endschema %}

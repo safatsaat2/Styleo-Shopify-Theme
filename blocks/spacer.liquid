@@ -1,0 +1,35 @@
+<div class="tb-spacer" style="--h: {{ block.settings.height }}px; --h-mobile: {{ block.settings.height_mobile }}px;" aria-hidden="true" {{ block.shopify_attributes }}></div>
+
+{% schema %}
+{
+  "name": "t:names.spacer",
+  "tag": null,
+  "settings": [
+    {
+      "type": "range",
+      "id": "height",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "t:labels.height_on_desktop",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "height_mobile",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "t:labels.height_on_mobile",
+      "default": 24
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.spacer"
+    }
+  ]
+}
+{% endschema %}

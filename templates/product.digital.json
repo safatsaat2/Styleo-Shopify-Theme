@@ -1,0 +1,109 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-product",
+      "blocks": {
+        "title": {
+          "type": "title",
+          "settings": {
+            "size": "h1"
+          }
+        },
+        "price": {
+          "type": "price",
+          "settings": {
+            "show_saving": true,
+            "show_installments": true
+          }
+        },
+        "digital": {
+          "type": "digital_note",
+          "settings": {
+            "text": "Instant download after purchase"
+          }
+        },
+        "description": {
+          "type": "description",
+          "settings": {}
+        },
+        "picker": {
+          "type": "variant_picker",
+          "settings": {
+            "picker_style": "buttons",
+            "show_swatches": false
+          }
+        },
+        "buy": {
+          "type": "buy_buttons",
+          "settings": {
+            "show_dynamic_checkout": true,
+            "show_gift_card_recipient": false,
+            "preorder_note": ""
+          }
+        },
+        "specs": {
+          "type": "specs",
+          "settings": {
+            "heading": "What you get",
+            "open": true
+          }
+        },
+        "license": {
+          "type": "collapsible_tab",
+          "settings": {
+            "heading": "License and access",
+            "icon": "info",
+            "content": "<p>Explain how customers download the file and how they can use it.</p>",
+            "open": false
+          }
+        },
+        "share": {
+          "type": "share",
+          "settings": {}
+        }
+      },
+      "block_order": [
+        "title",
+        "price",
+        "digital",
+        "description",
+        "picker",
+        "buy",
+        "specs",
+        "license",
+        "share"
+      ],
+      "settings": {
+        "gallery_layout": "thumbnails_bottom",
+        "media_width": "half",
+        "media_ratio": "portrait",
+        "zoom": "hover",
+        "loop_video": true,
+        "sticky_info": true,
+        "show_breadcrumbs": true,
+        "sticky_add_to_cart": true,
+        "sticky_color_scheme": "noir",
+        "color_scheme": "cream",
+        "padding_top": 32,
+        "padding_bottom": 64
+      }
+    },
+    "recommendations": {
+      "type": "product-recommendations",
+      "settings": {
+        "heading": "You may also like",
+        "intent": "related",
+        "limit": 4,
+        "columns": 4,
+        "desktop_layout": "grid",
+        "color_scheme": "cream",
+        "padding_top": 48,
+        "padding_bottom": 80
+      }
+    }
+  },
+  "order": [
+    "main",
+    "recommendations"
+  ]
+}

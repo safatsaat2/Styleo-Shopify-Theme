@@ -1,0 +1,55 @@
+{%- comment -%}
+  Share control. Uses the device share sheet where available, otherwise
+  shows copy link and social media share links.
+
+  Accepts:
+  - url {String}: absolute URL to share
+  - title {String}
+  - image {Image}: optional, used by Pinterest
+{%- endcomment -%}
+
+{%- liquid
+  assign share_url = url | url_encode
+  assign share_title = title | url_encode
+-%}
+
+<lc-share class="share" data-url="{{ url }}" data-title="{{ title | escape }}">
+  <button type="button" class="share__native link-arrow" data-share-native hidden>
+    {% render 'icon', name: 'share' %}
+    {{ 'general.share.share' | t }}
+  </button>
+  <div class="share__fallback" data-share-fallback>
+    <span class="share__label">{{ 'general.share.share' | t }}</span>
+    <button type="button" class="icon-button share__copy" data-share-copy aria-label="{{ 'general.share.copy_link' | t }}">
+      {% render 'icon', name: 'copy' %}
+    </button>
+    <a
+      class="icon-button"
+      href="https://www.facebook.com/sharer/sharer.php?u={{ share_url }}"
+      target="_blank"
+      rel="noopener"
+      aria-label="{{ 'general.share.on_platform' | t: platform: 'Facebook' }} ({{ 'accessibility.opens_new_window' | t }})"
+    >
+      {% render 'icon-social', name: 'facebook' %}
+    </a>
+    <a
+      class="icon-button"
+      href="https://twitter.com/intent/tweet?text={{ share_title }}&amp;url={{ share_url }}"
+      target="_blank"
+      rel="noopener"
+      aria-label="{{ 'general.share.on_platform' | t: platform: 'X' }} ({{ 'accessibility.opens_new_window' | t }})"
+    >
+      {% render 'icon-social', name: 'twitter' %}
+    </a>
+    <a
+      class="icon-button"
+      href="https://pinterest.com/pin/create/button/?url={{ share_url }}&amp;description={{ share_title }}{% if image %}&amp;media={{ image | image_url: width: 1200 | prepend: 'https:' | url_encode }}{% endif %}"
+      target="_blank"
+      rel="noopener"
+      aria-label="{{ 'general.share.on_platform' | t: platform: 'Pinterest' }} ({{ 'accessibility.opens_new_window' | t }})"
+    >
+      {% render 'icon-social', name: 'pinterest' %}
+    </a>
+    <span class="share__status visually-hidden" role="status" data-share-status></span>
+  </div>
+</lc-share>

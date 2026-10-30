@@ -1,0 +1,126 @@
+{%- comment -%}
+  Age check shown once before browsing, for stores that sell age-restricted
+  products. It's a soft, theme-level notice: the answer is saved in the
+  shopper's browser and can be bypassed, so it's not a legal age verification.
+  Off by default.
+{%- endcomment -%}
+
+{%- liquid
+  assign show_here = section.settings.enabled
+  if request.page_type == 'password' or request.page_type == 'policy'
+    assign show_here = false
+  endif
+  if request.design_mode
+    assign show_here = true
+  endif
+-%}
+
+{%- if show_here -%}
+  <lc-age-gate data-section-id="{{ section.id }}" data-days="{{ section.settings.remember_days }}">
+    <lc-dialog id="AgeGate-{{ section.id }}" data-persistent>
+      <dialog
+        class="dialog dialog--modal age-gate color-{{ section.settings.color_scheme }}"
+        aria-labelledby="AgeGateHeading-{{ section.id }}"
+        aria-describedby="AgeGateText-{{ section.id }}"
+        style="--dialog-width: 30rem;"
+      >
+        <div class="age-gate__content">
+          {%- if settings.logo != blank -%}
+            {{ settings.logo | image_url: width: 320 | image_tag: class: 'age-gate__logo', alt: shop.name, widths: '160, 240, 320', sizes: '160px' }}
+          {%- else -%}
+            <p class="logo__text age-gate__shop">{{ shop.name }}</p>
+          {%- endif -%}
+          <h2 id="AgeGateHeading-{{ section.id }}" class="h3">{{ section.settings.heading }}</h2>
+          <div id="AgeGateText-{{ section.id }}" class="rte age-gate__text">{{ section.settings.text }}</div>
+          <div class="button-row age-gate__buttons" data-age-gate-buttons>
+            <button type="button" class="button" data-age-gate-confirm data-dialog-focus>{{ section.settings.confirm_label | escape }}</button>
+            {%- if section.settings.decline_url != blank -%}
+              <a href="{{ section.settings.decline_url }}" class="button button--outline">{{ section.settings.decline_label | escape }}</a>
+            {%- else -%}
+              <button type="button" class="button button--outline" data-age-gate-decline>{{ section.settings.decline_label | escape }}</button>
+            {%- endif -%}
+          </div>
+          <p class="form-message form-message--error age-gate__declined" role="alert" hidden data-age-gate-declined>{{ 'sections.age_gate.declined' | t }}</p>
+        </div>
+      </dialog>
+    </lc-dialog>
+  </lc-age-gate>
+  <script src="{{ 'age-gate.js' | asset_url }}" defer></script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "t:names.age_verification",
+  "tag": "section",
+  "class": "section-age-verification",
+  "limit": 1,
+  "enabled_on": {
+    "groups": [
+      "custom.overlay"
+    ]
+  },
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "enabled",
+      "label": "t:labels.show_age_verification",
+      "default": false
+    },
+    {
+      "type": "paragraph",
+      "content": "t:content.shoppers_confirm_their_age_once_and_the_answer_i_624694"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "t:labels.heading",
+      "default": "Confirm your age to enter"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "t:labels.text",
+      "default": "<p>You must be 21 or older to visit this store. Confirm your age to continue.</p>"
+    },
+    {
+      "type": "text",
+      "id": "confirm_label",
+      "label": "t:labels.confirm_button_label",
+      "default": "Enter, I'm 21 or older"
+    },
+    {
+      "type": "text",
+      "id": "decline_label",
+      "label": "t:labels.decline_button_label",
+      "default": "Leave"
+    },
+    {
+      "type": "url",
+      "id": "decline_url",
+      "label": "t:labels.decline_link",
+      "info": "t:info.where_shoppers_go_when_they_decline_leave_blank_6524e3"
+    },
+    {
+      "type": "range",
+      "id": "remember_days",
+      "min": 1,
+      "max": 90,
+      "step": 1,
+      "unit": "d",
+      "label": "t:labels.remember_answer_for",
+      "default": 30
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:labels.color_scheme",
+      "default": "paper"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.age_verification"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,132 @@
+{%- comment -%} Message that shows only for matching products, customers, or countries. {%- endcomment -%}
+{% render 'conditional-message', settings: block.settings, product: product, attributes: block.shopify_attributes %}
+
+{% schema %}
+{
+  "name": "t:names.conditional_message",
+  "tag": null,
+  "settings": [
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "t:labels.text",
+      "default": "<p>Buy 2, get 1 free. The discount applies at checkout.</p>"
+    },
+    {
+      "type": "select",
+      "id": "icon",
+      "label": "t:labels.icon",
+      "options": [
+        {
+          "value": "none",
+          "label": "t:options.none"
+        },
+        {
+          "value": "tag",
+          "label": "t:options.tag"
+        },
+        {
+          "value": "gift",
+          "label": "t:options.gift"
+        },
+        {
+          "value": "star",
+          "label": "t:options.star"
+        },
+        {
+          "value": "info",
+          "label": "t:options.info"
+        },
+        {
+          "value": "truck",
+          "label": "t:options.truck"
+        },
+        {
+          "value": "heart",
+          "label": "t:options.heart"
+        },
+        {
+          "value": "account",
+          "label": "t:options.account"
+        },
+        {
+          "value": "globe",
+          "label": "t:options.globe"
+        },
+        {
+          "value": "check",
+          "label": "t:options.check"
+        }
+      ],
+      "default": "tag"
+    },
+    {
+      "type": "select",
+      "id": "style",
+      "label": "t:labels.style",
+      "options": [
+        {
+          "value": "note",
+          "label": "t:options.note"
+        },
+        {
+          "value": "highlight",
+          "label": "t:options.highlight"
+        }
+      ],
+      "default": "highlight"
+    },
+    {
+      "type": "header",
+      "content": "t:content.conditions"
+    },
+    {
+      "type": "paragraph",
+      "content": "t:content.the_message_shows_only_when_every_condition_you_6fe8ee"
+    },
+    {
+      "type": "text",
+      "id": "product_tag",
+      "label": "t:labels.product_tag",
+      "info": "t:info.for_example_bogo_works_on_product_pages"
+    },
+    {
+      "type": "select",
+      "id": "customer_status",
+      "label": "t:labels.customers",
+      "options": [
+        {
+          "value": "any",
+          "label": "t:options.everyone"
+        },
+        {
+          "value": "signed_in",
+          "label": "t:options.signed_in_customers"
+        },
+        {
+          "value": "signed_out",
+          "label": "t:options.signed_out_customers"
+        }
+      ],
+      "default": "any"
+    },
+    {
+      "type": "text",
+      "id": "customer_tag",
+      "label": "t:labels.customer_tag",
+      "info": "t:info.for_example_vip_or_wholesale_only_signed_in_cust_a917c4"
+    },
+    {
+      "type": "text",
+      "id": "countries",
+      "label": "t:labels.country_codes",
+      "info": "t:info.two_letter_codes_separated_by_commas_for_example_24f7ab"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.conditional_message"
+    }
+  ]
+}
+{% endschema %}

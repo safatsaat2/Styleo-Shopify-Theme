@@ -1,0 +1,84 @@
+{%- comment -%}
+  Purchase options for products with selling plans (subscriptions,
+  pre-orders, try before you buy). Inputs submit with the product form
+  through the form attribute.
+
+  Accepts:
+  - product {Product}
+  - variant {Variant}
+  - form_id {String}
+  - section_id {String}
+{%- endcomment -%}
+
+{%- if product.selling_plan_groups.size > 0 -%}
+  {%- assign selected_plan_id = product.selected_selling_plan.id -%}
+  <fieldset class="selling-plans" data-product-part="selling-plans">
+    <legend class="selling-plans__legend">{{ 'products.selling_plans.legend' | t }}</legend>
+
+    {%- unless product.requires_selling_plan -%}
+      <label class="selling-plans__option" for="SellingPlan-{{ section_id }}-none">
+        <input
+          type="radio"
+          id="SellingPlan-{{ section_id }}-none"
+          name="selling_plan"
+          value=""
+          form="{{ form_id }}"
+          data-selling-plan
+          {% if selected_plan_id == blank %}
+            checked
+          {% endif %}
+        >
+        <span class="selling-plans__name">{{ 'products.selling_plans.one_time' | t }}</span>
+        <span class="selling-plans__price">{{ variant.price | money }}</span>
+      </label>
+    {%- endunless -%}
+
+    {%- for group in product.selling_plan_groups -%}
+      {%- if product.selling_plan_groups.size > 1 -%}
+        <p class="selling-plans__group">{{ group.name }}</p>
+      {%- endif -%}
+      {%- for plan in group.selling_plans -%}
+        {%- assign allocation = variant.selling_plan_allocations | where: 'selling_plan_id', plan.id | first -%}
+        {%- liquid
+          assign is_checked = false
+          if selected_plan_id == plan.id
+            assign is_checked = true
+          elsif product.requires_selling_plan and selected_plan_id == blank and forloop.first and forloop.parentloop.first
+            assign is_checked = true
+          endif
+        -%}
+        <label class="selling-plans__option" for="SellingPlan-{{ section_id }}-{{ plan.id }}">
+          <input
+            type="radio"
+            id="SellingPlan-{{ section_id }}-{{ plan.id }}"
+            name="selling_plan"
+            value="{{ plan.id }}"
+            form="{{ form_id }}"
+            data-selling-plan
+            {% if is_checked %}
+              checked
+            {% endif %}
+          >
+          <span class="selling-plans__name">
+            {{ plan.name }}
+            {%- if plan.description != blank -%}
+              <span class="selling-plans__description">{{ plan.description }}</span>
+            {%- endif -%}
+          </span>
+          {%- if allocation -%}
+            <span class="selling-plans__price">
+              {%- if allocation.compare_at_price > allocation.price -%}
+                <s>{{ allocation.compare_at_price | money }}</s>
+              {%- endif -%}
+              {{ allocation.price | money }}
+              {%- if allocation.price_adjustments.size > 0 and allocation.per_delivery_price != allocation.price -%}
+                {%- assign per_delivery = allocation.per_delivery_price | money -%}
+                <span class="selling-plans__description">{{ 'products.selling_plans.per_delivery' | t: price: per_delivery }}</span>
+              {%- endif -%}
+            </span>
+          {%- endif -%}
+        </label>
+      {%- endfor -%}
+    {%- endfor -%}
+  </fieldset>
+{%- endif -%}

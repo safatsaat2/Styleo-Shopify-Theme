@@ -1,0 +1,312 @@
+{
+  "sections": {
+    "slideshow": {
+      "type": "slideshow",
+      "blocks": {
+        "s1": {
+          "type": "slide",
+          "settings": {
+            "subheading": "New season",
+            "heading": "Quiet tailoring, made to move",
+            "text": "<p>Introduce your latest collection with a short line.</p>",
+            "button_label": "Shop new arrivals",
+            "button_style": "surface",
+            "horizontal": "start",
+            "vertical": "bottom",
+            "color_scheme": "noir"
+          }
+        },
+        "s2": {
+          "type": "slide",
+          "settings": {
+            "subheading": "Essentials",
+            "heading": "Pieces for every day",
+            "text": "<p>Point customers to your core range.</p>",
+            "button_label": "Shop essentials",
+            "button_style": "surface",
+            "horizontal": "start",
+            "vertical": "bottom",
+            "color_scheme": "noir"
+          }
+        }
+      },
+      "block_order": [
+        "s1",
+        "s2"
+      ],
+      "settings": {
+        "height": "large",
+        "full_width": true,
+        "overlay_opacity": 25,
+        "autoplay": true,
+        "autoplay_speed": 6,
+        "show_arrows": true,
+        "accessibility_label": "Featured looks",
+        "color_scheme": "noir",
+        "padding_top": 0,
+        "padding_bottom": 0
+      }
+    },
+    "columns": {
+      "type": "multicolumn",
+      "blocks": {
+        "a": {
+          "type": "column",
+          "settings": {
+            "icon": "truck",
+            "heading": "Free shipping",
+            "text": "<p>Explain when orders ship free.</p>"
+          }
+        },
+        "b": {
+          "type": "column",
+          "settings": {
+            "icon": "return",
+            "heading": "Easy returns",
+            "text": "<p>Summarize your return policy.</p>"
+          }
+        },
+        "c": {
+          "type": "column",
+          "settings": {
+            "icon": "shield",
+            "heading": "Secure checkout",
+            "text": "<p>Reassure customers about payment.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "a",
+        "b",
+        "c"
+      ],
+      "settings": {
+        "heading": "",
+        "alignment": "center",
+        "columns": 3,
+        "mobile_columns": "1",
+        "card_style": "plain",
+        "color_scheme": "paper",
+        "padding_top": 48,
+        "padding_bottom": 48
+      }
+    },
+    "collage": {
+      "type": "collage",
+      "blocks": {
+        "t1": {
+          "type": "tile",
+          "settings": {
+            "heading": "Tailoring",
+            "button_label": "Shop now"
+          }
+        },
+        "t2": {
+          "type": "tile",
+          "settings": {
+            "heading": "Shirts",
+            "button_label": "Shop now"
+          }
+        },
+        "t3": {
+          "type": "tile",
+          "settings": {
+            "heading": "Shoes",
+            "button_label": "Shop now"
+          }
+        },
+        "t4": {
+          "type": "tile",
+          "settings": {
+            "heading": "Bags",
+            "button_label": "Shop now"
+          }
+        },
+        "t5": {
+          "type": "tile",
+          "settings": {
+            "heading": "Accessories",
+            "button_label": "Shop now"
+          }
+        }
+      },
+      "block_order": [
+        "t1",
+        "t2",
+        "t3",
+        "t4",
+        "t5"
+      ],
+      "settings": {
+        "heading": "Shop by category",
+        "layout": "feature-start",
+        "color_scheme": "paper",
+        "padding_top": 48,
+        "padding_bottom": 64
+      }
+    },
+    "products": {
+      "type": "product-list",
+      "settings": {
+        "heading": "New arrivals",
+        "link_label": "View all",
+        "limit": 8,
+        "columns": 4,
+        "desktop_layout": "grid",
+        "mobile_layout": "grid",
+        "color_scheme": "paper",
+        "padding_top": 0,
+        "padding_bottom": 80
+      }
+    },
+    "story": {
+      "type": "image-with-text",
+      "blocks": {
+        "sub": {
+          "type": "subheading",
+          "settings": {
+            "text": "Our story"
+          }
+        },
+        "head": {
+          "type": "heading",
+          "settings": {
+            "heading": "Made with intention",
+            "size": "h2"
+          }
+        },
+        "text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Share where your pieces come from and why they last.</p>"
+          }
+        },
+        "button": {
+          "type": "button",
+          "settings": {
+            "label": "About us",
+            "style": "secondary"
+          }
+        }
+      },
+      "block_order": [
+        "sub",
+        "head",
+        "text",
+        "button"
+      ],
+      "settings": {
+        "halo_shape": "arch",
+        "ratio": "4 / 5",
+        "media_position": "start",
+        "media_width": "half",
+        "alignment": "start",
+        "color_scheme": "mist",
+        "padding_top": 80,
+        "padding_bottom": 80
+      }
+    },
+    "testimonials": {
+      "type": "testimonials",
+      "blocks": {
+        "q1": {
+          "type": "testimonial"
+        },
+        "q2": {
+          "type": "testimonial"
+        },
+        "q3": {
+          "type": "testimonial"
+        }
+      },
+      "block_order": [
+        "q1",
+        "q2",
+        "q3"
+      ],
+      "settings": {
+        "subheading": "Kind words",
+        "heading": "What customers say",
+        "layout": "carousel",
+        "color_scheme": "paper",
+        "padding_top": 80,
+        "padding_bottom": 64
+      }
+    },
+    "logos": {
+      "type": "logo-list",
+      "blocks": {
+        "l1": {
+          "type": "logo"
+        },
+        "l2": {
+          "type": "logo"
+        },
+        "l3": {
+          "type": "logo"
+        },
+        "l4": {
+          "type": "logo"
+        },
+        "l5": {
+          "type": "logo"
+        }
+      },
+      "block_order": [
+        "l1",
+        "l2",
+        "l3",
+        "l4",
+        "l5"
+      ],
+      "settings": {
+        "heading": "As featured in",
+        "logo_height": 36,
+        "monochrome": true,
+        "color_scheme": "paper",
+        "padding_top": 32,
+        "padding_bottom": 64
+      }
+    },
+    "blog": {
+      "type": "blog-posts",
+      "settings": {
+        "subheading": "Journal",
+        "heading": "Style notes",
+        "limit": 3,
+        "columns": 3,
+        "link_label": "Read the blog",
+        "show_image": true,
+        "show_date": true,
+        "show_excerpt": true,
+        "color_scheme": "paper",
+        "padding_top": 0,
+        "padding_bottom": 80
+      }
+    },
+    "newsletter": {
+      "type": "newsletter",
+      "settings": {
+        "heading": "Join the list",
+        "text": "<p>Hear about new arrivals and private sales first.</p>",
+        "button_label": "Subscribe",
+        "layout": "split",
+        "full_width": true,
+        "color_scheme": "mist",
+        "padding_top": 0,
+        "padding_bottom": 0
+      }
+    }
+  },
+  "order": [
+    "slideshow",
+    "columns",
+    "collage",
+    "products",
+    "story",
+    "testimonials",
+    "logos",
+    "blog",
+    "newsletter"
+  ]
+}

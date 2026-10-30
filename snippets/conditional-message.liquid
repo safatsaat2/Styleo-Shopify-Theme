@@ -1,0 +1,63 @@
+{%- comment -%}
+  Message shown only when every condition that's set matches: a product
+  tag (offers such as "Buy 2, get 1 free"), the customer being signed in or
+  out, a customer tag (members or wholesale tiers), or the shopper's country.
+  Empty conditions are ignored. The text is the merchant's; nothing is
+  calculated, so it must describe a discount that exists in Shopify admin.
+
+  Accepts:
+  - settings {Object}: block settings with text, icon, style, product_tag,
+    customer_status, customer_tag, countries
+  - product {Product}: optional, for the product tag condition
+  - attributes {String}: block.shopify_attributes
+{%- endcomment -%}
+
+{%- liquid
+  assign show = true
+
+  if settings.product_tag != blank
+    unless product and product.tags contains settings.product_tag
+      assign show = false
+    endunless
+  endif
+
+  case settings.customer_status
+    when 'signed_in'
+      unless customer
+        assign show = false
+      endunless
+    when 'signed_out'
+      if customer
+        assign show = false
+      endif
+  endcase
+
+  if settings.customer_tag != blank
+    unless customer and customer.tags contains settings.customer_tag
+      assign show = false
+    endunless
+  endif
+
+  if settings.countries != blank
+    assign country_codes = settings.countries | upcase | remove: ' ' | split: ','
+    unless country_codes contains localization.country.iso_code
+      assign show = false
+    endunless
+  endif
+
+  if settings.text == blank
+    assign show = false
+  endif
+-%}
+
+{%- if show or request.design_mode -%}
+  <div class="conditional-message conditional-message--{{ settings.style }}{% unless show %} conditional-message--hidden{% endunless %}" {{ attributes }}>
+    {%- if settings.icon != 'none' -%}
+      {% render 'icon', name: settings.icon %}
+    {%- endif -%}
+    <div class="conditional-message__text rte">{{ settings.text }}</div>
+    {%- unless show -%}
+      <p class="conditional-message__editor-note">{{ 'blocks.conditional_message.hidden' | t }}</p>
+    {%- endunless -%}
+  </div>
+{%- endif -%}

@@ -1,0 +1,152 @@
+{
+  "sections": {
+    "intro": {
+      "type": "rich-text",
+      "blocks": {
+        "sub": {
+          "type": "subheading",
+          "settings": {
+            "text": "Wholesale"
+          }
+        },
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "heading": "Partner with us",
+            "size": "h1"
+          }
+        },
+        "text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Describe who you work with, minimum orders, and how long applications take.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "sub",
+        "heading",
+        "text"
+      ],
+      "settings": {
+        "alignment": "center",
+        "width": "narrow",
+        "color_scheme": "dusk",
+        "padding_top": 80,
+        "padding_bottom": 80
+      }
+    },
+    "benefits": {
+      "type": "multicolumn",
+      "blocks": {
+        "margin": {
+          "type": "column",
+          "settings": {
+            "icon": "tag",
+            "heading": "Wholesale pricing",
+            "text": "<p>Explain your pricing tiers.</p>"
+          }
+        },
+        "support": {
+          "type": "column",
+          "settings": {
+            "icon": "headset",
+            "heading": "Dedicated support",
+            "text": "<p>Say who retailers can contact.</p>"
+          }
+        },
+        "ship": {
+          "type": "column",
+          "settings": {
+            "icon": "truck",
+            "heading": "Reliable delivery",
+            "text": "<p>Share lead times for wholesale orders.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "margin",
+        "support",
+        "ship"
+      ],
+      "settings": {
+        "heading": "Why stock our pieces",
+        "alignment": "center",
+        "columns": 3,
+        "mobile_columns": "1",
+        "card_style": "card",
+        "color_scheme": "mist",
+        "padding_top": 56,
+        "padding_bottom": 56
+      }
+    },
+    "form": {
+      "type": "contact-form",
+      "blocks": {
+        "company": {
+          "type": "text_field",
+          "settings": {
+            "label": "Company",
+            "input_type": "text",
+            "width": "half",
+            "required": true
+          }
+        },
+        "website": {
+          "type": "text_field",
+          "settings": {
+            "label": "Website",
+            "input_type": "url",
+            "width": "half",
+            "required": false
+          }
+        },
+        "tax": {
+          "type": "text_field",
+          "settings": {
+            "label": "Tax or business ID",
+            "input_type": "text",
+            "width": "half",
+            "required": false
+          }
+        },
+        "type": {
+          "type": "select",
+          "settings": {
+            "label": "Business type",
+            "options": "Boutique, Department store, Online store, Other",
+            "width": "half",
+            "required": true
+          }
+        },
+        "message": {
+          "type": "message",
+          "settings": {
+            "label": "Tell us about your store",
+            "required": true
+          }
+        }
+      },
+      "block_order": [
+        "company",
+        "website",
+        "tax",
+        "type",
+        "message"
+      ],
+      "settings": {
+        "color_scheme": "cream",
+        "padding_top": 16,
+        "padding_bottom": 80,
+        "heading": "Apply for a wholesale account",
+        "form_name": "Wholesale inquiry",
+        "button_label": "Apply"
+      }
+    }
+  },
+  "order": [
+    "intro",
+    "benefits",
+    "form"
+  ]
+}

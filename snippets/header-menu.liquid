@@ -1,0 +1,181 @@
+{%- comment -%}
+  Desktop main menu with dropdowns and mega menus. Supports three levels.
+
+  Accepts:
+  - menu {Linklist}: the main menu
+  - menu_style {String}: 'dropdown' or 'mega'
+  - promos {Array}: mega_promo blocks from the header section
+  - section_id {String}
+{%- endcomment -%}
+
+<ul class="menu" role="list">
+  {%- for link in menu.links -%}
+    {%- liquid
+      assign link_handle = link.title | handle
+      assign link_promos = ''
+      for promo in promos
+        assign promo_handle = promo.settings.menu_item | handle
+        if promo_handle == link_handle
+          assign link_promos = link_promos | append: promo.id | append: ','
+        endif
+      endfor
+      assign has_promos = false
+      if link_promos != ''
+        assign has_promos = true
+      endif
+      assign panel_id = 'MenuPanel-' | append: section_id | append: '-' | append: forloop.index
+      assign is_mega = false
+      if menu_style == 'mega' or has_promos
+        assign is_mega = true
+      endif
+    -%}
+    <li class="menu__item">
+      {%- if link.links != blank -%}
+        <lc-disclosure class="menu__disclosure{% if is_mega %} menu__disclosure--mega{% endif %}">
+          <button
+            type="button"
+            class="menu__link menu__toggle{% if link.child_active or link.active %} is-active{% endif %}"
+            aria-expanded="false"
+            aria-controls="{{ panel_id }}"
+          >
+            <span>{{ link.title }}</span>
+            {% render 'icon', name: 'chevron-down' %}
+          </button>
+
+          {%- if is_mega -%}
+            <div id="{{ panel_id }}" class="menu__panel mega" hidden>
+              <div class="mega__inner page-width">
+                <ul class="mega__columns" role="list">
+                  {%- for child in link.links -%}
+                    <li class="mega__column">
+                      <a
+                        href="{{ child.url }}"
+                        class="mega__heading"
+                        {% if child.current %}
+                          aria-current="page"
+                        {% endif %}
+                      >
+                        {{- child.title -}}
+                      </a>
+                      {%- if child.links != blank -%}
+                        <ul class="mega__list" role="list">
+                          {%- for grandchild in child.links -%}
+                            <li>
+                              <a
+                                href="{{ grandchild.url }}"
+                                class="mega__link"
+                                {% if grandchild.current %}
+                                  aria-current="page"
+                                {% endif %}
+                              >
+                                {{- grandchild.title -}}
+                              </a>
+                            </li>
+                          {%- endfor -%}
+                        </ul>
+                      {%- endif -%}
+                    </li>
+                  {%- endfor -%}
+                </ul>
+
+                {%- if has_promos -%}
+                  <div class="mega__promos">
+                    {%- for promo in promos -%}
+                      {%- unless link_promos contains promo.id -%}{%- continue -%}{%- endunless -%}
+                      <a
+                        class="mega-promo"
+                        href="{{ promo.settings.link | default: link.url }}"
+                        {{ promo.shopify_attributes }}
+                      >
+                        <span class="mega-promo__media media" style="--ratio: 3 / 4;">
+                          {%- if promo.settings.image != blank -%}
+                            {%- assign focal_style = 'object-position: ' | append: promo.settings.image.presentation.focal_point -%}
+                            {{
+                              promo.settings.image
+                              | image_url: width: 640
+                              | image_tag:
+                                widths: '240, 320, 480, 640',
+                                sizes: '(min-width: 1280px) 260px, 20vw',
+                                loading: 'lazy',
+                                style: focal_style
+                            }}
+                          {%- else -%}
+                            {{ 'lifestyle-1' | placeholder_svg_tag: 'placeholder-svg' }}
+                          {%- endif -%}
+                        </span>
+                        <span class="mega-promo__text">
+                          {%- if promo.settings.subheading != blank -%}
+                            <span class="subheading">{{ promo.settings.subheading }}</span>
+                          {%- endif -%}
+                          {%- if promo.settings.heading != blank -%}
+                            <span class="mega-promo__heading h4">{{ promo.settings.heading }}</span>
+                          {%- endif -%}
+                        </span>
+                      </a>
+                    {%- endfor -%}
+                  </div>
+                {%- endif -%}
+              </div>
+              <div class="mega__footer page-width">
+                <a href="{{ link.url }}" class="link-arrow">
+                  {{ 'header.view_all_of' | t: title: link.title }}
+                  {% render 'icon', name: 'arrow-right' %}
+                </a>
+              </div>
+            </div>
+          {%- else -%}
+            <div id="{{ panel_id }}" class="menu__panel dropdown" hidden>
+              <ul class="dropdown__list" role="list">
+                {%- for child in link.links -%}
+                  <li>
+                    <a
+                      href="{{ child.url }}"
+                      class="dropdown__link"
+                      {% if child.current %}
+                        aria-current="page"
+                      {% endif %}
+                    >
+                      {{- child.title -}}
+                    </a>
+                    {%- if child.links != blank -%}
+                      <ul class="dropdown__sublist" role="list">
+                        {%- for grandchild in child.links -%}
+                          <li>
+                            <a
+                              href="{{ grandchild.url }}"
+                              class="dropdown__link dropdown__link--nested"
+                              {% if grandchild.current %}
+                                aria-current="page"
+                              {% endif %}
+                            >
+                              {{- grandchild.title -}}
+                            </a>
+                          </li>
+                        {%- endfor -%}
+                      </ul>
+                    {%- endif -%}
+                  </li>
+                {%- endfor -%}
+                <li class="dropdown__all">
+                  <a href="{{ link.url }}" class="dropdown__link dropdown__link--all">
+                    {{- 'header.view_all' | t -}}
+                  </a>
+                </li>
+              </ul>
+            </div>
+          {%- endif -%}
+        </lc-disclosure>
+      {%- else -%}
+        <a
+          href="{{ link.url }}"
+          class="menu__link{% if link.active %} is-active{% endif %}"
+          {% if link.current %}
+            aria-current="page"
+          {% endif %}
+        >
+          {{- link.title -}}
+        </a>
+      {%- endif -%}
+    </li>
+  {%- endfor -%}
+</ul>

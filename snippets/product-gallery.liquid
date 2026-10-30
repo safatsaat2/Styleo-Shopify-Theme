@@ -1,0 +1,241 @@
+{%- comment -%}
+  Product media gallery.
+  - The selected variant's media comes first so it's the initial view and
+    the LCP image.
+  - Images whose alt text contains "#360" are grouped into one spin viewer.
+  - Layouts: stacked, grid, thumbnails_left, thumbnails_bottom, carousel.
+    Small screens always use a swipeable carousel with thumbnails.
+
+  Accepts:
+  - product {Product}
+  - section {Section}
+  - layout {String}
+  - ratio {String}: 'adapt', 'portrait', or 'square'
+  - zoom {String}: 'hover', 'dialog', or 'none'
+  - loop_video {Boolean}
+  - priority {String}: fetchpriority for the first media ('high' or 'auto')
+  - sizes {String}
+{%- endcomment -%}
+
+{%- liquid
+  assign featured = product.selected_or_first_available_variant.featured_media | default: product.featured_media
+  assign featured_first = false
+  if featured
+    assign featured_first = true
+    if featured.alt contains '#360'
+      assign featured_first = false
+    endif
+  endif
+
+  assign zoom_enabled = false
+  if zoom != 'none'
+    assign zoom_enabled = true
+  endif
+
+  case ratio
+    when 'portrait'
+      assign forced_ratio = '3 / 4'
+    when 'square'
+      assign forced_ratio = '1 / 1'
+    else
+      assign forced_ratio = blank
+  endcase
+
+  assign spin_count = 0
+  for media in product.media
+    if media.alt contains '#360'
+      assign spin_count = spin_count | plus: 1
+    endif
+  endfor
+
+  assign media_count = product.media.size | minus: spin_count
+  if spin_count > 1
+    assign media_count = media_count | plus: 1
+  endif
+
+  assign show_thumbs = false
+  if media_count > 1
+    if layout == 'thumbnails_left' or layout == 'thumbnails_bottom'
+      assign show_thumbs = true
+    endif
+  endif
+
+  comment
+    Build the display order once: featured first, then the rest.
+  endcomment
+  assign ordered_ids = ''
+  if featured_first
+    assign ordered_ids = featured.id | append: ','
+  endif
+  for media in product.media
+    if media.alt contains '#360'
+      continue
+    endif
+    if featured_first and media.id == featured.id
+      continue
+    endif
+    assign ordered_ids = ordered_ids | append: media.id | append: ','
+  endfor
+  assign ordered_ids = ordered_ids | split: ','
+-%}
+
+<lc-media-gallery
+  id="Gallery-{{ section.id }}"
+  class="gallery gallery--{{ layout }}{% if show_thumbs %} gallery--has-thumbs{% endif %}"
+  data-zoom="{{ zoom }}"
+>
+  <div class="gallery__viewer">
+    <ul class="gallery__track" role="list" data-gallery-track aria-label="{{ 'products.media.gallery_label' | t }}">
+      {%- if product.media.size == 0 -%}
+        <li class="gallery__slide is-active">
+          <div class="product-media media" style="--ratio: {{ forced_ratio | default: '3 / 4' }};">
+            {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
+          </div>
+        </li>
+      {%- else -%}
+        {%- for media_id in ordered_ids -%}
+          {%- assign media_id_number = media_id | plus: 0 -%}
+          {%- assign media = product.media | where: 'id', media_id_number | first -%}
+          {%- liquid
+            assign media_loading = 'lazy'
+            assign media_priority = 'auto'
+            if forloop.first
+              assign media_loading = 'eager'
+              assign media_priority = priority | default: 'auto'
+            endif
+          -%}
+          <li
+            class="gallery__slide{% if forloop.first %} is-active{% endif %}"
+            data-media-id="{{ media.id }}"
+            data-media-type="{{ media.media_type }}"
+            data-index="{{ forloop.index0 }}"
+          >
+            {% render 'product-media',
+              media: media,
+              product: product,
+              sizes: sizes,
+              loading: media_loading,
+              fetchpriority: media_priority,
+              ratio: forced_ratio,
+              zoom: zoom_enabled,
+              index: forloop.index0,
+              loop: loop_video
+            %}
+          </li>
+        {%- endfor -%}
+
+        {%- if spin_count > 1 -%}
+          <li class="gallery__slide" data-media-type="spin" data-index="{{ ordered_ids.size }}">
+            <lc-spin
+              class="spin product-media media"
+              style="--ratio: {{ forced_ratio | default: '1 / 1' }};"
+              tabindex="0"
+              role="img"
+              aria-label="{{ 'products.media.spin_label' | t }}"
+            >
+              {%- for media in product.media -%}
+                {%- if media.alt contains '#360' -%}
+                  {{
+                    media.preview_image
+                    | image_url: width: 1200
+                    | image_tag:
+                      class: 'spin__frame',
+                      loading: 'lazy',
+                      alt: '',
+                      sizes: sizes,
+                      widths: '600, 900, 1200'
+                  }}
+                {%- endif -%}
+              {%- endfor -%}
+              <span class="spin__hint" aria-hidden="true">
+                {% render 'icon', name: 'arrow-left' %}<span>360°</span>{% render 'icon', name: 'arrow-right' %}
+              </span>
+            </lc-spin>
+          </li>
+        {%- endif -%}
+      {%- endif -%}
+    </ul>
+
+    {%- if media_count > 1 -%}
+      <div class="gallery__nav">
+        <button type="button" class="gallery__arrow icon-button" data-gallery-prev aria-label="{{ 'accessibility.previous' | t }}">
+          {% render 'icon', name: 'chevron-left' %}
+        </button>
+        <span class="gallery__counter" aria-hidden="true"><span data-gallery-current>1</span> / {{ media_count }}</span>
+        <button type="button" class="gallery__arrow icon-button" data-gallery-next aria-label="{{ 'accessibility.next' | t }}">
+          {% render 'icon', name: 'chevron-right' %}
+        </button>
+      </div>
+    {%- endif -%}
+  </div>
+
+  {%- if media_count > 1 -%}
+    <ul class="gallery__thumbs{% unless show_thumbs %} gallery__thumbs--mobile-only{% endunless %}" role="list" aria-label="{{ 'products.media.thumbnails_label' | t }}">
+      {%- for media_id in ordered_ids -%}
+        {%- assign media_id_number = media_id | plus: 0 -%}
+        {%- assign media = product.media | where: 'id', media_id_number | first -%}
+        <li>
+          <button
+            type="button"
+            class="gallery__thumb"
+            data-gallery-thumb="{{ forloop.index0 }}"
+            aria-label="{{ 'products.media.show_media' | t: index: forloop.index }}"
+            aria-current="{% if forloop.first %}true{% else %}false{% endif %}"
+          >
+            {{ media.preview_image | image_url: width: 160 | image_tag: loading: 'lazy', alt: '', sizes: '80px', widths: '80, 160' }}
+            {%- if media.media_type != 'image' -%}
+              <span class="gallery__thumb-badge">{% render 'icon', name: 'play' %}</span>
+            {%- endif -%}
+          </button>
+        </li>
+      {%- endfor -%}
+      {%- if spin_count > 1 -%}
+        {%- assign spin_label_index = ordered_ids.size | plus: 1 -%}
+        <li>
+          <button
+            type="button"
+            class="gallery__thumb gallery__thumb--spin"
+            data-gallery-thumb="{{ ordered_ids.size }}"
+            aria-label="{{ 'products.media.show_media' | t: index: spin_label_index }}"
+            aria-current="false"
+          >
+            <span>360°</span>
+          </button>
+        </li>
+      {%- endif -%}
+    </ul>
+  {%- endif -%}
+
+  {%- if zoom_enabled and product.media.size > 0 -%}
+    <lc-dialog id="ZoomDialog-{{ section.id }}">
+      <dialog class="dialog dialog--full zoom-dialog color-{{ settings.overlay_color_scheme }}" aria-label="{{ 'products.media.zoom_label' | t }}">
+        <button type="button" class="icon-button zoom-dialog__close" data-dialog-close aria-label="{{ 'general.close' | t }}">
+          {% render 'icon', name: 'close' %}
+        </button>
+        <ul class="zoom-dialog__list" role="list">
+          {%- for media_id in ordered_ids -%}
+            {%- assign media_id_number = media_id | plus: 0 -%}
+            {%- assign media = product.media | where: 'id', media_id_number | first -%}
+            {%- if media.media_type != 'image' -%}{%- continue -%}{%- endif -%}
+            <li class="zoom-dialog__item" data-zoom-media="{{ media.id }}">
+              {{
+                media.preview_image
+                | image_url: width: 2400
+                | image_tag:
+                  loading: 'lazy',
+                  sizes: '100vw',
+                  widths: '1080, 1500, 2048, 2400',
+                  alt: media.alt
+              }}
+            </li>
+          {%- endfor -%}
+        </ul>
+      </dialog>
+    </lc-dialog>
+  {%- endif -%}
+
+  {%- assign models = product.media | where: 'media_type', 'model' -%}
+  {%- if models.size > 0 -%}
+    <script type="application/json" data-product-models>{{ models | json }}</script>
+  {%- endif -%}
+</lc-media-gallery>

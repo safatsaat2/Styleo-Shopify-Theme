@@ -1,0 +1,82 @@
+{%- comment -%}
+  Shared <head> assets for every layout: favicon, fonts, theme tokens,
+  base styles, runtime config, and the core script.
+{%- endcomment -%}
+
+<meta name="theme-color" content="{{ settings.body_color_scheme.settings.background }}">
+
+{%- if settings.favicon != blank %}
+  <link rel="icon" type="image/png" href="{{ settings.favicon | image_url: width: 32, height: 32 }}">
+  <link rel="apple-touch-icon" href="{{ settings.favicon | image_url: width: 180, height: 180 }}">
+{%- endif %}
+
+{%- unless settings.type_body_font.system? %}
+  {{ settings.type_body_font | font_url | preload_tag: as: 'font', type: 'font/woff2', crossorigin: true }}
+{%- endunless %}
+{%- unless settings.type_heading_font.system? %}
+  {{ settings.type_heading_font | font_url | preload_tag: as: 'font', type: 'font/woff2', crossorigin: true }}
+{%- endunless %}
+
+{% render 'theme-styles' %}
+
+{{ 'base.css' | asset_url | stylesheet_tag: preload: true }}
+{{ 'components.css' | asset_url | stylesheet_tag }}
+{{ 'component-cards.css' | asset_url | stylesheet_tag }}
+
+{%- if settings.page_transitions %}
+  <style>
+    @media (prefers-reduced-motion: no-preference) {
+      @view-transition { navigation: auto; }
+    }
+  </style>
+{%- endif %}
+
+<script>
+  document.documentElement.classList.replace('no-js', 'js');
+  window.LilacConfig = {
+    routes: {
+      root: {{ routes.root_url | json }},
+      cart: {{ routes.cart_url | json }},
+      cartAdd: {{ routes.cart_add_url | json }},
+      cartChange: {{ routes.cart_change_url | json }},
+      cartUpdate: {{ routes.cart_update_url | json }},
+      search: {{ routes.search_url | json }},
+      predictiveSearch: {{ routes.predictive_search_url | json }},
+      productRecommendations: {{ routes.product_recommendations_url | json }}
+    },
+    cartType: {{ settings.cart_type | json }},
+    moneyFormat: {{ shop.money_format | json }},
+    moneyWithCurrencyFormat: {{ shop.money_with_currency_format | json }},
+    currencyCodeEnabled: {{ settings.currency_code_enabled | json }},
+    currency: {{ cart.currency.iso_code | json }},
+    locale: {{ request.locale.iso_code | json }},
+    designMode: {{ request.design_mode | json }},
+    animations: {{ settings.animations_reveal | json }},
+    assets: {
+      productJs: {{ 'product.js' | asset_url | json }},
+      galleryJs: {{ 'media-gallery.js' | asset_url | json }},
+      productCss: {{ 'section-product.css' | asset_url | json }}
+    },
+    strings: {
+      linkCopied: {{ 'general.share.link_copied' | t | json }},
+      loading: {{ 'general.loading' | t | json }},
+      close: {{ 'general.close' | t | json }},
+      cartError: {{ 'cart.errors.generic' | t | json }},
+      networkError: {{ 'cart.errors.network' | t | json }},
+      cartAdded: {{ 'cart.status.added' | t: title: '[title]' | json }},
+      cartUpdated: {{ 'cart.status.updated' | t | json }},
+      cartSaved: {{ 'cart.status.saved' | t | json }},
+      discountInvalid: {{ 'cart.discount.invalid' | t | json }},
+      noShippingRates: {{ 'cart.shipping_estimator.no_rates' | t | json }},
+      shippingRatesFound: {{ 'cart.shipping_estimator.rates_found' | t | json }},
+      free: {{ 'cart.shipping_estimator.free' | t | json }},
+      faqResults: {{ 'faq.results' | t | json }},
+      faqNoResults: {{ 'faq.no_results' | t | json }},
+      quickOrderItemsOne: {{ 'quick_order.items_one' | t | json }},
+      quickOrderItemsOther: {{ 'quick_order.items_other' | t | json }},
+      quickOrderAdded: {{ 'quick_order.added' | t | json }},
+      recentlyCleared: {{ 'recently_viewed.cleared' | t | json }}
+    }
+  };
+</script>
+<script src="{{ 'theme.js' | asset_url }}" defer></script>

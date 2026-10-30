@@ -1,0 +1,72 @@
+{%- comment -%}
+  Quick view and variant parts for featured products.
+  Rendered through the Section Rendering API at a product URL:
+  /products/handle?section_id=quick-view (optionally with option_values).
+  Not added to templates.
+{%- endcomment -%}
+
+{%- liquid
+  assign form_id = 'ProductForm-quick-view'
+  assign variant = product.selected_or_first_available_variant
+-%}
+
+{%- if product -%}
+  <lc-product
+    class="product product--quick-view product--carousel"
+    data-section-id="quick-view"
+    data-render-section="quick-view"
+    data-product-url="{{ product.url }}"
+    data-product-id="{{ product.id }}"
+    data-variant-id="{{ variant.id }}"
+    data-variant-media-id="{{ variant.featured_media.id }}"
+  >
+    <div class="product__grid">
+      <div class="product__media">
+        {% render 'product-gallery',
+          product: product,
+          section: section,
+          layout: 'carousel',
+          ratio: 'portrait',
+          zoom: 'none',
+          loop_video: true,
+          priority: 'auto',
+          sizes: '(min-width: 750px) 22rem, 100vw'
+        %}
+      </div>
+      <div class="product__info">
+        <div class="product__info-inner">
+          {%- if product.vendor != blank and settings.card_show_vendor -%}
+            <p class="product__vendor subheading">{{ product.vendor }}</p>
+          {%- endif -%}
+          <h2 class="product__title h3" id="QuickViewTitle">
+            <a href="{{ product.url }}" class="product__title-link">{{ product.title | escape }}</a>
+          </h2>
+          {% render 'rating', product: product, class: 'product__rating' %}
+          <div class="product__price-block">
+            {% render 'product-price-block', product: product, section_id: 'quick-view', show_saving: true %}
+          </div>
+          <div data-product-part="badges">{% render 'badges', product: product, variant: variant, class: 'product__badges' %}</div>
+          {% render 'variant-picker', product: product, section_id: 'quick-view', style: 'buttons', show_swatches: true %}
+          {% render 'inventory-status', product: product, variant: variant, show_count: true %}
+          <p class="product__sku" data-product-part="sku"{% if variant.sku == blank %} hidden{% endif %}>{{ 'products.sku' | t }} {{ variant.sku }}</p>
+          {% render 'selling-plans', product: product, variant: variant, form_id: form_id, section_id: 'quick-view' %}
+          {% render 'product-quantity', product: product, section_id: 'quick-view', form_id: form_id %}
+          {% render 'product-buy-buttons', product: product, section_id: 'quick-view', form_id: form_id %}
+          {%- if product.description != blank -%}
+            <div class="product__description rte text-sm">{{ product.description | strip_html | truncatewords: 40 }}</div>
+          {%- endif -%}
+          <a href="{{ product.url }}" class="link-arrow product__details-link">
+            {{- 'products.view_details' | t -}}
+            {% render 'icon', name: 'arrow-right' %}
+          </a>
+        </div>
+      </div>
+    </div>
+  </lc-product>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "t:names.quick_view"
+}
+{% endschema %}

@@ -1,0 +1,37 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-blog",
+      "settings": {
+        "subheading": "Journal",
+        "columns": 3,
+        "per_page": 9,
+        "show_tags": true,
+        "show_image": true,
+        "show_date": true,
+        "show_author": true,
+        "show_excerpt": true,
+        "color_scheme": "cream",
+        "padding_top": 48,
+        "padding_bottom": 80,
+        "layout": "featured"
+      }
+    },
+    "newsletter": {
+      "type": "newsletter",
+      "settings": {
+        "heading": "Style notes, delivered",
+        "text": "<p>New stories and styling ideas in your inbox.</p>",
+        "layout": "centered",
+        "full_width": false,
+        "color_scheme": "lavender",
+        "padding_top": 0,
+        "padding_bottom": 80
+      }
+    }
+  },
+  "order": [
+    "main",
+    "newsletter"
+  ]
+}

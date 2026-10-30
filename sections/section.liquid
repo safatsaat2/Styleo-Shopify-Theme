@@ -1,0 +1,417 @@
+{%- comment -%}
+  Custom section: a free layout built from theme blocks and app blocks.
+  Blocks sit in a row or a column; groups nest further layouts.
+{%- endcomment -%}
+
+{%- liquid
+  assign bg = section.settings.background_image
+  assign width_class = 'page-width'
+  case section.settings.width
+    when 'narrow'
+      assign width_class = 'page-width page-width--narrow'
+    when 'full'
+      assign width_class = 'page-width--full'
+  endcase
+-%}
+
+<div
+  class="custom-section color-{{ section.settings.color_scheme }}{% if bg %} custom-section--media{% endif %}"
+  style="--min-h: {{ section.settings.min_height }}svh; --overlay: {{ section.settings.overlay | divided_by: 100.0 }};"
+>
+  {%- if bg -%}
+    {%- liquid
+      assign loading = 'lazy'
+      assign priority = 'auto'
+      if section.index <= 2
+        assign loading = 'eager'
+        assign priority = 'high'
+      endif
+    -%}
+    {% render 'image', image: bg, sizes: '100vw', loading: loading, fetchpriority: priority, class: 'custom-section__bg' %}
+    <span class="custom-section__overlay" aria-hidden="true"></span>
+  {%- endif -%}
+  {%- if section.settings.show_glow -%}
+    <span class="glow custom-section__glow" aria-hidden="true"></span>
+  {%- endif -%}
+
+  <div class="{{ width_class }} section-spacing" style="--pt: {{ section.settings.padding_top }}px; --pb: {{ section.settings.padding_bottom }}px;">
+    <div
+      class="custom-section__layout custom-section__layout--{{ section.settings.direction }}{% if section.settings.stack_mobile %} custom-section__layout--stack{% endif %}"
+      style="--gap: {{ section.settings.gap }}px; --align: {{ section.settings.align }}; --justify: {{ section.settings.justify }};"
+    >
+      {% content_for 'blocks' %}
+    </div>
+  </div>
+</div>
+
+{{ 'section-blocks.css' | asset_url | stylesheet_tag }}
+
+{% schema %}
+{
+  "name": "t:names.custom_section",
+  "tag": "section",
+  "class": "section-custom",
+  "blocks": [
+    {
+      "type": "@theme"
+    },
+    {
+      "type": "@app"
+    }
+  ],
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:content.layout"
+    },
+    {
+      "type": "select",
+      "id": "direction",
+      "label": "t:labels.direction",
+      "options": [
+        {
+          "value": "column",
+          "label": "t:options.vertical"
+        },
+        {
+          "value": "row",
+          "label": "t:options.horizontal"
+        }
+      ],
+      "default": "column"
+    },
+    {
+      "type": "checkbox",
+      "id": "stack_mobile",
+      "label": "t:labels.stack_on_mobile",
+      "default": true,
+      "visible_if": "{{ section.settings.direction == 'row' }}"
+    },
+    {
+      "type": "select",
+      "id": "align",
+      "label": "t:labels.alignment",
+      "options": [
+        {
+          "value": "flex-start",
+          "label": "t:options.start"
+        },
+        {
+          "value": "center",
+          "label": "t:options.center"
+        },
+        {
+          "value": "flex-end",
+          "label": "t:options.end"
+        },
+        {
+          "value": "stretch",
+          "label": "t:options.stretch"
+        }
+      ],
+      "default": "flex-start"
+    },
+    {
+      "type": "select",
+      "id": "justify",
+      "label": "t:labels.distribution",
+      "options": [
+        {
+          "value": "flex-start",
+          "label": "t:options.start"
+        },
+        {
+          "value": "center",
+          "label": "t:options.center"
+        },
+        {
+          "value": "flex-end",
+          "label": "t:options.end"
+        },
+        {
+          "value": "space-between",
+          "label": "t:options.space_between"
+        }
+      ],
+      "default": "flex-start"
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "label": "t:labels.gap",
+      "default": 20
+    },
+    {
+      "type": "select",
+      "id": "width",
+      "label": "t:labels.width",
+      "options": [
+        {
+          "value": "narrow",
+          "label": "t:options.narrow"
+        },
+        {
+          "value": "page",
+          "label": "t:options.page"
+        },
+        {
+          "value": "full",
+          "label": "t:options.full_width"
+        }
+      ],
+      "default": "page"
+    },
+    {
+      "type": "range",
+      "id": "min_height",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "label": "t:labels.minimum_height",
+      "info": "t:info.percent_of_the_screen_height",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "t:content.appearance"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:labels.color_scheme",
+      "default": "cream"
+    },
+    {
+      "type": "image_picker",
+      "id": "background_image",
+      "label": "t:labels.background_image"
+    },
+    {
+      "type": "range",
+      "id": "overlay",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "%",
+      "label": "t:labels.image_overlay",
+      "default": 30,
+      "visible_if": "{{ section.settings.background_image != blank }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_glow",
+      "label": "t:labels.show_accent_glow",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "label": "t:labels.top",
+      "default": 64
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "label": "t:labels.bottom",
+      "default": 64
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.custom_section",
+      "category": "t:categories.layout",
+      "blocks": {
+        "heading": {
+          "type": "heading"
+        },
+        "text": {
+          "type": "text"
+        },
+        "button": {
+          "type": "button"
+        }
+      },
+      "block_order": [
+        "heading",
+        "text",
+        "button"
+      ]
+    },
+    {
+      "name": "t:names.text_and_image_columns",
+      "category": "t:categories.layout",
+      "settings": {
+        "direction": "row",
+        "align": "center",
+        "gap": 48
+      },
+      "blocks": {
+        "column": {
+          "type": "group",
+          "settings": {
+            "gap": 16
+          },
+          "blocks": {
+            "subheading": {
+              "type": "text",
+              "settings": {
+                "text": "<p>Our story</p>",
+                "style": "subheading"
+              }
+            },
+            "heading": {
+              "type": "heading",
+              "settings": {
+                "heading": "Made to be <em>worn</em>, loved, and kept"
+              }
+            },
+            "text": {
+              "type": "text",
+              "settings": {
+                "style": "large"
+              }
+            },
+            "button": {
+              "type": "button",
+              "settings": {
+                "label": "Read our story"
+              }
+            }
+          },
+          "block_order": [
+            "subheading",
+            "heading",
+            "text",
+            "button"
+          ]
+        },
+        "image": {
+          "type": "image",
+          "settings": {
+            "shape": "arch"
+          }
+        }
+      },
+      "block_order": [
+        "column",
+        "image"
+      ]
+    },
+    {
+      "name": "t:names.trust_strip",
+      "category": "t:categories.layout",
+      "settings": {
+        "color_scheme": "lavender",
+        "padding_top": 24,
+        "padding_bottom": 24
+      },
+      "blocks": {
+        "icons": {
+          "type": "group",
+          "settings": {
+            "direction": "row",
+            "justify": "space-between",
+            "gap": 24
+          },
+          "blocks": {
+            "one": {
+              "type": "icon",
+              "settings": {
+                "icon": "truck",
+                "label": "Free shipping over $100"
+              }
+            },
+            "two": {
+              "type": "icon",
+              "settings": {
+                "icon": "return",
+                "label": "30-day returns"
+              }
+            },
+            "three": {
+              "type": "icon",
+              "settings": {
+                "icon": "shield",
+                "label": "Secure checkout"
+              }
+            },
+            "four": {
+              "type": "icon",
+              "settings": {
+                "icon": "headset",
+                "label": "Real people, real help"
+              }
+            }
+          },
+          "block_order": [
+            "one",
+            "two",
+            "three",
+            "four"
+          ]
+        }
+      },
+      "block_order": [
+        "icons"
+      ]
+    },
+    {
+      "name": "t:names.dusk_statement",
+      "category": "t:categories.layout",
+      "settings": {
+        "color_scheme": "dusk",
+        "align": "center",
+        "width": "narrow",
+        "show_glow": true,
+        "padding_top": 96,
+        "padding_bottom": 96
+      },
+      "blocks": {
+        "badge": {
+          "type": "orbit-badge",
+          "settings": {
+            "alignment": "center"
+          }
+        },
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "heading": "Quiet pieces, <em>loud</em> confidence",
+            "size": "h1",
+            "alignment": "center"
+          }
+        },
+        "button": {
+          "type": "button",
+          "settings": {
+            "label": "Discover the edit",
+            "style": "secondary"
+          }
+        }
+      },
+      "block_order": [
+        "badge",
+        "heading",
+        "button"
+      ]
+    }
+  ]
+}
+{% endschema %}

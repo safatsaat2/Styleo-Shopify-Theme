@@ -1,0 +1,125 @@
+{%- layout none -%}
+{%- comment -%}
+  Gift card page sent to the recipient: store logo or name, card value and
+  balance, the code with a copy button, a QR code (at least 120 x 120px),
+  Add to Apple Wallet, and a print option.
+{%- endcomment -%}
+<!doctype html>
+<html class="no-js" lang="{{ request.locale.iso_code }}">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    {%- assign formatted_initial_value = gift_card.initial_value | money_without_trailing_zeros: gift_card.currency -%}
+    <title>{{ 'gift_card.title' | t: value: formatted_initial_value, shop: shop.name }}</title>
+    <meta name="description" content="{{ 'gift_card.description' | t: shop: shop.name | escape }}">
+    {% render 'head-assets' %}
+    {{ 'template-gift-card.css' | asset_url | stylesheet_tag }}
+    <script src="{{ 'vendor/qrcode.js' | shopify_asset_url }}" defer></script>
+    {{ content_for_header }}
+  </head>
+
+  <body class="color-{{ settings.body_color_scheme.id }} template-gift-card">
+    <main class="gift-card color-dusk" id="MainContent">
+      <span class="glow gift-card__glow" aria-hidden="true"></span>
+      <header class="gift-card__header">
+        {%- if settings.logo_inverse != blank -%}
+          {{ settings.logo_inverse | image_url: width: 480 | image_tag: alt: shop.name, class: 'gift-card__logo', widths: '160, 240, 320, 480', sizes: '160px' }}
+        {%- elsif settings.logo != blank -%}
+          {{ settings.logo | image_url: width: 480 | image_tag: alt: shop.name, class: 'gift-card__logo', widths: '160, 240, 320, 480', sizes: '160px' }}
+        {%- else -%}
+          <p class="logo__text gift-card__shop">{{ shop.name }}</p>
+        {%- endif -%}
+      </header>
+
+      <section class="gift-card__card color-paper" aria-labelledby="GiftCardTitle">
+        <p class="subheading">{{ 'gift_card.label' | t }}</p>
+        <h1 id="GiftCardTitle" class="gift-card__value h1">{{ formatted_initial_value }}</h1>
+
+        {%- if gift_card.enabled == false or gift_card.expired -%}
+          <p class="badge badge--muted">
+            {%- if gift_card.expired -%}{{ 'gift_card.expired' | t }}{%- else -%}{{ 'gift_card.disabled' | t }}{%- endif -%}
+          </p>
+        {%- endif -%}
+
+        {%- if gift_card.balance != gift_card.initial_value -%}
+          <p class="gift-card__balance">
+            {{ 'gift_card.balance' | t }} <strong>{{ gift_card.balance | money }}</strong>
+          </p>
+        {%- endif -%}
+
+        {%- if gift_card.expires_on -%}
+          {%- assign expiry = gift_card.expires_on | date: format: 'date' -%}
+          <p class="gift-card__expiry">{{ 'gift_card.expires_on' | t: date: expiry }}</p>
+        {%- endif -%}
+
+        <div class="gift-card__code-row">
+          <label class="visually-hidden" for="GiftCardCode">{{ 'gift_card.code_label' | t }}</label>
+          <input id="GiftCardCode" class="gift-card__code" type="text" value="{{ gift_card.code | format_code }}" readonly>
+          <button type="button" class="button button--secondary button--small" data-copy-code="{{ gift_card.code }}">
+            {% render 'icon', name: 'copy' %}
+            {{ 'gift_card.copy' | t }}
+          </button>
+        </div>
+        <p class="visually-hidden" role="status" data-copy-status></p>
+
+        <div class="gift-card__qr" aria-hidden="true">
+          <div id="GiftCardQr" data-identifier="{{ gift_card.qr_identifier }}"></div>
+        </div>
+        <p class="gift-card__qr-label">{{ 'gift_card.qr_label' | t }}</p>
+
+        {%- if gift_card.pass_url -%}
+          <a href="{{ gift_card.pass_url }}" class="gift-card__wallet" rel="nofollow">
+            <img
+              src="{{ 'gift-card/add-to-apple-wallet.svg' | shopify_asset_url }}"
+              width="120"
+              height="40"
+              alt="{{ 'gift_card.apple_wallet' | t }}"
+              loading="lazy"
+            >
+          </a>
+        {%- endif -%}
+
+        <div class="button-row gift-card__actions">
+          <a href="{{ shop.url }}" class="button">{{ 'gift_card.shop' | t }}</a>
+          <button type="button" class="button button--outline" data-print>{% render 'icon', name: 'download' %} {{ 'gift_card.print' | t }}</button>
+        </div>
+      </section>
+
+      {%- if gift_card.message != blank -%}
+        <section class="gift-card__note color-paper" aria-label="{{ 'gift_card.message_label' | t }}">
+          <p class="subheading">{{ 'gift_card.message_label' | t }}</p>
+          <blockquote class="gift-card__message">{{ gift_card.message }}</blockquote>
+          {%- if gift_card.recipient.name != blank or gift_card.customer -%}
+            <p class="gift-card__from">{{ 'gift_card.from' | t: name: gift_card.customer.first_name }}</p>
+          {%- endif -%}
+        </section>
+      {%- endif -%}
+
+      {%- if gift_card.send_on -%}
+        <p class="gift-card__send-on">{{ 'gift_card.send_on' | t: date: gift_card.send_on }}</p>
+      {%- endif -%}
+    </main>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        var qr = document.getElementById('GiftCardQr');
+        if (qr && window.QRCode) {
+          new QRCode(qr, { text: qr.dataset.identifier, width: 160, height: 160, correctLevel: QRCode.CorrectLevel.M });
+        }
+        document.querySelector('[data-copy-code]')?.addEventListener('click', function (event) {
+          var code = event.currentTarget.dataset.copyCode;
+          var status = document.querySelector('[data-copy-status]');
+          navigator.clipboard.writeText(code).then(function () {
+            if (status) status.textContent = {{ 'gift_card.copied' | t | json }};
+            event.currentTarget.classList.add('is-copied');
+          }).catch(function () {
+            document.getElementById('GiftCardCode').select();
+          });
+        });
+        document.querySelector('[data-print]')?.addEventListener('click', function () { window.print(); });
+      });
+    </script>
+  </body>
+</html>

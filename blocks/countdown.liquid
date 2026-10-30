@@ -1,0 +1,75 @@
+<div class="tb-countdown tb-align-{{ block.settings.alignment }}" {{ block.shopify_attributes }}>
+  {%- if block.settings.end_date != blank -%}
+    {% render 'countdown',
+      end_date: block.settings.end_date,
+      end_time: block.settings.end_time,
+      label: block.settings.label,
+      expired_text: block.settings.expired_text
+    %}
+  {%- elsif request.design_mode -%}
+    <p class="field__hint">{{ 'countdown.add_end_date' | t }}</p>
+  {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "t:names.countdown",
+  "tag": null,
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "t:content.counts_down_to_a_real_end_date_it_hides_when_the_558c7d"
+    },
+    {
+      "type": "text",
+      "id": "end_date",
+      "label": "t:labels.end_date",
+      "info": "t:info.format_yyyy_mm_dd_in_your_store_s_time_zone"
+    },
+    {
+      "type": "text",
+      "id": "end_time",
+      "label": "t:labels.end_time",
+      "default": "23:59",
+      "info": "t:info.format_hh_mm_24_hour"
+    },
+    {
+      "type": "text",
+      "id": "label",
+      "label": "t:labels.label",
+      "default": "Offer ends in"
+    },
+    {
+      "type": "text",
+      "id": "expired_text",
+      "label": "t:labels.text_after_it_ends",
+      "info": "t:info.leave_blank_to_hide_the_countdown"
+    },
+    {
+      "type": "select",
+      "id": "alignment",
+      "label": "t:labels.alignment",
+      "options": [
+        {
+          "value": "start",
+          "label": "t:options.left"
+        },
+        {
+          "value": "center",
+          "label": "t:options.center"
+        },
+        {
+          "value": "end",
+          "label": "t:options.right"
+        }
+      ],
+      "default": "start"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.countdown"
+    }
+  ]
+}
+{% endschema %}

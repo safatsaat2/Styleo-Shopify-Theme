@@ -1,0 +1,37 @@
+{%- comment -%}
+  Halo media: the theme's signature image treatment. A lavender orb sits
+  behind the image, or the image is cut into an arch.
+
+  Accepts:
+  - image {Image}
+  - shape {String}: 'arch', 'orb', 'frame', or 'none'
+  - ratio {String}: CSS aspect ratio, default '4 / 5'
+  - sizes {String}
+  - loading {String}
+  - fetchpriority {String}
+  - placeholder {String}: placeholder_svg_tag name, default 'lifestyle-1'
+  - overlay {String}: captured HTML placed on top (for example an orbit badge)
+  - class {String}
+{%- endcomment -%}
+
+{%- assign halo_shape = shape | default: 'arch' -%}
+
+<div class="halo halo--{{ halo_shape }} {{ class }}" style="--ratio: {{ ratio | default: '4 / 5' }};">
+  {%- if halo_shape == 'orb' or halo_shape == 'arch' -%}
+    <span class="halo__orb" aria-hidden="true"></span>
+  {%- endif -%}
+  <div class="halo__media">
+    {%- if image != blank -%}
+      {% render 'image',
+        image: image,
+        sizes: sizes,
+        loading: loading,
+        fetchpriority: fetchpriority,
+        class: 'halo__image'
+      %}
+    {%- else -%}
+      {{ placeholder | default: 'lifestyle-1' | placeholder_svg_tag: 'placeholder-svg halo__image' }}
+    {%- endif -%}
+  </div>
+  {{ overlay }}
+</div>

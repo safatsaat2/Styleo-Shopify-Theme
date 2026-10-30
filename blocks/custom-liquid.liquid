@@ -1,0 +1,23 @@
+<div class="tb-custom-liquid" {{ block.shopify_attributes }}>
+  {{ block.settings.custom_liquid }}
+</div>
+
+{% schema %}
+{
+  "name": "t:names.custom_liquid",
+  "tag": null,
+  "settings": [
+    {
+      "type": "liquid",
+      "id": "custom_liquid",
+      "label": "t:labels.liquid_code",
+      "info": "t:info.add_app_snippets_or_other_code_code_here_is_your_e2a3d2"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.custom_liquid"
+    }
+  ]
+}
+{% endschema %}

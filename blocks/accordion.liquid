@@ -1,0 +1,46 @@
+<div class="tb-accordion accordion-group" {{ block.shopify_attributes }}>
+  {% content_for 'blocks' %}
+</div>
+
+{% schema %}
+{
+  "name": "t:names.accordion",
+  "tag": null,
+  "blocks": [
+    {
+      "type": "_accordion-row"
+    }
+  ],
+  "settings": [],
+  "presets": [
+    {
+      "name": "t:names.accordion",
+      "blocks": {
+        "one": {
+          "type": "_accordion-row",
+          "settings": {
+            "heading": "Shipping"
+          }
+        },
+        "two": {
+          "type": "_accordion-row",
+          "settings": {
+            "heading": "Returns"
+          }
+        },
+        "three": {
+          "type": "_accordion-row",
+          "settings": {
+            "heading": "Care"
+          }
+        }
+      },
+      "block_order": [
+        "one",
+        "two",
+        "three"
+      ]
+    }
+  ]
+}
+{% endschema %}

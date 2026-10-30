@@ -1,0 +1,48 @@
+{%- comment -%}
+  Store logo, or the store name set in the heading font.
+  Works with any logo aspect ratio: width comes from theme settings and
+  height follows the image.
+
+  Accepts:
+  - inverse {Boolean}: also output the dark-background logo (for transparent headers)
+  - class {String}: extra class on the link
+  - tag {String}: wrapper element, defaults to "div"
+{%- endcomment -%}
+
+{%- liquid
+  assign wrapper = tag | default: 'div'
+  assign desktop_width = settings.logo_width
+  assign mobile_width = settings.logo_width_mobile
+  assign logo_sizes = '(min-width: 750px) ' | append: desktop_width | append: 'px, ' | append: mobile_width | append: 'px'
+-%}
+
+<{{ wrapper }} class="logo {{ class }}" style="--logo-width: {{ desktop_width }}px; --logo-width-mobile: {{ mobile_width }}px;">
+  <a href="{{ routes.root_url }}" class="logo__link">
+    {%- if settings.logo != blank -%}
+      {{
+        settings.logo
+        | image_url: width: 600
+        | image_tag:
+          class: 'logo__img logo__img--default',
+          widths: '120, 180, 240, 300, 360, 480, 600',
+          sizes: logo_sizes,
+          alt: shop.name,
+          loading: 'eager'
+      }}
+      {%- if inverse and settings.logo_inverse != blank -%}
+        {{
+          settings.logo_inverse
+          | image_url: width: 600
+          | image_tag:
+            class: 'logo__img logo__img--inverse',
+            widths: '120, 180, 240, 300, 360, 480, 600',
+            sizes: logo_sizes,
+            alt: shop.name,
+            loading: 'eager'
+        }}
+      {%- endif -%}
+    {%- else -%}
+      <span class="logo__text">{{ shop.name }}</span>
+    {%- endif -%}
+  </a>
+</{{ wrapper }}>

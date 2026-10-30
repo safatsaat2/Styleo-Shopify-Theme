@@ -1,0 +1,96 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-page",
+      "settings": {
+        "show_title": true,
+        "alignment": "start",
+        "width": "medium",
+        "color_scheme": "cream",
+        "padding_top": 48,
+        "padding_bottom": 32,
+        "subheading": "Fit"
+      }
+    },
+    "how": {
+      "type": "multicolumn",
+      "blocks": {
+        "chest": {
+          "type": "column",
+          "settings": {
+            "icon": "info",
+            "heading": "Chest",
+            "text": "<p>Measure around the fullest part, keeping the tape level.</p>"
+          }
+        },
+        "waist": {
+          "type": "column",
+          "settings": {
+            "icon": "info",
+            "heading": "Waist",
+            "text": "<p>Measure around your natural waistline.</p>"
+          }
+        },
+        "hips": {
+          "type": "column",
+          "settings": {
+            "icon": "info",
+            "heading": "Hips",
+            "text": "<p>Measure around the fullest part of your hips.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "chest",
+        "waist",
+        "hips"
+      ],
+      "settings": {
+        "heading": "How to measure",
+        "alignment": "center",
+        "columns": 3,
+        "mobile_columns": "1",
+        "card_style": "card",
+        "color_scheme": "mist",
+        "padding_top": 56,
+        "padding_bottom": 56
+      }
+    },
+    "faq": {
+      "type": "faq",
+      "blocks": {
+        "q1": {
+          "type": "question",
+          "settings": {
+            "question": "What if I am between sizes?",
+            "answer": "<p>Tell customers which way to size for your fits.</p>"
+          }
+        },
+        "q2": {
+          "type": "question",
+          "settings": {
+            "question": "Can I exchange for another size?",
+            "answer": "<p>Explain your exchange process.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "q1",
+        "q2"
+      ],
+      "settings": {
+        "subheading": "",
+        "heading": "Fit questions",
+        "show_search": false,
+        "color_scheme": "cream",
+        "padding_top": 56,
+        "padding_bottom": 80
+      }
+    }
+  },
+  "order": [
+    "main",
+    "how",
+    "faq"
+  ]
+}

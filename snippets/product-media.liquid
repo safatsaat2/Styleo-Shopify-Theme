@@ -1,0 +1,96 @@
+{%- comment -%}
+  One piece of product media. Images render directly; videos, external
+  videos, and 3D models render a poster with a play control and load their
+  player only when requested.
+
+  Accepts:
+  - media {Media}
+  - product {Product}
+  - sizes {String}
+  - loading {String}
+  - fetchpriority {String}
+  - ratio {String}: forced CSS aspect ratio; blank uses the media's own ratio
+  - zoom {Boolean}: image opens the zoom dialog
+  - index {Number}: position, used by the zoom dialog
+  - loop {Boolean}: loop uploaded videos
+{%- endcomment -%}
+
+{%- liquid
+  assign media_ratio = ratio | default: media.preview_image.aspect_ratio | default: 1
+  assign media_alt = media.alt | default: product.title | escape
+  assign media_position = index | plus: 1
+-%}
+
+{%- case media.media_type -%}
+  {%- when 'image' -%}
+    <div class="product-media media{% if zoom %} product-media--zoomable{% endif %}" style="--ratio: {{ media_ratio }}; --fit: contain;">
+      {% render 'image',
+        image: media.preview_image,
+        sizes: sizes,
+        widths: '360, 540, 720, 900, 1080, 1296, 1512, 1728, 2048',
+        loading: loading,
+        fetchpriority: fetchpriority,
+        alt: media_alt,
+        class: 'product-media__image'
+      %}
+      {%- if zoom -%}
+        <button
+          type="button"
+          class="product-media__zoom"
+          data-zoom-open="{{ media.id }}"
+          aria-label="{{ 'products.media.open_zoom' | t: index: media_position }}"
+          aria-haspopup="dialog"
+        >
+          <span class="product-media__zoom-icon icon-button">{% render 'icon', name: 'zoom' %}</span>
+        </button>
+      {%- endif -%}
+    </div>
+
+  {%- when 'video', 'external_video' -%}
+    <lc-deferred-media class="product-media media product-media--deferred" style="--ratio: {{ media_ratio }};" data-media-type="{{ media.media_type }}">
+      {% render 'image',
+        image: media.preview_image,
+        sizes: sizes,
+        loading: loading,
+        alt: media_alt,
+        class: 'product-media__poster'
+      %}
+      <button type="button" class="product-media__play" data-deferred-load aria-label="{{ 'products.media.play_video' | t: title: media_alt }}">
+        <span class="product-media__play-icon">{% render 'icon', name: 'play' %}</span>
+      </button>
+      <template>
+        {%- if media.media_type == 'video' -%}
+          {{ media | video_tag: controls: true, playsinline: true, preload: 'metadata', loop: loop, image_size: '1600x' }}
+        {%- else -%}
+          {{ media | external_video_url: autoplay: true, rel: 0, playsinline: 1 | external_video_tag: loading: 'lazy' }}
+        {%- endif -%}
+      </template>
+    </lc-deferred-media>
+
+  {%- when 'model' -%}
+    <lc-deferred-media class="product-media media product-media--deferred product-media--model" style="--ratio: {{ media_ratio }};" data-media-type="model">
+      {% render 'image',
+        image: media.preview_image,
+        sizes: sizes,
+        loading: loading,
+        alt: media_alt,
+        class: 'product-media__poster'
+      %}
+      <button type="button" class="product-media__play" data-deferred-load aria-label="{{ 'products.media.view_3d' | t: title: media_alt }}">
+        <span class="product-media__play-icon product-media__play-icon--3d">3D</span>
+      </button>
+      <template>
+        {{ media | model_viewer_tag: image_size: '1024x', reveal: 'interaction', toggleable: true, data-model-id: media.id }}
+      </template>
+    </lc-deferred-media>
+    <button
+      type="button"
+      class="button button--outline button--small product-media__xr"
+      data-shopify-xr
+      data-shopify-model3d-id="{{ media.id }}"
+      data-shopify-title="{{ product.title | escape }}"
+      data-shopify-xr-hidden
+    >
+      {{ 'products.media.view_in_space' | t }}
+    </button>
+{%- endcase -%}

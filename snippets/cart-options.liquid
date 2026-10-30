@@ -1,0 +1,129 @@
+{%- comment -%}
+  Optional cart extras saved on the order: order note, gift message,
+  delivery date (cart attributes), and a gift wrap toggle.
+  Text fields save in the background without redrawing the cart.
+
+  Accepts:
+  - id {String}: unique prefix
+  - show_gift_message {Boolean}
+  - form_id {String}: cart form, so fields also submit without JavaScript
+{%- endcomment -%}
+
+{%- liquid
+  assign wrap_product = settings.gift_wrap_product
+  assign wrap_variant = wrap_product.selected_or_first_available_variant
+  assign wrap_in_cart = false
+  if wrap_variant
+    for item in cart.items
+      if item.variant_id == wrap_variant.id
+        assign wrap_in_cart = true
+        break
+      endif
+    endfor
+  endif
+-%}
+
+<div class="cart-options">
+  {%- if wrap_product != blank and wrap_product.available -%}
+    <label class="checkbox cart-options__gift-wrap" for="{{ id }}-gift-wrap">
+      <input type="checkbox" id="{{ id }}-gift-wrap" data-cart-gift-wrap="{{ wrap_variant.id }}"{% if wrap_in_cart %} checked{% endif %}>
+      <span>
+        {% render 'icon', name: 'gift' %}
+        {{ 'cart.gift_wrap.label' | t }} (+{{ wrap_variant.price | money }})
+      </span>
+    </label>
+  {%- endif -%}
+
+  {%- if show_gift_message -%}
+    <details class="accordion cart-options__item"{% if cart.attributes['Gift message'] != blank %} open{% endif %}>
+      <summary class="accordion__summary">
+        <span class="accordion__title">{% render 'icon', name: 'gift' %} {{ 'cart.gift_message.label' | t }}</span>
+        {% render 'icon', name: 'chevron-down' %}
+      </summary>
+      <div class="accordion__content">
+        <label class="visually-hidden" for="{{ id }}-gift-message">{{ 'cart.gift_message.label' | t }}</label>
+        <textarea
+          id="{{ id }}-gift-message"
+          class="textarea"
+          rows="3"
+          maxlength="250"
+          name="attributes[Gift message]"
+          form="{{ form_id }}"
+          data-cart-attribute="Gift message"
+          placeholder="{{ 'cart.gift_message.placeholder' | t }}"
+        >{{ cart.attributes['Gift message'] }}</textarea>
+      </div>
+    </details>
+  {%- endif -%}
+
+  {%- if settings.cart_delivery_date -%}
+    {%- liquid
+      assign lead_seconds = settings.cart_delivery_lead_days | times: 86400
+      assign earliest = 'now' | date: '%s' | plus: lead_seconds | date: '%Y-%m-%d'
+    -%}
+    <div class="field cart-options__item">
+      <label class="field__label" for="{{ id }}-delivery-date">{{ 'cart.delivery_date.label' | t }}</label>
+      <input
+        id="{{ id }}-delivery-date"
+        class="input"
+        type="date"
+        min="{{ earliest }}"
+        value="{{ cart.attributes['Delivery date'] }}"
+        name="attributes[Delivery date]"
+        form="{{ form_id }}"
+        data-cart-attribute="Delivery date"
+        data-lead-days="{{ settings.cart_delivery_lead_days }}"
+      >
+      <span class="field__hint">{{ 'cart.delivery_date.hint' | t }}</span>
+    </div>
+
+    {%- assign time_slots = settings.cart_delivery_time_slots | newline_to_br | split: '<br />' -%}
+    {%- if settings.cart_delivery_time_slots != blank -%}
+      {%- assign current_slot = cart.attributes['Delivery time'] -%}
+      <div class="field cart-options__item">
+        <label class="field__label" for="{{ id }}-delivery-time">{{ 'cart.delivery_date.time_label' | t }}</label>
+        <div class="select-wrapper">
+          <select
+            id="{{ id }}-delivery-time"
+            class="select"
+            name="attributes[Delivery time]"
+            form="{{ form_id }}"
+            data-cart-attribute="Delivery time"
+          >
+            <option value="">{{ 'cart.delivery_date.time_any' | t }}</option>
+            {%- for slot in time_slots -%}
+              {%- assign slot_label = slot | strip -%}
+              {%- if slot_label != blank -%}
+                <option value="{{ slot_label | escape }}"{% if slot_label == current_slot %} selected{% endif %}>{{ slot_label }}</option>
+              {%- endif -%}
+            {%- endfor -%}
+          </select>
+          {% render 'icon', name: 'chevron-down' %}
+        </div>
+      </div>
+    {%- endif -%}
+  {%- endif -%}
+
+  {%- if settings.cart_note -%}
+    <details class="accordion cart-options__item"{% if cart.note != blank %} open{% endif %}>
+      <summary class="accordion__summary">
+        <span class="accordion__title">{% render 'icon', name: 'mail' %} {{ 'cart.note.label' | t }}</span>
+        {% render 'icon', name: 'chevron-down' %}
+      </summary>
+      <div class="accordion__content">
+        <label class="visually-hidden" for="{{ id }}-note">{{ 'cart.note.label' | t }}</label>
+        <textarea
+          id="{{ id }}-note"
+          class="textarea"
+          name="note"
+          form="{{ form_id }}"
+          rows="3"
+          data-cart-note
+          placeholder="{{ 'cart.note.placeholder' | t }}"
+        >{{ cart.note }}</textarea>
+      </div>
+    </details>
+  {%- endif -%}
+
+  <p class="cart-options__saved visually-hidden" role="status" data-cart-saved></p>
+</div>

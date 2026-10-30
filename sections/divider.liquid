@@ -1,0 +1,108 @@
+{%- comment -%}
+  Divider between sections: a line, a line with an ornament, or a soft
+  gradient fade from one color scheme into the next.
+{%- endcomment -%}
+
+<div class="divider-section color-{{ section.settings.color_scheme }} divider-section--{{ section.settings.style }}" style="--pt: {{ section.settings.padding_top }}px; --pb: {{ section.settings.padding_bottom }}px;">
+  {%- if section.settings.style == 'fade' -%}
+    <div class="divider-section__fade color-{{ section.settings.fade_to }}" aria-hidden="true"></div>
+  {%- else -%}
+    <div class="page-width section-spacing">
+      <div class="tb-divider tb-divider--{{ section.settings.style }} tb-align-center" style="--width: {{ section.settings.width }}%;">
+        {%- if section.settings.style == 'ornament' -%}
+          <span class="tb-divider__line"></span>
+          <svg class="tb-divider__mark" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path d="M12 3l2.2 6.8L21 12l-6.8 2.2L12 21l-2.2-6.8L3 12l6.8-2.2z" fill="currentColor"/></svg>
+          <span class="tb-divider__line"></span>
+        {%- else -%}
+          <hr class="tb-divider__line">
+        {%- endif -%}
+      </div>
+    </div>
+  {%- endif -%}
+</div>
+
+{{ 'section-blocks.css' | asset_url | stylesheet_tag }}
+
+{% schema %}
+{
+  "name": "t:names.divider",
+  "tag": "section",
+  "class": "section-divider",
+  "settings": [
+    {
+      "type": "select",
+      "id": "style",
+      "label": "t:labels.style",
+      "options": [
+        {
+          "value": "line",
+          "label": "t:options.line"
+        },
+        {
+          "value": "ornament",
+          "label": "t:options.line_with_ornament"
+        },
+        {
+          "value": "fade",
+          "label": "t:options.color_fade"
+        }
+      ],
+      "default": "ornament"
+    },
+    {
+      "type": "range",
+      "id": "width",
+      "min": 10,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "label": "t:labels.width",
+      "default": 40,
+      "visible_if": "{{ section.settings.style != 'fade' }}"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:labels.color_scheme",
+      "default": "cream"
+    },
+    {
+      "type": "color_scheme",
+      "id": "fade_to",
+      "label": "t:labels.fade_into_color_scheme",
+      "default": "dusk",
+      "visible_if": "{{ section.settings.style == 'fade' }}"
+    },
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "t:labels.top",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "t:labels.bottom",
+      "default": 24
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.divider",
+      "category": "t:categories.layout"
+    }
+  ]
+}
+{% endschema %}

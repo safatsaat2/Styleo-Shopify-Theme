@@ -1,0 +1,77 @@
+{%- comment -%}
+  Address fields for the legacy customer address forms.
+  Must be rendered inside {% form 'customer_address' %}.
+
+  Accepts:
+  - form {Form}: the customer_address form
+  - prefix {String}: unique id prefix ('New' or the address id)
+  - is_default {Boolean}: whether this address is the default
+{%- endcomment -%}
+
+<lc-address-form class="address-fields">
+  <div class="customer__row">
+    <div class="field">
+      <label class="field__label" for="AddressFirstName{{ prefix }}">{{ 'customer.fields.first_name' | t }}</label>
+      <input id="AddressFirstName{{ prefix }}" class="input" type="text" name="address[first_name]" value="{{ form.first_name }}" autocomplete="given-name">
+    </div>
+    <div class="field">
+      <label class="field__label" for="AddressLastName{{ prefix }}">{{ 'customer.fields.last_name' | t }}</label>
+      <input id="AddressLastName{{ prefix }}" class="input" type="text" name="address[last_name]" value="{{ form.last_name }}" autocomplete="family-name">
+    </div>
+  </div>
+
+  <div class="field">
+    <label class="field__label" for="AddressCompany{{ prefix }}">{{ 'customer.fields.company' | t }}</label>
+    <input id="AddressCompany{{ prefix }}" class="input" type="text" name="address[company]" value="{{ form.company }}" autocomplete="organization">
+  </div>
+
+  <div class="field">
+    <label class="field__label" for="AddressAddress1{{ prefix }}">{{ 'customer.fields.address1' | t }}</label>
+    <input id="AddressAddress1{{ prefix }}" class="input" type="text" name="address[address1]" value="{{ form.address1 }}" autocomplete="address-line1">
+  </div>
+
+  <div class="field">
+    <label class="field__label" for="AddressAddress2{{ prefix }}">{{ 'customer.fields.address2' | t }}</label>
+    <input id="AddressAddress2{{ prefix }}" class="input" type="text" name="address[address2]" value="{{ form.address2 }}" autocomplete="address-line2">
+  </div>
+
+  <div class="customer__row">
+    <div class="field">
+      <label class="field__label" for="AddressCity{{ prefix }}">{{ 'customer.fields.city' | t }}</label>
+      <input id="AddressCity{{ prefix }}" class="input" type="text" name="address[city]" value="{{ form.city }}" autocomplete="address-level2">
+    </div>
+    <div class="field">
+      <label class="field__label" for="AddressZip{{ prefix }}">{{ 'customer.fields.zip' | t }}</label>
+      <input id="AddressZip{{ prefix }}" class="input" type="text" name="address[zip]" value="{{ form.zip }}" autocomplete="postal-code" autocapitalize="characters">
+    </div>
+  </div>
+
+  <div class="customer__row">
+    <div class="field">
+      <label class="field__label" for="AddressCountry{{ prefix }}">{{ 'customer.fields.country' | t }}</label>
+      <div class="select-wrapper">
+        <select id="AddressCountry{{ prefix }}" class="select" name="address[country]" autocomplete="country" data-country-select data-default="{{ form.country | escape }}">
+          {{ all_country_option_tags }}
+        </select>
+        {% render 'icon', name: 'chevron-down' %}
+      </div>
+    </div>
+    <div class="field" data-province-field hidden>
+      <label class="field__label" for="AddressProvince{{ prefix }}">{{ 'customer.fields.province' | t }}</label>
+      <div class="select-wrapper">
+        <select id="AddressProvince{{ prefix }}" class="select" name="address[province]" autocomplete="address-level1" data-province-select data-default="{{ form.province | escape }}"></select>
+        {% render 'icon', name: 'chevron-down' %}
+      </div>
+    </div>
+  </div>
+
+  <div class="field">
+    <label class="field__label" for="AddressPhone{{ prefix }}">{{ 'customer.fields.phone' | t }}</label>
+    <input id="AddressPhone{{ prefix }}" class="input" type="tel" name="address[phone]" value="{{ form.phone }}" autocomplete="tel">
+  </div>
+
+  <label class="checkbox">
+    <input type="checkbox" name="address[default]" value="1"{% if is_default %} checked{% endif %}>
+    <span>{{ 'customer.addresses.set_default' | t }}</span>
+  </label>
+</lc-address-form>

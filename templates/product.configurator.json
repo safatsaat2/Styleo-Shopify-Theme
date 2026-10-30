@@ -1,0 +1,136 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-product",
+      "blocks": {
+        "title": {
+          "type": "title",
+          "settings": {
+            "size": "h1"
+          }
+        },
+        "price": {
+          "type": "price",
+          "settings": {
+            "show_saving": true,
+            "show_installments": true
+          }
+        },
+        "description": {
+          "type": "description",
+          "settings": {}
+        },
+        "picker": {
+          "type": "variant_picker",
+          "settings": {
+            "picker_style": "buttons",
+            "show_swatches": true
+          }
+        },
+        "engraving": {
+          "type": "custom_field",
+          "settings": {
+            "field_type": "text",
+            "label": "Engraving",
+            "hint": "Up to 20 characters",
+            "max_length": 20,
+            "required": false
+          }
+        },
+        "finish": {
+          "type": "custom_field",
+          "settings": {
+            "field_type": "select",
+            "label": "Finish",
+            "options": "Polished, Brushed, Matte",
+            "max_length": 50,
+            "required": true
+          }
+        },
+        "note": {
+          "type": "custom_field",
+          "settings": {
+            "field_type": "textarea",
+            "label": "Notes for our studio",
+            "max_length": 200,
+            "required": false
+          }
+        },
+        "gift": {
+          "type": "gift_wrap",
+          "settings": {
+            "label": "Add gift wrapping",
+            "show_message": true
+          }
+        },
+        "quantity": {
+          "type": "quantity",
+          "settings": {}
+        },
+        "buy": {
+          "type": "buy_buttons",
+          "settings": {
+            "show_dynamic_checkout": false,
+            "show_gift_card_recipient": false,
+            "preorder_note": ""
+          }
+        },
+        "delivery": {
+          "type": "delivery_estimate",
+          "settings": {}
+        },
+        "quote": {
+          "type": "quote",
+          "settings": {
+            "label": "Request a custom quote"
+          }
+        }
+      },
+      "block_order": [
+        "title",
+        "price",
+        "description",
+        "picker",
+        "engraving",
+        "finish",
+        "note",
+        "gift",
+        "quantity",
+        "buy",
+        "delivery",
+        "quote"
+      ],
+      "settings": {
+        "gallery_layout": "thumbnails_bottom",
+        "media_width": "half",
+        "media_ratio": "portrait",
+        "zoom": "hover",
+        "loop_video": true,
+        "sticky_info": true,
+        "show_breadcrumbs": true,
+        "sticky_add_to_cart": true,
+        "sticky_color_scheme": "noir",
+        "color_scheme": "cream",
+        "padding_top": 32,
+        "padding_bottom": 64
+      }
+    },
+    "recommendations": {
+      "type": "product-recommendations",
+      "settings": {
+        "heading": "You may also like",
+        "intent": "related",
+        "limit": 4,
+        "columns": 4,
+        "desktop_layout": "grid",
+        "color_scheme": "cream",
+        "padding_top": 48,
+        "padding_bottom": 80
+      }
+    }
+  },
+  "order": [
+    "main",
+    "recommendations"
+  ]
+}

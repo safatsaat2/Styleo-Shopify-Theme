@@ -1,0 +1,210 @@
+{%- comment -%}
+  Social gallery: images the merchant uploads, each optionally linked or
+  tagged with a product. This isn't a live feed. Use an app block for
+  live Instagram or TikTok content.
+{%- endcomment -%}
+
+<div class="social-gallery-section color-{{ section.settings.color_scheme }} visibility-{{ section.settings.visibility }}">
+  <div class="page-width section-spacing" style="--pt: {{ section.settings.padding_top }}px; --pb: {{ section.settings.padding_bottom }}px;">
+    {% render 'section-heading',
+      subheading: section.settings.subheading,
+      heading: section.settings.heading,
+      link_label: section.settings.profile_label,
+      link_url: section.settings.profile_link,
+      align: 'center'
+    %}
+
+    <ul class="social-gallery" role="list" style="--cols: {{ section.settings.columns }};">
+      {%- for block in section.blocks -%}
+        {%- case block.type -%}
+          {%- when 'image' -%}
+            {%- liquid
+              assign tagged = block.settings.product
+              assign tile_url = block.settings.link
+              if tile_url == blank and tagged != blank
+                assign tile_url = tagged.url
+              endif
+            -%}
+            <li class="social-gallery__item" data-reveal style="--reveal-index: {{ forloop.index0 | modulo: 4 }};" {{ block.shopify_attributes }}>
+              {%- if tile_url != blank -%}<a href="{{ tile_url }}" class="social-gallery__link">{%- else -%}<div class="social-gallery__link">{%- endif -%}
+                <span class="social-gallery__media media" style="--ratio: 1 / 1;">
+                  {%- if block.settings.image != blank -%}
+                    {% render 'image', image: block.settings.image, sizes: '(min-width: 990px) 20vw, 50vw', alt: block.settings.alt %}
+                  {%- else -%}
+                    {%- capture placeholder_name -%}{% cycle 'lifestyle-1', 'product-2', 'lifestyle-2', 'product-4', 'collection-1', 'product-6' %}{%- endcapture -%}
+                    {{ placeholder_name | placeholder_svg_tag: 'placeholder-svg' }}
+                  {%- endif -%}
+                </span>
+                {%- if tagged != blank -%}
+                  <span class="social-gallery__tag">
+                    <span class="social-gallery__tag-title">{{ tagged.title | escape }}</span>
+                    {% render 'price', product: tagged, show_unit: false %}
+                  </span>
+                {%- endif -%}
+              {%- if tile_url != blank -%}</a>{%- else -%}</div>{%- endif -%}
+            </li>
+          {%- when '@app' -%}
+            <li class="social-gallery__item social-gallery__item--app" {{ block.shopify_attributes }}>{% render block %}</li>
+        {%- endcase -%}
+      {%- endfor -%}
+    </ul>
+  </div>
+</div>
+
+{{ 'section-home.css' | asset_url | stylesheet_tag }}
+
+{% schema %}
+{
+  "name": "t:names.social_gallery",
+  "tag": "section",
+  "class": "section-social-gallery",
+  "max_blocks": 12,
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "t:content.upload_your_own_images_for_a_live_instagram_or_t_3d26c0"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "t:labels.subheading",
+      "default": "Seen on social media"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "t:labels.heading",
+      "default": "Styled by you"
+    },
+    {
+      "type": "text",
+      "id": "profile_label",
+      "label": "t:labels.profile_link_label",
+      "info": "t:info.for_example_your_account_handle"
+    },
+    {
+      "type": "url",
+      "id": "profile_link",
+      "label": "t:labels.profile_link"
+    },
+    {
+      "type": "range",
+      "id": "columns",
+      "min": 3,
+      "max": 6,
+      "step": 1,
+      "label": "t:labels.images_per_row_on_large_screens",
+      "default": 6
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:labels.color_scheme",
+      "default": "cream"
+    },
+    {
+      "type": "select",
+      "id": "visibility",
+      "label": "t:labels.show_on",
+      "options": [
+        {
+          "value": "all",
+          "label": "t:options.all_devices"
+        },
+        {
+          "value": "mobile",
+          "label": "t:options.small_screens_only"
+        },
+        {
+          "value": "desktop",
+          "label": "t:options.large_screens_only"
+        }
+      ],
+      "default": "all"
+    },
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "t:labels.top",
+      "default": 64
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "t:labels.bottom",
+      "default": 64
+    }
+  ],
+  "blocks": [
+    {
+      "type": "image",
+      "name": "t:names.image",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "t:labels.image"
+        },
+        {
+          "type": "text",
+          "id": "alt",
+          "label": "t:labels.image_description",
+          "info": "t:info.read_by_screen_readers"
+        },
+        {
+          "type": "product",
+          "id": "product",
+          "label": "t:labels.tagged_product",
+          "info": "t:info.shows_the_product_name_and_price_on_the_image"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "t:labels.link",
+          "info": "t:info.defaults_to_the_tagged_product"
+        }
+      ]
+    },
+    {
+      "type": "@app"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.social_gallery",
+      "blocks": [
+        {
+          "type": "image"
+        },
+        {
+          "type": "image"
+        },
+        {
+          "type": "image"
+        },
+        {
+          "type": "image"
+        },
+        {
+          "type": "image"
+        },
+        {
+          "type": "image"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

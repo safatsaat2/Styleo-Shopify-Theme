@@ -1,0 +1,80 @@
+{%- comment -%}
+  Pickup availability for one variant. Rendered through:
+  /variants/{id}/?section_id=pickup-availability
+  Not added to templates.
+{%- endcomment -%}
+
+{%- assign pick_up_availabilities = product_variant.store_availabilities | where: 'pick_up_enabled', true -%}
+
+{%- if pick_up_availabilities.size > 0 -%}
+  {%- assign closest = pick_up_availabilities.first -%}
+  <div class="pickup__summary">
+    {%- if closest.available -%}
+      <span class="status-dot status-dot--success" aria-hidden="true"></span>
+    {%- else -%}
+      <span class="status-dot status-dot--muted" aria-hidden="true"></span>
+    {%- endif -%}
+    <div>
+      <p class="pickup__title">
+        {%- if closest.available -%}
+          {{ 'products.pickup.available_at' | t: location: closest.location.name }}
+        {%- else -%}
+          {{ 'products.pickup.unavailable_at' | t: location: closest.location.name }}
+        {%- endif -%}
+      </p>
+      {%- if closest.available -%}
+        <p class="pickup__time">{{ closest.pick_up_time }}</p>
+      {%- endif -%}
+      <button type="button" class="pickup__open link" data-dialog-open="PickupDialog-{{ product_variant.id }}" aria-haspopup="dialog">
+        {%- if pick_up_availabilities.size > 1 -%}
+          {{ 'products.pickup.check_other' | t }}
+        {%- else -%}
+          {{ 'products.pickup.view_details' | t }}
+        {%- endif -%}
+      </button>
+    </div>
+  </div>
+
+  <lc-dialog id="PickupDialog-{{ product_variant.id }}">
+    <dialog class="dialog dialog--drawer color-{{ settings.overlay_color_scheme }}" aria-labelledby="PickupDialogTitle-{{ product_variant.id }}">
+      <div class="dialog__panel">
+        <div class="dialog__header">
+          <div>
+            <h2 id="PickupDialogTitle-{{ product_variant.id }}" class="dialog__title">{{ product_variant.product.title | escape }}</h2>
+            {%- unless product_variant.product.has_only_default_variant -%}
+              <p class="text-sm text-muted">{{ product_variant.title | escape }}</p>
+            {%- endunless -%}
+          </div>
+          <button type="button" class="icon-button" data-dialog-close aria-label="{{ 'general.close' | t }}">{% render 'icon', name: 'close' %}</button>
+        </div>
+        <ul class="dialog__body pickup__list" role="list">
+          {%- for availability in pick_up_availabilities -%}
+            <li class="pickup__location">
+              <h3 class="h5">{{ availability.location.name }}</h3>
+              <p class="pickup__status">
+                {%- if availability.available -%}
+                  <span class="status-dot status-dot--success" aria-hidden="true"></span>
+                  {{ 'products.pickup.available' | t }}, {{ availability.pick_up_time }}
+                {%- else -%}
+                  <span class="status-dot status-dot--muted" aria-hidden="true"></span>
+                  {{ 'products.pickup.unavailable' | t }}
+                {%- endif -%}
+              </p>
+              {%- assign address = availability.location.address -%}
+              <address class="pickup__address">
+                {{ address | format_address }}
+                {%- if address.phone.size > 0 -%}<br>{{ address.phone }}{%- endif -%}
+              </address>
+            </li>
+          {%- endfor -%}
+        </ul>
+      </div>
+    </dialog>
+  </lc-dialog>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "t:names.pickup_availability"
+}
+{% endschema %}

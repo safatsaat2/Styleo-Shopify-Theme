@@ -1,0 +1,217 @@
+{
+  "sections": {
+    "hero": {
+      "type": "hero",
+      "blocks": {
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "heading": "Elevate",
+            "accent_line": "every moment",
+            "size": "h0"
+          }
+        },
+        "text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Modern style. Timeless confidence. Made for you.</p>"
+          }
+        },
+        "buttons": {
+          "type": "buttons",
+          "settings": {
+            "button_label": "Shop collection",
+            "button_link": "/collections/all",
+            "button_style": "primary",
+            "show_arrow": true,
+            "button_label_2": "",
+            "button_style_2": "outline"
+          }
+        },
+        "badge": {
+          "type": "orbit_badge",
+          "settings": {
+            "text": "Modern • Timeless • New collection",
+            "position": "top-end"
+          }
+        }
+      },
+      "block_order": [
+        "heading",
+        "text",
+        "buttons",
+        "badge"
+      ],
+      "settings": {
+        "layout": "split",
+        "media_position": "end",
+        "halo_shape": "arch",
+        "media_ratio": "portrait",
+        "alignment": "start",
+        "mobile_alignment": "center",
+        "color_scheme": "dusk",
+        "show_glow": true,
+        "padding_top": 64,
+        "padding_bottom": 104
+      }
+    },
+    "dock": {
+      "type": "feature-dock",
+      "blocks": {
+        "shipping": {
+          "type": "item",
+          "settings": {
+            "icon": "truck",
+            "heading": "Free shipping",
+            "text": "On qualifying orders"
+          }
+        },
+        "returns": {
+          "type": "item",
+          "settings": {
+            "icon": "return",
+            "heading": "Easy returns",
+            "text": "Share your return window"
+          }
+        },
+        "payment": {
+          "type": "item",
+          "settings": {
+            "icon": "shield",
+            "heading": "Secure payment",
+            "text": "Encrypted checkout"
+          }
+        },
+        "support": {
+          "type": "item",
+          "settings": {
+            "icon": "headset",
+            "heading": "Dedicated support",
+            "text": "Say when you can help"
+          }
+        }
+      },
+      "block_order": [
+        "shipping",
+        "returns",
+        "payment",
+        "support"
+      ],
+      "settings": {
+        "style": "pill",
+        "overlap": true,
+        "color_scheme": "lavender",
+        "padding_top": 0,
+        "padding_bottom": 0
+      }
+    },
+    "collections": {
+      "type": "featured-collections",
+      "blocks": {
+        "c1": {
+          "type": "collection",
+          "settings": {
+            "title": "Modern blazer"
+          }
+        },
+        "c2": {
+          "type": "collection",
+          "settings": {
+            "title": "New arrivals"
+          }
+        },
+        "c3": {
+          "type": "collection",
+          "settings": {
+            "title": "Casual essentials"
+          }
+        }
+      },
+      "block_order": [
+        "c1",
+        "c2",
+        "c3"
+      ],
+      "settings": {
+        "heading": "Featured collection",
+        "heading_alignment": "start",
+        "link_label": "View all collections",
+        "link_url": "/collections",
+        "card_style": "arch",
+        "mobile_card_style": "orb",
+        "card_button_label": "Shop now",
+        "desktop_layout": "grid",
+        "columns": 3,
+        "mobile_layout": "grid",
+        "color_scheme": "cream",
+        "padding_top": 80,
+        "padding_bottom": 80
+      }
+    },
+    "new_arrivals": {
+      "type": "product-list",
+      "settings": {
+        "heading": "New arrivals",
+        "link_label": "View all",
+        "limit": 8,
+        "columns": 4,
+        "desktop_layout": "carousel",
+        "mobile_layout": "list",
+        "color_scheme": "cream",
+        "padding_top": 0,
+        "padding_bottom": 80
+      }
+    },
+    "promo": {
+      "type": "promo-banner",
+      "settings": {
+        "heading": "Timeless looks.",
+        "accent_line": "Endless confidence.",
+        "text": "<p>Discover pieces that define your style.</p>",
+        "button_label": "Explore now",
+        "button_link": "/collections/all",
+        "halo_shape": "orb",
+        "media_position": "end",
+        "full_width": false,
+        "color_scheme": "dusk",
+        "padding_top": 0,
+        "padding_bottom": 80
+      }
+    },
+    "best_sellers": {
+      "type": "product-list",
+      "settings": {
+        "heading": "Best sellers",
+        "link_label": "View all",
+        "limit": 4,
+        "columns": 4,
+        "desktop_layout": "grid",
+        "mobile_layout": "compact",
+        "color_scheme": "cream",
+        "padding_top": 0,
+        "padding_bottom": 80
+      }
+    },
+    "newsletter": {
+      "type": "newsletter",
+      "settings": {
+        "heading": "Join our style circle",
+        "text": "<p>Be the first to know about new arrivals, exclusive offers, and style inspiration.</p>",
+        "layout": "centered",
+        "full_width": false,
+        "color_scheme": "lavender",
+        "padding_top": 0,
+        "padding_bottom": 96
+      }
+    }
+  },
+  "order": [
+    "hero",
+    "dock",
+    "collections",
+    "new_arrivals",
+    "promo",
+    "best_sellers",
+    "newsletter"
+  ]
+}

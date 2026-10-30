@@ -1,0 +1,174 @@
+{%- liquid
+  assign card_style = section.settings.card_style
+  if card_style == 'theme'
+    assign card_style = settings.collection_card_style
+  endif
+  assign columns = section.settings.columns
+-%}
+
+<div class="list-collections color-{{ section.settings.color_scheme }}">
+  <div class="page-width section-spacing" style="--pt: {{ section.settings.padding_top }}px; --pb: {{ section.settings.padding_bottom }}px;">
+    <div class="section-heading">
+      <div class="section-heading__text">
+        {%- if section.settings.subheading != blank -%}
+          <p class="subheading">{{ section.settings.subheading }}</p>
+        {%- endif -%}
+        <h1 class="h1">{{ section.settings.heading }}</h1>
+      </div>
+    </div>
+
+    {%- paginate collections by section.settings.per_page -%}
+      {%- case section.settings.sort -%}
+        {%- when 'alphabetical' -%}
+          {%- assign sorted = collections | sort_natural: 'title' -%}
+        {%- when 'alphabetical_reversed' -%}
+          {%- assign sorted = collections | sort_natural: 'title' | reverse -%}
+        {%- when 'products_high' -%}
+          {%- assign sorted = collections | sort: 'all_products_count' | reverse -%}
+        {%- when 'products_low' -%}
+          {%- assign sorted = collections | sort: 'all_products_count' -%}
+        {%- else -%}
+          {%- assign sorted = collections -%}
+      {%- endcase -%}
+
+      <ul class="results-grid list-collections__grid" role="list" style="--cols: {{ columns }}; --cols-mobile: {% if card_style == 'orb' %}3{% else %}2{% endif %};">
+        {%- for collection in sorted -%}
+          <li class="results-grid__item">
+            {% render 'collection-card',
+              collection: collection,
+              style: card_style,
+              sizes: '(min-width: 990px) 25vw, 50vw',
+              index: forloop.index0
+            %}
+          </li>
+        {%- endfor -%}
+      </ul>
+
+      {% render 'pagination', paginate: paginate, style: 'pages' %}
+    {%- endpaginate -%}
+  </div>
+</div>
+
+{{ 'section-collection.css' | asset_url | stylesheet_tag }}
+
+{% schema %}
+{
+  "name": "t:names.collection_list",
+  "tag": "section",
+  "class": "section-main-list-collections",
+  "settings": [
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "t:labels.subheading",
+      "default": "Catalog"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "t:labels.heading",
+      "default": "Collections"
+    },
+    {
+      "type": "select",
+      "id": "sort",
+      "label": "t:labels.sort_collections",
+      "options": [
+        {
+          "value": "default",
+          "label": "t:options.store_order"
+        },
+        {
+          "value": "alphabetical",
+          "label": "t:options.alphabetically_a_z"
+        },
+        {
+          "value": "alphabetical_reversed",
+          "label": "t:options.alphabetically_z_a"
+        },
+        {
+          "value": "products_high",
+          "label": "t:options.product_count_high_to_low"
+        },
+        {
+          "value": "products_low",
+          "label": "t:options.product_count_low_to_high"
+        }
+      ],
+      "default": "alphabetical"
+    },
+    {
+      "type": "select",
+      "id": "card_style",
+      "label": "t:labels.card_style",
+      "options": [
+        {
+          "value": "theme",
+          "label": "t:options.use_theme_setting"
+        },
+        {
+          "value": "arch",
+          "label": "t:options.arch"
+        },
+        {
+          "value": "orb",
+          "label": "t:options.circle"
+        },
+        {
+          "value": "minimal",
+          "label": "t:options.minimal"
+        }
+      ],
+      "default": "theme"
+    },
+    {
+      "type": "range",
+      "id": "columns",
+      "min": 2,
+      "max": 5,
+      "step": 1,
+      "label": "t:labels.columns_on_large_screens",
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "per_page",
+      "min": 8,
+      "max": 48,
+      "step": 4,
+      "label": "t:labels.collections_per_page",
+      "default": 24
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:labels.color_scheme",
+      "default": "cream"
+    },
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "t:labels.top",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "t:labels.bottom",
+      "default": 80
+    }
+  ]
+}
+{% endschema %}

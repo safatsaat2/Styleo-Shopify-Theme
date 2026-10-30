@@ -1,0 +1,532 @@
+{%- liquid
+  assign transparent = false
+  if section.settings.transparent_home and request.page_type == 'index'
+    assign transparent = true
+  endif
+
+  assign scheme = section.settings.color_scheme
+  assign active_scheme = scheme
+  if transparent
+    assign active_scheme = section.settings.transparent_color_scheme
+  endif
+
+  assign promos = section.blocks | where: 'type', 'mega_promo'
+  assign show_localization = false
+  if section.settings.show_country and localization.available_countries.size > 1
+    assign show_localization = true
+  endif
+  if section.settings.show_language and localization.available_languages.size > 1
+    assign show_localization = true
+  endif
+
+  case section.settings.header_height
+    when 'compact'
+      assign bar_height = 60
+    when 'tall'
+      assign bar_height = 88
+    else
+      assign bar_height = 72
+  endcase
+-%}
+
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    --header-bar-height: {{ bar_height }}px;
+    {%- if section.settings.sticky != 'none' %}
+      position: sticky;
+      top: 0;
+    {%- endif %}
+    z-index: 40;
+    {%- if transparent %}
+      margin-bottom: calc(var(--lc-header-height, {{ bar_height }}px) * -1);
+    {%- endif %}
+  }
+{%- endstyle -%}
+
+<lc-header
+  class="header header--{{ section.settings.layout }} header--mobile-{{ section.settings.mobile_logo_position }} color-{{ active_scheme }}{% if transparent %} is-transparent{% endif %}"
+  data-sticky="{{ section.settings.sticky }}"
+  data-scheme="color-{{ scheme }}"
+  {% if transparent %}
+    data-transparent-scheme="color-{{ section.settings.transparent_color_scheme }}"
+  {% endif %}
+>
+  <div class="header__bar page-width">
+    <div class="header__toggle">
+      <button
+        type="button"
+        class="icon-button header__menu-button"
+        data-dialog-open="MenuDrawer"
+        aria-haspopup="dialog"
+        aria-expanded="false"
+        aria-controls="MenuDrawer"
+        aria-label="{{ 'general.menu' | t }}"
+      >
+        {% render 'icon', name: 'menu' %}
+      </button>
+    </div>
+
+    {% render 'logo', inverse: transparent, class: 'header__logo' %}
+
+    {%- unless section.settings.layout == 'logo_center_menu_below' -%}
+      <nav class="header__nav" aria-label="{{ 'header.main_menu' | t }}">
+        {%- render 'header-menu',
+          menu: section.settings.menu,
+          menu_style: section.settings.menu_style,
+          promos: promos,
+          section_id: section.id
+        -%}
+      </nav>
+    {%- endunless -%}
+
+    <div class="header__actions">
+      {%- if section.settings.search_style == 'field' -%}
+        <a
+          href="{{ routes.search_url }}"
+          class="header__search-field mobile-hidden"
+          data-dialog-open="SearchDialog"
+          aria-haspopup="dialog"
+        >
+          {% render 'icon', name: 'search' %}
+          <span>{{ 'search.placeholder' | t }}</span>
+        </a>
+      {%- endif -%}
+      <a
+        href="{{ routes.search_url }}"
+        class="icon-button header__search{% if section.settings.search_style == 'field' %} header__search--mobile{% endif %}"
+        data-dialog-open="SearchDialog"
+        aria-haspopup="dialog"
+        aria-label="{{ 'general.search' | t }}"
+      >
+        {% render 'icon', name: 'search' %}
+      </a>
+
+      {%- if show_localization -%}
+        <div class="header__localization">
+          {%- render 'localization-form',
+            id: 'HeaderLocalization',
+            show_country: section.settings.show_country,
+            show_language: section.settings.show_language,
+            compact: true
+          -%}
+        </div>
+      {%- endif -%}
+
+      {%- if shop.customer_accounts_enabled and section.settings.show_account -%}
+        <div class="header__account">
+          <shopify-account menu="customer-account-main-menu">
+            {%- unless customer -%}
+              <span slot="signed-out-avatar" class="header__account-trigger">
+                <span class="icon-button header__account-icon{% if section.settings.show_sign_in_button %} header__account-icon--mobile{% endif %}" aria-hidden="true">
+                  {% render 'icon', name: 'account' %}
+                </span>
+                {%- if section.settings.show_sign_in_button -%}
+                  <span class="button button--small header__sign-in">{{ 'header.sign_in' | t }}</span>
+                {%- endif -%}
+              </span>
+            {%- endunless -%}
+          </shopify-account>
+        </div>
+      {%- endif -%}
+
+      <a
+        href="{{ routes.cart_url }}"
+        class="icon-button header__cart"
+        {% if settings.cart_type == 'drawer' and request.page_type != 'cart' %}
+          data-dialog-open="CartDrawer" aria-haspopup="dialog"
+        {% endif %}
+      >
+        {% render 'icon', name: 'bag' %}
+        <span class="visually-hidden" data-cart-label>{{ 'header.cart_count' | t: count: cart.item_count }}</span>
+        <span class="cart-count" data-cart-count aria-hidden="true"{% if cart.item_count == 0 %} hidden{% endif %}>
+          {%- if cart.item_count > 99 %}99+{% else %}{{ cart.item_count }}{% endif -%}
+        </span>
+      </a>
+
+      {%- for block in section.blocks -%}
+        {%- if block.type == '@app' -%}
+          <div class="header__app">{% render block %}</div>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+  </div>
+
+  {%- if section.settings.layout == 'logo_center_menu_below' -%}
+    <nav class="header__nav header__nav--below page-width" aria-label="{{ 'header.main_menu' | t }}">
+      {%- render 'header-menu',
+        menu: section.settings.menu,
+        menu_style: section.settings.menu_style,
+        promos: promos,
+        section_id: section.id
+      -%}
+    </nav>
+  {%- endif -%}
+</lc-header>
+
+{% render 'menu-drawer', section: section %}
+
+<lc-dialog id="SearchDialog">
+  <dialog class="dialog dialog--search color-{{ scheme }}" aria-label="{{ 'search.title' | t }}">
+    <lc-predictive-search
+      class="search-panel page-width"
+      data-enabled="{{ settings.predictive_search_enabled }}"
+      data-results-url="{{ routes.predictive_search_url }}"
+    >
+      <form id="PredictiveSearchForm" action="{{ routes.search_url }}" method="get" role="search" class="search-panel__form">
+        <div class="search-panel__field">
+          {% render 'icon', name: 'search' %}
+          <label for="HeaderSearchInput" class="visually-hidden">{{ 'search.label' | t }}</label>
+          <input
+            id="HeaderSearchInput"
+            class="search-panel__input"
+            type="search"
+            name="q"
+            value="{{ search.terms | escape }}"
+            placeholder="{{ 'search.placeholder' | t }}"
+            autocomplete="off"
+            autocorrect="off"
+            autocapitalize="off"
+            spellcheck="false"
+            enterkeyhint="search"
+            data-dialog-focus
+            {% if settings.predictive_search_enabled %}
+              role="combobox"
+              aria-expanded="false"
+              aria-autocomplete="list"
+              aria-controls="PredictiveSearchResults"
+            {% endif %}
+          >
+          <input type="hidden" name="options[prefix]" value="last">
+          <button type="reset" class="icon-button search-panel__reset" aria-label="{{ 'search.clear' | t }}" hidden>
+            {% render 'icon', name: 'close' %}
+          </button>
+        </div>
+        <button type="button" class="button button--ghost button--small search-panel__close" data-dialog-close>
+          {{- 'general.close' | t -}}
+        </button>
+      </form>
+
+      <div class="search-panel__body">
+        <div class="search-panel__empty" data-predictive-empty>
+          {%- assign popular = settings.popular_searches | split: ',' -%}
+          {%- if popular.size > 0 -%}
+            <h2 class="h6 search-panel__heading">{{ 'search.popular' | t }}</h2>
+            <ul class="cluster" role="list">
+              {%- for term in popular -%}
+                {%- assign clean_term = term | strip -%}
+                {%- if clean_term != blank -%}
+                  <li>
+                    <a class="chip" href="{{ routes.search_url }}?q={{ clean_term | url_encode }}&amp;options%5Bprefix%5D=last">
+                      {% render 'icon', name: 'search' %}
+                      {{ clean_term }}
+                    </a>
+                  </li>
+                {%- endif -%}
+              {%- endfor -%}
+            </ul>
+          {%- endif -%}
+        </div>
+        <div id="PredictiveSearchResults" class="search-panel__results" data-predictive-results></div>
+        <p class="visually-hidden" role="status" aria-live="polite" data-predictive-status></p>
+      </div>
+    </lc-predictive-search>
+  </dialog>
+</lc-dialog>
+
+{{ 'section-header.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'header.js' | asset_url }}" defer></script>
+{%- if settings.predictive_search_enabled -%}
+  <script src="{{ 'predictive-search.js' | asset_url }}" defer></script>
+{%- endif -%}
+
+{%- if request.page_type == 'index' -%}
+  {%- capture organization_json -%}
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": {{ shop.name | json }},
+      "url": {{ request.origin | append: routes.root_url | json }}
+      {%- if settings.logo != blank -%},
+        "logo": {{ settings.logo | image_url: width: 600 | prepend: 'https:' | json }}
+      {%- endif -%}
+      {%- assign social_urls = '' -%}
+      {%- assign social_keys = 'social_instagram_link,social_facebook_link,social_tiktok_link,social_pinterest_link,social_youtube_link,social_twitter_link,social_threads_link,social_snapchat_link,social_linkedin_link,social_tumblr_link,social_vimeo_link' | split: ',' -%}
+      {%- for setting_key in social_keys -%}
+        {%- if settings[setting_key] != blank -%}
+          {%- assign social_urls = social_urls | append: settings[setting_key] | append: '|' -%}
+        {%- endif -%}
+      {%- endfor -%}
+      {%- if social_urls != '' -%},
+        "sameAs": {{ social_urls | split: '|' | json }}
+      {%- endif -%}
+    }
+  {%- endcapture -%}
+  <script type="application/ld+json">{{ organization_json }}</script>
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": {{ shop.name | json }},
+      "url": {{ request.origin | append: routes.root_url | json }},
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {{ request.origin | append: routes.search_url | append: '?q={search_term_string}' | json }},
+        "query-input": "required name=search_term_string"
+      }
+    }
+  </script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "t:names.header",
+  "tag": "header",
+  "class": "section-header",
+  "max_blocks": 12,
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:content.layout"
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "t:labels.desktop_layout",
+      "options": [
+        {
+          "value": "logo_left_menu_center",
+          "label": "t:options.logo_left_menu_center"
+        },
+        {
+          "value": "logo_left_menu_left",
+          "label": "t:options.logo_left_menu_left"
+        },
+        {
+          "value": "logo_center_menu_left",
+          "label": "t:options.logo_center_menu_left"
+        },
+        {
+          "value": "logo_center_menu_below",
+          "label": "t:options.logo_center_menu_below"
+        }
+      ],
+      "default": "logo_left_menu_center"
+    },
+    {
+      "type": "select",
+      "id": "mobile_logo_position",
+      "label": "t:labels.mobile_logo_position",
+      "options": [
+        {
+          "value": "left",
+          "label": "t:options.left"
+        },
+        {
+          "value": "center",
+          "label": "t:options.center"
+        }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "select",
+      "id": "header_height",
+      "label": "t:labels.height",
+      "options": [
+        {
+          "value": "compact",
+          "label": "t:options.compact"
+        },
+        {
+          "value": "default",
+          "label": "t:options.default"
+        },
+        {
+          "value": "tall",
+          "label": "t:options.tall"
+        }
+      ],
+      "default": "default"
+    },
+    {
+      "type": "select",
+      "id": "sticky",
+      "label": "t:labels.sticky_header",
+      "options": [
+        {
+          "value": "always",
+          "label": "t:options.always"
+        },
+        {
+          "value": "scroll_up",
+          "label": "t:options.on_scroll_up"
+        },
+        {
+          "value": "none",
+          "label": "t:options.never"
+        }
+      ],
+      "default": "always"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:labels.color_scheme",
+      "default": "noir"
+    },
+    {
+      "type": "header",
+      "content": "t:content.transparent_header"
+    },
+    {
+      "type": "checkbox",
+      "id": "transparent_home",
+      "label": "t:labels.show_transparent_header_on_home_page",
+      "info": "t:info.the_header_sits_on_top_of_the_first_section_unti_653eda",
+      "default": false
+    },
+    {
+      "type": "color_scheme",
+      "id": "transparent_color_scheme",
+      "label": "t:labels.transparent_color_scheme",
+      "info": "t:info.only_the_text_and_icon_colors_are_used",
+      "default": "dusk"
+    },
+    {
+      "type": "header",
+      "content": "t:content.navigation"
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "t:labels.menu",
+      "default": "main-menu"
+    },
+    {
+      "type": "select",
+      "id": "menu_style",
+      "label": "t:labels.menu_style",
+      "options": [
+        {
+          "value": "dropdown",
+          "label": "t:options.dropdown"
+        },
+        {
+          "value": "mega",
+          "label": "t:options.mega_menu"
+        }
+      ],
+      "default": "dropdown"
+    },
+    {
+      "type": "paragraph",
+      "content": "t:content.add_mega_menu_promotions_to_show_images_next_to_e6ae81"
+    },
+    {
+      "type": "text",
+      "id": "drawer_button_label",
+      "label": "t:labels.mobile_menu_button_label",
+      "default": "Shop all"
+    },
+    {
+      "type": "url",
+      "id": "drawer_button_link",
+      "label": "t:labels.mobile_menu_button_link",
+      "default": "/collections/all"
+    },
+    {
+      "type": "header",
+      "content": "t:content.search"
+    },
+    {
+      "type": "select",
+      "id": "search_style",
+      "label": "t:labels.search_on_large_screens",
+      "options": [
+        {
+          "value": "icon",
+          "label": "t:options.icon"
+        },
+        {
+          "value": "field",
+          "label": "t:options.field"
+        }
+      ],
+      "default": "icon"
+    },
+    {
+      "type": "header",
+      "content": "t:content.customer_account"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_account",
+      "label": "t:labels.show_account",
+      "info": "t:info.account_button_info",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_sign_in_button",
+      "label": "t:labels.show_sign_in_button_on_large_screens",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "t:content.country_and_language"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_country",
+      "label": "t:labels.show_country_region_selector",
+      "info": "t:info.shown_when_you_sell_in_more_than_one_market",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_language",
+      "label": "t:labels.show_language_selector",
+      "info": "t:info.shown_when_your_store_has_more_than_one_publishe_e14430",
+      "default": true
+    }
+  ],
+  "blocks": [
+    {
+      "type": "mega_promo",
+      "name": "t:names.mega_menu_promotion",
+      "settings": [
+        {
+          "type": "text",
+          "id": "menu_item",
+          "label": "t:labels.menu_item",
+          "info": "t:info.enter_the_name_of_a_top_level_menu_item_that_has_86c681"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "t:labels.image"
+        },
+        {
+          "type": "text",
+          "id": "subheading",
+          "label": "t:labels.subheading"
+        },
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "t:labels.heading",
+          "default": "Featured"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "t:labels.link"
+        }
+      ]
+    },
+    {
+      "type": "@app"
+    }
+  ]
+}
+{% endschema %}

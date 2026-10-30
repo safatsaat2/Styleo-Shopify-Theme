@@ -1,0 +1,62 @@
+{
+  "type": "header",
+  "name": "t:names.header_group",
+  "sections": {
+    "announcement-bar": {
+      "type": "announcement-bar",
+      "blocks": {
+        "announcement-shipping": {
+          "type": "announcement",
+          "settings": {
+            "text": "Free shipping on orders over a set amount",
+            "link": "/collections/all",
+            "show_arrow": true
+          }
+        },
+        "announcement-returns": {
+          "type": "announcement",
+          "settings": {
+            "text": "Easy returns within 30 days",
+            "link": "",
+            "show_arrow": false
+          }
+        }
+      },
+      "block_order": [
+        "announcement-shipping",
+        "announcement-returns"
+      ],
+      "settings": {
+        "color_scheme": "lavender",
+        "autoplay": true,
+        "autoplay_speed": 5,
+        "dismissible": false
+      }
+    },
+    "header": {
+      "type": "header",
+      "settings": {
+        "layout": "logo_left_menu_center",
+        "mobile_logo_position": "left",
+        "header_height": "default",
+        "sticky": "always",
+        "color_scheme": "noir",
+        "transparent_home": false,
+        "transparent_color_scheme": "dusk",
+        "menu": "main-menu",
+        "menu_style": "dropdown",
+        "drawer_button_label": "Shop all",
+        "drawer_button_link": "/collections/all",
+        "search_style": "icon",
+        "show_account": true,
+        "show_sign_in_button": true,
+        "show_country": true,
+        "show_language": true
+      }
+    }
+  },
+  "order": [
+    "announcement-bar",
+    "header"
+  ]
+}

@@ -1,0 +1,233 @@
+{%- comment -%}
+  Turns theme settings into CSS custom properties.
+  Loads every font through font_face, with bold, italic, and bold italic
+  variants from font_modify when the family offers them.
+  Rendered once in the <head> of each layout.
+{%- endcomment -%}
+
+{%- liquid
+  assign font_setting_ids = 'type_heading_font,type_body_font,type_subheading_font,type_menu_font,type_button_font' | split: ','
+
+  case settings.heading_letter_spacing
+    when 'tight'
+      assign heading_tracking = '-0.015em'
+    when 'wide'
+      assign heading_tracking = '0.04em'
+    else
+      assign heading_tracking = '0em'
+  endcase
+
+  case settings.corner_style
+    when 'sharp'
+      assign radius_sm = '0px'
+      assign radius_md = '0px'
+      assign radius_lg = '2px'
+      assign radius_xl = '4px'
+    when 'soft'
+      assign radius_sm = '4px'
+      assign radius_md = '8px'
+      assign radius_lg = '12px'
+      assign radius_xl = '16px'
+    else
+      assign radius_sm = '12px'
+      assign radius_md = '16px'
+      assign radius_lg = '24px'
+      assign radius_xl = 'clamp(2rem, 1.6rem + 1.5vw, 2.5rem)'
+  endcase
+
+  case settings.button_size
+    when 'small'
+      assign button_height = '40px'
+      assign button_padding = '1.25rem'
+    when 'large'
+      assign button_height = '52px'
+      assign button_padding = '2.25rem'
+    else
+      assign button_height = '46px'
+      assign button_padding = '1.75rem'
+  endcase
+
+  case settings.animation_intensity
+    when 'subtle'
+      assign motion_distance = '10px'
+      assign motion_duration = '0.5s'
+    when 'expressive'
+      assign motion_distance = '32px'
+      assign motion_duration = '0.9s'
+    else
+      assign motion_distance = '18px'
+      assign motion_duration = '0.7s'
+  endcase
+
+  case settings.card_image_ratio
+    when 'square'
+      assign card_ratio = '1 / 1'
+    when 'landscape'
+      assign card_ratio = '4 / 3'
+    when 'adapt'
+      assign card_ratio = 'auto'
+    else
+      assign card_ratio = '3 / 4'
+  endcase
+
+  case settings.collection_card_ratio
+    when 'square'
+      assign collection_ratio = '1 / 1'
+    when 'landscape'
+      assign collection_ratio = '4 / 3'
+    else
+      assign collection_ratio = '3 / 4'
+  endcase
+-%}
+
+<style>
+  {%- assign loaded_fonts = '' -%}
+  {%- for setting_id in font_setting_ids -%}
+    {%- assign font = settings[setting_id] -%}
+    {%- capture font_key %}|{{ font.family }}-{{ font.weight }}-{{ font.style }}|{% endcapture -%}
+    {%- if loaded_fonts contains font_key %}{% continue %}{% endif -%}
+    {%- assign loaded_fonts = loaded_fonts | append: font_key -%}
+    {%- assign font_bold = font | font_modify: 'weight', 'bold' -%}
+    {%- assign font_italic = font | font_modify: 'style', 'italic' -%}
+    {%- assign font_bold_italic = font_bold | font_modify: 'style', 'italic' -%}
+    {{ font | font_face: font_display: 'swap' }}
+    {%- if font_bold %}{{ font_bold | font_face: font_display: 'swap' }}{% endif -%}
+    {%- if font_italic %}{{ font_italic | font_face: font_display: 'swap' }}{% endif -%}
+    {%- if font_bold_italic %}{{ font_bold_italic | font_face: font_display: 'swap' }}{% endif -%}
+  {%- endfor %}
+
+  :root {
+    --lc-font-heading: {{ settings.type_heading_font.family }}, {{ settings.type_heading_font.fallback_families }};
+    --lc-font-heading-weight: {{ settings.type_heading_font.weight }};
+    --lc-font-heading-style: {{ settings.type_heading_font.style }};
+    --lc-font-body: {{ settings.type_body_font.family }}, {{ settings.type_body_font.fallback_families }};
+    --lc-font-body-weight: {{ settings.type_body_font.weight }};
+    --lc-font-body-weight-bold: {{ settings.type_body_font.weight | plus: 200 | at_most: 900 }};
+    --lc-font-body-style: {{ settings.type_body_font.style }};
+    --lc-font-subheading: {{ settings.type_subheading_font.family }}, {{ settings.type_subheading_font.fallback_families }};
+    --lc-font-subheading-weight: {{ settings.type_subheading_font.weight }};
+    --lc-font-menu: {{ settings.type_menu_font.family }}, {{ settings.type_menu_font.fallback_families }};
+    --lc-font-menu-weight: {{ settings.type_menu_font.weight }};
+    --lc-font-button: {{ settings.type_button_font.family }}, {{ settings.type_button_font.fallback_families }};
+    --lc-font-button-weight: {{ settings.type_button_font.weight }};
+
+    --lc-heading-scale: {{ settings.heading_scale | divided_by: 100.0 }};
+    --lc-body-scale: {{ settings.body_scale | divided_by: 100.0 }};
+    --lc-heading-tracking: {{ heading_tracking }};
+    --lc-heading-case: {{ settings.heading_case }};
+    --lc-subheading-size: {{ settings.subheading_size }}px;
+    --lc-subheading-case: {{ settings.subheading_case }};
+    --lc-menu-size: {{ settings.menu_size }}px;
+    --lc-menu-case: {{ settings.menu_case }};
+
+    --lc-page-width: {{ settings.page_width }};
+    --lc-page-margin: {{ settings.page_margin_mobile }}px;
+    --lc-page-margin-desktop: {{ settings.page_margin_desktop }}px;
+    --lc-section-scale: {{ settings.section_spacing | divided_by: 100.0 }};
+    --lc-gap: {{ settings.grid_gap_mobile }}px;
+    --lc-gap-desktop: {{ settings.grid_gap_desktop }}px;
+
+    --lc-radius-sm: {{ radius_sm }};
+    --lc-radius-md: {{ radius_md }};
+    --lc-radius-lg: {{ radius_lg }};
+    --lc-radius-xl: {{ radius_xl }};
+    --lc-border-opacity: {{ settings.border_opacity | divided_by: 100.0 }};
+
+    {%- case settings.shadow_style -%}
+      {%- when 'none' %}
+    --lc-shadow-sm: none;
+    --lc-shadow-md: none;
+    --lc-shadow-lg: none;
+    --lc-shadow-glow: none;
+      {%- when 'subtle' %}
+    --lc-shadow-sm: 0 1px 2px rgb(15 15 16 / 0.04);
+    --lc-shadow-md: 0 4px 12px rgb(15 15 16 / 0.05);
+    --lc-shadow-lg: 0 12px 28px rgb(0 0 0 / 0.12);
+    --lc-shadow-glow: 0 8px 20px rgb(var(--lc-accent-rgb, 200 182 226) / 0.18);
+      {%- else %}
+    --lc-shadow-sm: 0 1px 2px rgb(15 15 16 / 0.06);
+    --lc-shadow-md: 0 6px 16px rgb(15 15 16 / 0.08);
+    --lc-shadow-lg: 0 20px 40px rgb(0 0 0 / 0.25);
+    --lc-shadow-glow: 0 10px 30px rgb(var(--lc-accent-rgb, 200 182 226) / 0.3);
+    {%- endcase %}
+
+    --lc-button-height: {{ button_height }};
+    --lc-button-padding: {{ button_padding }};
+    --lc-button-radius: {{ settings.button_radius }}px;
+    --lc-button-size: {{ settings.button_text_size }}px;
+    --lc-button-case: {{ settings.button_case }};
+
+    --lc-input-height: {{ settings.input_height }}px;
+    --lc-input-radius: {{ settings.input_radius }}px;
+    --lc-input-border-width: {{ settings.input_border_width }}px;
+    --lc-input-border-opacity: {{ settings.input_border_opacity | divided_by: 100.0 }};
+
+    --lc-card-radius: {{ settings.card_radius }}px;
+    --lc-card-ratio: {{ card_ratio }};
+    --lc-card-fit: {{ settings.card_image_fit }};
+    --lc-card-align: {{ settings.card_text_alignment }};
+    --lc-collection-ratio: {{ collection_ratio }};
+    --lc-badge-radius: {% if settings.badge_shape == 'pill' %}999px{% else %}var(--lc-radius-sm){% endif %};
+    --lc-swatch-size: {{ settings.swatch_size }}px;
+    --lc-swatch-radius: {% if settings.swatch_shape == 'circle' %}50%{% else %}var(--lc-radius-sm){% endif %};
+
+    --lc-motion-distance: {{ motion_distance }};
+    --lc-motion-duration: {{ motion_duration }};
+    --lc-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  {% for scheme in settings.color_schemes -%}
+    {%- assign s = scheme.settings -%}
+    .color-{{ scheme.id }} {
+      --lc-bg: {{ s.background }};
+      --lc-bg-rgb: {{ s.background.red }} {{ s.background.green }} {{ s.background.blue }};
+      --lc-bg-gradient: {% if s.background_gradient != blank %}{{ s.background_gradient }}{% else %}none{% endif %};
+      --lc-fg: {{ s.foreground }};
+      --lc-fg-rgb: {{ s.foreground.red }} {{ s.foreground.green }} {{ s.foreground.blue }};
+      --lc-heading: {{ s.heading }};
+      --lc-muted: {{ s.foreground_muted }};
+      --lc-accent: {{ s.accent }};
+      --lc-accent-rgb: {{ s.accent.red }} {{ s.accent.green }} {{ s.accent.blue }};
+      --lc-accent-text: {% if s.background.lightness < 50 %}{{ s.accent }}{% else %}{{ s.accent | color_mix: s.foreground, 55 }}{% endif %};
+      --lc-border-rgb: {{ s.border.red }} {{ s.border.green }} {{ s.border.blue }};
+      --lc-surface: {{ s.surface }};
+      --lc-surface-fg: {{ s.surface_foreground }};
+      --lc-button-bg: {{ s.button_background }};
+      --lc-button-fg: {{ s.button_label }};
+      --lc-button-hover-bg: {{ s.button_hover_background }};
+      --lc-button-hover-fg: {{ s.button_hover_label }};
+      --lc-button2-bg: {{ s.secondary_button_background }};
+      --lc-button2-fg: {{ s.secondary_button_label }};
+      --lc-scheme-dark: {% if s.background.lightness < 50 %}1{% else %}0{% endif %};
+    }
+  {% endfor -%}
+
+  {%- if settings.dark_mode_enabled -%}
+    {%- assign dark = settings.dark_mode_color_scheme.settings -%}
+    @media (prefers-color-scheme: dark) {
+      .color-{{ settings.body_color_scheme.id }} {
+        --lc-bg: {{ dark.background }};
+        --lc-bg-rgb: {{ dark.background.red }} {{ dark.background.green }} {{ dark.background.blue }};
+        --lc-bg-gradient: {% if dark.background_gradient != blank %}{{ dark.background_gradient }}{% else %}none{% endif %};
+        --lc-fg: {{ dark.foreground }};
+        --lc-fg-rgb: {{ dark.foreground.red }} {{ dark.foreground.green }} {{ dark.foreground.blue }};
+        --lc-heading: {{ dark.heading }};
+        --lc-muted: {{ dark.foreground_muted }};
+        --lc-accent: {{ dark.accent }};
+        --lc-accent-rgb: {{ dark.accent.red }} {{ dark.accent.green }} {{ dark.accent.blue }};
+        --lc-accent-text: {{ dark.accent }};
+        --lc-border-rgb: {{ dark.border.red }} {{ dark.border.green }} {{ dark.border.blue }};
+        --lc-surface: {{ dark.surface }};
+        --lc-surface-fg: {{ dark.surface_foreground }};
+        --lc-button-bg: {{ dark.button_background }};
+        --lc-button-fg: {{ dark.button_label }};
+        --lc-button-hover-bg: {{ dark.button_hover_background }};
+        --lc-button-hover-fg: {{ dark.button_hover_label }};
+        --lc-button2-bg: {{ dark.secondary_button_background }};
+        --lc-button2-fg: {{ dark.secondary_button_label }};
+        --lc-scheme-dark: 1;
+      }
+      :root { color-scheme: dark; }
+    }
+  {%- endif %}
+</style>

@@ -1,0 +1,186 @@
+{%- liquid
+  assign blog = section.settings.blog
+  assign limit = section.settings.limit
+  assign link_url = section.settings.link_url | default: blog.url
+-%}
+
+<div class="blog-posts-section color-{{ section.settings.color_scheme }} visibility-{{ section.settings.visibility }}">
+  <div class="page-width section-spacing" style="--pt: {{ section.settings.padding_top }}px; --pb: {{ section.settings.padding_bottom }}px;">
+    {% render 'section-heading',
+      subheading: section.settings.subheading,
+      heading: section.settings.heading,
+      link_label: section.settings.link_label,
+      link_url: link_url
+    %}
+
+    <lc-carousel class="blog-posts blog-posts--mobile-carousel" style="--cols: {{ section.settings.columns }};">
+      <ul class="blog-posts__track" role="list" data-carousel-track>
+        {%- if blog != blank and blog.articles_count > 0 -%}
+          {%- for article in blog.articles limit: limit -%}
+            <li class="blog-posts__item">
+              {% render 'article-card',
+                article: article,
+                show_image: section.settings.show_image,
+                show_date: section.settings.show_date,
+                show_author: section.settings.show_author,
+                show_excerpt: section.settings.show_excerpt,
+                index: forloop.index0
+              %}
+            </li>
+          {%- endfor -%}
+        {%- else -%}
+          {%- for i in (1..limit) -%}
+            <li class="blog-posts__item">
+              {% render 'article-card', article: blank, show_date: false, index: forloop.index0 %}
+            </li>
+          {%- endfor -%}
+        {%- endif -%}
+      </ul>
+      <button type="button" class="carousel__button carousel__button--prev" data-carousel-prev aria-label="{{ 'accessibility.previous' | t }}">
+        {% render 'icon', name: 'chevron-left' %}
+      </button>
+      <button type="button" class="carousel__button carousel__button--next" data-carousel-next aria-label="{{ 'accessibility.next' | t }}">
+        {% render 'icon', name: 'chevron-right' %}
+      </button>
+    </lc-carousel>
+  </div>
+</div>
+
+{{ 'section-home.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'carousel.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "t:names.blog_posts",
+  "tag": "section",
+  "class": "section-blog-posts",
+  "settings": [
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "t:labels.subheading",
+      "default": "Journal"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "t:labels.heading",
+      "default": "Style notes"
+    },
+    {
+      "type": "blog",
+      "id": "blog",
+      "label": "t:labels.blog"
+    },
+    {
+      "type": "range",
+      "id": "limit",
+      "min": 2,
+      "max": 6,
+      "step": 1,
+      "label": "t:labels.number_of_posts",
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "columns",
+      "min": 2,
+      "max": 4,
+      "step": 1,
+      "label": "t:labels.posts_per_row_on_large_screens",
+      "default": 3
+    },
+    {
+      "type": "text",
+      "id": "link_label",
+      "label": "t:labels.link_label",
+      "default": "Read the blog"
+    },
+    {
+      "type": "url",
+      "id": "link_url",
+      "label": "t:labels.link",
+      "info": "t:info.defaults_to_the_blog"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_image",
+      "label": "t:labels.show_featured_image",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_date",
+      "label": "t:labels.show_date",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_author",
+      "label": "t:labels.show_author",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_excerpt",
+      "label": "t:labels.show_excerpt",
+      "default": true
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:labels.color_scheme",
+      "default": "cream"
+    },
+    {
+      "type": "select",
+      "id": "visibility",
+      "label": "t:labels.show_on",
+      "options": [
+        {
+          "value": "all",
+          "label": "t:options.all_devices"
+        },
+        {
+          "value": "mobile",
+          "label": "t:options.small_screens_only"
+        },
+        {
+          "value": "desktop",
+          "label": "t:options.large_screens_only"
+        }
+      ],
+      "default": "all"
+    },
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "t:labels.top",
+      "default": 64
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "t:labels.bottom",
+      "default": 64
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.blog_posts"
+    }
+  ]
+}
+{% endschema %}

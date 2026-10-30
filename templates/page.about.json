@@ -1,0 +1,177 @@
+{
+  "sections": {
+    "intro": {
+      "type": "rich-text",
+      "blocks": {
+        "sub": {
+          "type": "subheading",
+          "settings": {
+            "text": "Our story"
+          }
+        },
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "heading": "Style with",
+            "accent_line": "intention",
+            "size": "h0"
+          }
+        },
+        "text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Share why your brand exists and what you believe about the pieces you make.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "sub",
+        "heading",
+        "text"
+      ],
+      "settings": {
+        "alignment": "start",
+        "width": "medium",
+        "color_scheme": "dusk",
+        "padding_top": 96,
+        "padding_bottom": 96
+      }
+    },
+    "story": {
+      "type": "image-with-text",
+      "blocks": {
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "heading": "Modern. Timeless. Yours.",
+            "size": "h2"
+          }
+        },
+        "text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Describe who you design for and how you choose materials, fit, and finish.</p>"
+          }
+        },
+        "button": {
+          "type": "button",
+          "settings": {
+            "label": "Shop the collection",
+            "style": "primary"
+          }
+        }
+      },
+      "block_order": [
+        "heading",
+        "text",
+        "button"
+      ],
+      "settings": {
+        "halo_shape": "arch",
+        "ratio": "4 / 5",
+        "media_position": "start",
+        "media_width": "half",
+        "alignment": "start",
+        "color_scheme": "cream",
+        "padding_top": 80,
+        "padding_bottom": 80
+      }
+    },
+    "values": {
+      "type": "multicolumn",
+      "blocks": {
+        "design": {
+          "type": "column",
+          "settings": {
+            "icon": "star",
+            "heading": "Thoughtful design",
+            "text": "<p>Clean cuts, considered details, lasting materials.</p>"
+          }
+        },
+        "fit": {
+          "type": "column",
+          "settings": {
+            "icon": "check",
+            "heading": "Confident fit",
+            "text": "<p>Silhouettes that move with you.</p>"
+          }
+        },
+        "luxury": {
+          "type": "column",
+          "settings": {
+            "icon": "heart",
+            "heading": "Everyday luxury",
+            "text": "<p>Elevated pieces priced for real life.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "design",
+        "fit",
+        "luxury"
+      ],
+      "settings": {
+        "heading": "What we stand for",
+        "alignment": "center",
+        "columns": 3,
+        "mobile_columns": "1",
+        "card_style": "card",
+        "color_scheme": "mist",
+        "padding_top": 56,
+        "padding_bottom": 56
+      }
+    },
+    "team": {
+      "type": "multicolumn",
+      "blocks": {
+        "a": {
+          "type": "column",
+          "settings": {
+            "icon": "none",
+            "heading": "Team member",
+            "text": "<p>Role and a short line about what they do.</p>"
+          }
+        },
+        "b": {
+          "type": "column",
+          "settings": {
+            "icon": "none",
+            "heading": "Team member",
+            "text": "<p>Role and a short line about what they do.</p>"
+          }
+        },
+        "c": {
+          "type": "column",
+          "settings": {
+            "icon": "none",
+            "heading": "Team member",
+            "text": "<p>Role and a short line about what they do.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "a",
+        "b",
+        "c"
+      ],
+      "settings": {
+        "subheading": "The people behind it",
+        "heading": "Meet the team",
+        "alignment": "center",
+        "columns": 3,
+        "mobile_columns": "2",
+        "card_style": "plain",
+        "image_ratio": "3 / 4",
+        "color_scheme": "cream",
+        "padding_top": 80,
+        "padding_bottom": 80
+      }
+    }
+  },
+  "order": [
+    "intro",
+    "story",
+    "values",
+    "team"
+  ]
+}

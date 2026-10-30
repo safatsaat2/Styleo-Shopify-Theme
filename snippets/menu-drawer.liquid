@@ -1,0 +1,133 @@
+{%- comment -%}
+  Mobile navigation drawer. Nested menu levels open as accordions so the
+  whole tree stays in one keyboard-friendly list.
+
+  Accepts:
+  - section {Section}: header section (menu, color scheme, button settings)
+{%- endcomment -%}
+
+{%- assign menu = section.settings.menu -%}
+
+<lc-dialog id="MenuDrawer" class="menu-drawer-wrapper">
+  <dialog
+    class="dialog dialog--drawer menu-drawer color-{{ section.settings.color_scheme }}"
+    aria-labelledby="MenuDrawerTitle"
+    style="--dialog-width: 22rem;"
+  >
+    <div class="dialog__panel">
+      <div class="dialog__header">
+        <h2 id="MenuDrawerTitle" class="menu-drawer__title">
+          <span class="visually-hidden">{{ 'general.menu' | t }}</span>
+          <span class="logo__text" aria-hidden="true">{{ shop.name }}</span>
+        </h2>
+        <button type="button" class="icon-button" data-dialog-close aria-label="{{ 'general.close' | t }}">
+          {% render 'icon', name: 'close' %}
+        </button>
+      </div>
+
+      <nav class="dialog__body menu-drawer__nav" aria-label="{{ 'header.main_menu' | t }}">
+        <ul class="menu-drawer__list" role="list">
+          {%- for link in menu.links -%}
+            <li>
+              {%- if link.links != blank -%}
+                <details class="menu-drawer__details"{% if link.child_active %} open{% endif %}>
+                  <summary class="menu-drawer__link">
+                    <span>{{ link.title }}</span>
+                    {% render 'icon', name: 'chevron-down' %}
+                  </summary>
+                  <ul class="menu-drawer__sublist" role="list">
+                    {%- for child in link.links -%}
+                      <li>
+                        {%- if child.links != blank -%}
+                          <details class="menu-drawer__details"{% if child.child_active %} open{% endif %}>
+                            <summary class="menu-drawer__link menu-drawer__link--child">
+                              <span>{{ child.title }}</span>
+                              {% render 'icon', name: 'chevron-down' %}
+                            </summary>
+                            <ul class="menu-drawer__sublist" role="list">
+                              {%- for grandchild in child.links -%}
+                                <li>
+                                  <a
+                                    href="{{ grandchild.url }}"
+                                    class="menu-drawer__link menu-drawer__link--grandchild"
+                                    {% if grandchild.current %}
+                                      aria-current="page"
+                                    {% endif %}
+                                  >
+                                    {{- grandchild.title -}}
+                                  </a>
+                                </li>
+                              {%- endfor -%}
+                              <li>
+                                <a href="{{ child.url }}" class="menu-drawer__link menu-drawer__link--grandchild menu-drawer__link--all">
+                                  {{- 'header.view_all_of' | t: title: child.title -}}
+                                </a>
+                              </li>
+                            </ul>
+                          </details>
+                        {%- else -%}
+                          <a
+                            href="{{ child.url }}"
+                            class="menu-drawer__link menu-drawer__link--child"
+                            {% if child.current %}
+                              aria-current="page"
+                            {% endif %}
+                          >
+                            {{- child.title -}}
+                          </a>
+                        {%- endif -%}
+                      </li>
+                    {%- endfor -%}
+                    <li>
+                      <a href="{{ link.url }}" class="menu-drawer__link menu-drawer__link--child menu-drawer__link--all">
+                        {{- 'header.view_all_of' | t: title: link.title -}}
+                      </a>
+                    </li>
+                  </ul>
+                </details>
+              {%- else -%}
+                <a
+                  href="{{ link.url }}"
+                  class="menu-drawer__link"
+                  {% if link.current %}
+                    aria-current="page"
+                  {% endif %}
+                >
+                  <span>{{ link.title }}</span>
+                  {% render 'icon', name: 'chevron-right' %}
+                </a>
+              {%- endif -%}
+            </li>
+          {%- endfor -%}
+        </ul>
+
+        {%- if shop.customer_accounts_enabled and section.settings.show_account -%}
+          <a href="{{ routes.account_url }}" class="menu-drawer__utility" rel="nofollow">
+            {% render 'icon', name: 'account' %}
+            {%- if customer -%}
+              {{ 'header.account' | t }}
+            {%- else -%}
+              {{ 'header.sign_in' | t }}
+            {%- endif -%}
+          </a>
+        {%- endif -%}
+      </nav>
+
+      <div class="dialog__footer menu-drawer__footer">
+        {%- render 'localization-form',
+          id: 'MenuDrawerLocalization',
+          show_country: section.settings.show_country,
+          show_language: section.settings.show_language,
+          class: 'menu-drawer__localization'
+        -%}
+        {%- render 'social-icons', class: 'menu-drawer__social' -%}
+        {%- if section.settings.drawer_button_label != blank -%}
+          <a href="{{ section.settings.drawer_button_link | default: routes.all_products_collection_url }}" class="button button--full">
+            {{ section.settings.drawer_button_label }}
+            {% render 'icon', name: 'arrow-right' %}
+          </a>
+        {%- endif -%}
+      </div>
+    </div>
+  </dialog>
+</lc-dialog>

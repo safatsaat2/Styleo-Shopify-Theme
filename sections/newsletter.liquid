@@ -1,0 +1,159 @@
+<div class="newsletter-section visibility-{{ section.settings.visibility }}">
+  <div class="{% if section.settings.full_width %}page-width--full{% else %}page-width{% endif %} section-spacing" style="--pt: {{ section.settings.padding_top }}px; --pb: {{ section.settings.padding_bottom }}px;">
+    <div class="newsletter newsletter--{{ section.settings.layout }}{% unless section.settings.full_width %} newsletter--inset{% endunless %} color-{{ section.settings.color_scheme }}" data-reveal>
+      <div class="newsletter__content">
+        {%- if section.settings.subheading != blank -%}
+          <p class="subheading">{{ section.settings.subheading }}</p>
+        {%- endif -%}
+        {%- if section.settings.heading != blank -%}
+          <h2 class="h2 text-balance">{{ section.settings.heading }}</h2>
+        {%- endif -%}
+        {%- if section.settings.text != blank -%}
+          <div class="rte newsletter__text">{{ section.settings.text }}</div>
+        {%- endif -%}
+        {%- assign form_id = 'Newsletter-' | append: section.id -%}
+        {% render 'newsletter-form', id: form_id, button_label: section.settings.button_label, class: 'newsletter__field' %}
+        {%- if section.settings.legal_text != blank -%}
+          <div class="newsletter__legal">{{ section.settings.legal_text }}</div>
+        {%- endif -%}
+      </div>
+      {%- if section.settings.layout == 'split' -%}
+        <div class="newsletter__media media">
+          {%- if section.settings.image != blank -%}
+            {% render 'image', image: section.settings.image, sizes: '(min-width: 990px) 40vw, 100vw' %}
+          {%- else -%}
+            {{ 'lifestyle-2' | placeholder_svg_tag: 'placeholder-svg' }}
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+</div>
+
+{{ 'section-home.css' | asset_url | stylesheet_tag }}
+
+{% schema %}
+{
+  "name": "t:names.newsletter",
+  "tag": "section",
+  "class": "section-newsletter",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "t:content.subscribers_are_added_to_your_customer_list_with_676bec"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "t:labels.subheading"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "t:labels.heading",
+      "default": "Join our style circle"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "t:labels.text",
+      "default": "<p>Be the first to know about new arrivals, exclusive offers, and style ideas.</p>"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "t:labels.button_label",
+      "info": "t:info.leave_blank_to_show_an_arrow"
+    },
+    {
+      "type": "richtext",
+      "id": "legal_text",
+      "label": "t:labels.consent_text",
+      "info": "t:info.for_example_a_link_to_your_privacy_policy"
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "t:labels.layout",
+      "options": [
+        {
+          "value": "centered",
+          "label": "t:options.centered"
+        },
+        {
+          "value": "split",
+          "label": "t:options.text_beside_image"
+        }
+      ],
+      "default": "centered"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "t:labels.image",
+      "info": "t:info.shown_with_the_text_beside_image_layout"
+    },
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "t:labels.make_section_full_width",
+      "default": false
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:labels.color_scheme",
+      "default": "lavender"
+    },
+    {
+      "type": "select",
+      "id": "visibility",
+      "label": "t:labels.show_on",
+      "options": [
+        {
+          "value": "all",
+          "label": "t:options.all_devices"
+        },
+        {
+          "value": "mobile",
+          "label": "t:options.small_screens_only"
+        },
+        {
+          "value": "desktop",
+          "label": "t:options.large_screens_only"
+        }
+      ],
+      "default": "all"
+    },
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "t:labels.top",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "t:labels.bottom",
+      "default": 80
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.newsletter"
+    }
+  ]
+}
+{% endschema %}

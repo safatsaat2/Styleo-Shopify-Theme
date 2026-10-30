@@ -1,0 +1,147 @@
+{%- comment -%}
+  Limited-time banner with a countdown to a real end date.
+  After the date passes the section hides, or shows the expired message.
+{%- endcomment -%}
+
+<div class="countdown-section color-{{ section.settings.color_scheme }} visibility-{{ section.settings.visibility }}" data-countdown-wrapper>
+  <div class="page-width section-spacing" style="--pt: {{ section.settings.padding_top }}px; --pb: {{ section.settings.padding_bottom }}px;">
+    <div class="countdown-banner" data-reveal>
+      <div class="countdown-banner__text">
+        {%- if section.settings.subheading != blank -%}
+          <p class="subheading">{{ section.settings.subheading }}</p>
+        {%- endif -%}
+        {%- if section.settings.heading != blank -%}
+          <h2 class="h2 text-balance">{{ section.settings.heading }}</h2>
+        {%- endif -%}
+        {%- if section.settings.text != blank -%}
+          <div class="rte">{{ section.settings.text }}</div>
+        {%- endif -%}
+      </div>
+      {% render 'countdown',
+        end_date: section.settings.end_date,
+        end_time: section.settings.end_time,
+        expired_text: section.settings.expired_text
+      %}
+      {% render 'button', label: section.settings.button_label, url: section.settings.button_link, arrow: true, size: 'large' %}
+    </div>
+  </div>
+</div>
+
+{{ 'section-home.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'countdown.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "t:names.countdown",
+  "tag": "section",
+  "class": "section-countdown",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "t:content.counts_down_to_a_real_date_in_your_store_s_time_7105a1"
+    },
+    {
+      "type": "text",
+      "id": "end_date",
+      "label": "t:labels.end_date",
+      "info": "t:info.format_yyyy_mm_dd_for_example_2026_12_31"
+    },
+    {
+      "type": "text",
+      "id": "end_time",
+      "label": "t:labels.end_time",
+      "info": "t:info.n_24_hour_format_hh_mm",
+      "default": "23:59"
+    },
+    {
+      "type": "text",
+      "id": "expired_text",
+      "label": "t:labels.message_after_the_end_date",
+      "info": "t:info.leave_blank_to_hide_the_section_when_the_countdo_159afc"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "t:labels.subheading",
+      "default": "Limited time"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "t:labels.heading",
+      "default": "Announce a sale or launch"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "t:labels.text"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "t:labels.button_label",
+      "default": "Shop the sale"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "t:labels.button_link"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:labels.color_scheme",
+      "default": "dusk"
+    },
+    {
+      "type": "select",
+      "id": "visibility",
+      "label": "t:labels.show_on",
+      "options": [
+        {
+          "value": "all",
+          "label": "t:options.all_devices"
+        },
+        {
+          "value": "mobile",
+          "label": "t:options.small_screens_only"
+        },
+        {
+          "value": "desktop",
+          "label": "t:options.large_screens_only"
+        }
+      ],
+      "default": "all"
+    },
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "t:labels.top",
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "t:labels.bottom",
+      "default": 56
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.countdown"
+    }
+  ]
+}
+{% endschema %}

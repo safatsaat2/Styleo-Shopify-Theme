@@ -1,0 +1,63 @@
+{%- comment -%}
+  Countdown to a merchant-set end date in the store's time zone.
+  Renders nothing once the date has passed, and hides itself in the
+  browser when it reaches zero. No evergreen or looping timers.
+
+  Accepts:
+  - end_date {String}: YYYY-MM-DD
+  - end_time {String}: HH:MM (24-hour), default 23:59
+  - label {String}: optional caption above the timer
+  - expired_text {String}: optional text shown after expiry instead of hiding
+  - class {String}
+{%- endcomment -%}
+
+{%- liquid
+  assign valid_date = false
+  assign clean_date = end_date | strip
+  if clean_date.size == 10
+    assign date_parts = clean_date | split: '-'
+    if date_parts.size == 3
+      assign valid_date = true
+    endif
+  endif
+
+  assign clean_time = end_time | strip | default: '23:59'
+  if clean_time.size != 5
+    assign clean_time = '23:59'
+  endif
+
+  if valid_date
+    assign offset = 'now' | date: '%z'
+    assign offset_hours = offset | slice: 0, 3
+    assign offset_minutes = offset | slice: 3, 2
+    assign end_iso = clean_date | append: 'T' | append: clean_time | append: ':00' | append: offset_hours | append: ':' | append: offset_minutes
+    assign end_seconds = end_iso | date: '%s' | plus: 0
+    assign now_seconds = 'now' | date: '%s' | plus: 0
+    assign expired = false
+    if end_seconds <= now_seconds
+      assign expired = true
+    endif
+  endif
+-%}
+
+{%- if valid_date == false -%}
+  {%- if request.design_mode -%}
+    <p class="countdown__notice notice">{% render 'icon', name: 'info' %} {{ 'countdown.set_date' | t }}</p>
+  {%- endif -%}
+{%- elsif expired == false -%}
+  <lc-countdown class="countdown {{ class }}" data-end="{{ end_iso }}" data-expired-text="{{ expired_text | escape }}">
+    {%- if label != blank -%}
+      <p class="countdown__label subheading">{{ label }}</p>
+    {%- endif -%}
+    <div class="countdown__units" role="timer" aria-live="off" aria-label="{{ 'countdown.label' | t }}">
+      <span class="countdown__unit"><span class="countdown__value" data-unit="days">00</span><span class="countdown__name">{{ 'countdown.days' | t }}</span></span>
+      <span class="countdown__unit"><span class="countdown__value" data-unit="hours">00</span><span class="countdown__name">{{ 'countdown.hours' | t }}</span></span>
+      <span class="countdown__unit"><span class="countdown__value" data-unit="minutes">00</span><span class="countdown__name">{{ 'countdown.minutes' | t }}</span></span>
+      <span class="countdown__unit"><span class="countdown__value" data-unit="seconds">00</span><span class="countdown__name">{{ 'countdown.seconds' | t }}</span></span>
+    </div>
+    {%- assign end_display = end_iso | date: format: 'date' -%}
+    <p class="visually-hidden">{{ 'countdown.ends_on' | t: date: end_display }}</p>
+  </lc-countdown>
+{%- elsif expired_text != blank -%}
+  <p class="countdown__expired {{ class }}">{{ expired_text }}</p>
+{%- endif -%}

@@ -1,0 +1,151 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-product",
+      "blocks": {
+        "title": {
+          "type": "title",
+          "settings": {
+            "size": "h1"
+          }
+        },
+        "price": {
+          "type": "price",
+          "settings": {
+            "show_saving": false,
+            "show_installments": true
+          }
+        },
+        "when": {
+          "type": "collapsible_tab",
+          "settings": {
+            "heading": "Date, time, and place",
+            "icon": "calendar",
+            "content": "<p>Add the date, start time, and address. Pick a variant for each date or ticket type.</p>",
+            "open": true
+          }
+        },
+        "description": {
+          "type": "description",
+          "settings": {}
+        },
+        "picker": {
+          "type": "variant_picker",
+          "settings": {
+            "picker_style": "buttons",
+            "show_swatches": false
+          }
+        },
+        "inventory": {
+          "type": "inventory",
+          "settings": {
+            "show_count": true
+          }
+        },
+        "attendee": {
+          "type": "custom_field",
+          "settings": {
+            "field_type": "text",
+            "label": "Attendee name",
+            "hint": "Shown on the guest list",
+            "max_length": 60,
+            "required": true
+          }
+        },
+        "requests": {
+          "type": "custom_field",
+          "settings": {
+            "field_type": "textarea",
+            "label": "Access needs or requests",
+            "max_length": 200,
+            "required": false
+          }
+        },
+        "quantity": {
+          "type": "quantity",
+          "settings": {}
+        },
+        "buy": {
+          "type": "buy_buttons",
+          "settings": {
+            "show_dynamic_checkout": true,
+            "show_gift_card_recipient": false,
+            "preorder_note": ""
+          }
+        },
+        "notify": {
+          "type": "notify_me",
+          "settings": {
+            "heading": "Get an email when it's available"
+          }
+        },
+        "policy": {
+          "type": "collapsible_tab",
+          "settings": {
+            "heading": "Tickets and refunds",
+            "icon": "info",
+            "content": "<p>Explain how tickets are delivered and your refund or transfer policy.</p>",
+            "open": false
+          }
+        },
+        "group": {
+          "type": "quote",
+          "settings": {
+            "label": "Ask about group bookings"
+          }
+        },
+        "share": {
+          "type": "share",
+          "settings": {}
+        }
+      },
+      "block_order": [
+        "title",
+        "price",
+        "when",
+        "description",
+        "picker",
+        "inventory",
+        "attendee",
+        "requests",
+        "quantity",
+        "buy",
+        "notify",
+        "policy",
+        "group",
+        "share"
+      ],
+      "settings": {
+        "gallery_layout": "stacked",
+        "media_width": "half",
+        "media_ratio": "portrait",
+        "zoom": "hover",
+        "loop_video": true,
+        "sticky_info": true,
+        "show_breadcrumbs": true,
+        "sticky_add_to_cart": false,
+        "sticky_color_scheme": "noir",
+        "color_scheme": "cream",
+        "padding_top": 32,
+        "padding_bottom": 64
+      }
+    },
+    "recommendations": {
+      "type": "product-recommendations",
+      "settings": {
+        "heading": "You may also like",
+        "intent": "related",
+        "limit": 4,
+        "columns": 4,
+        "desktop_layout": "grid",
+        "color_scheme": "cream",
+        "padding_top": 48,
+        "padding_bottom": 80
+      }
+    }
+  },
+  "order": [
+    "main",
+    "recommendations"
+  ]
+}

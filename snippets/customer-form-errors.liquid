@@ -1,0 +1,32 @@
+{%- comment -%}
+  Error and success messages for customer forms.
+  Must be rendered inside a {% form %} tag.
+
+  Accepts:
+  - form {Form}
+  - success {String}: message shown when form.posted_successfully? is true
+{%- endcomment -%}
+
+{%- if form.posted_successfully? and success != blank -%}
+  <p class="form-message form-message--success" role="status" tabindex="-1" autofocus>
+    {% render 'icon', name: 'check' %}
+    <span>{{ success }}</span>
+  </p>
+{%- endif -%}
+
+{%- if form.errors -%}
+  <div class="form-message form-message--error" role="alert" tabindex="-1" autofocus>
+    {% render 'icon', name: 'error' %}
+    <ul>
+      {%- for field in form.errors -%}
+        <li>
+          {%- if field == 'form' -%}
+            {{ form.errors.messages[field] }}
+          {%- else -%}
+            {{ form.errors.translated_fields[field] | capitalize }} {{ form.errors.messages[field] }}
+          {%- endif -%}
+        </li>
+      {%- endfor -%}
+    </ul>
+  </div>
+{%- endif -%}

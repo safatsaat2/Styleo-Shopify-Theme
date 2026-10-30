@@ -1,0 +1,35 @@
+{%- comment -%}
+  Responsive image with focal point support.
+
+  Accepts:
+  - image {Image}: required
+  - sizes {String}: sizes attribute, default '100vw'
+  - widths {String}: srcset widths
+  - loading {String}: 'lazy' (default) or 'eager'
+  - fetchpriority {String}: 'high' for the LCP image
+  - alt {String}: overrides image.alt
+  - class {String}
+{%- endcomment -%}
+
+{%- liquid
+  assign image_sizes = sizes | default: '100vw'
+  assign image_widths = widths | default: '360, 540, 720, 900, 1080, 1296, 1512, 1728, 2048, 2400'
+  assign image_loading = loading | default: 'lazy'
+  assign image_priority = fetchpriority | default: 'auto'
+  assign focal = image.presentation.focal_point | default: 'center'
+  assign focal_style = 'object-position: ' | append: focal | append: ';'
+  assign image_alt = alt | default: image.alt | escape
+-%}
+
+{{
+  image
+  | image_url: width: 2400
+  | image_tag:
+    widths: image_widths,
+    sizes: image_sizes,
+    loading: image_loading,
+    fetchpriority: image_priority,
+    class: class,
+    alt: image_alt,
+    style: focal_style
+}}

@@ -1,0 +1,99 @@
+{%- comment -%}
+  Product badges driven by real product data:
+  sold out (inventory), coming soon (tag), sale (compare-at price),
+  new (published date), best seller (collection or tag), limited edition (tag).
+  Shows at most two badges.
+
+  Accepts:
+  - product {Product}
+  - variant {Variant}: optional, for variant-level sale and sold out state
+  - class {String}
+{%- endcomment -%}
+
+{%- liquid
+  if variant
+    assign available = variant.available
+    assign price = variant.price
+    assign compare = variant.compare_at_price
+  else
+    assign available = product.available
+    assign price = product.price
+    assign compare = product.compare_at_price
+  endif
+
+  assign coming_soon = false
+  if settings.coming_soon_tag != blank and product.tags contains settings.coming_soon_tag
+    assign coming_soon = true
+  endif
+
+  assign is_new = false
+  if settings.show_new_badge and product.published_at
+    assign now_seconds = 'now' | date: '%s' | plus: 0
+    assign published_seconds = product.published_at | date: '%s' | plus: 0
+    assign age_days = now_seconds | minus: published_seconds | divided_by: 86400
+    if age_days < settings.new_badge_days
+      assign is_new = true
+    endif
+  endif
+
+  assign best_seller = false
+  if settings.best_seller_tag != blank and product.tags contains settings.best_seller_tag
+    assign best_seller = true
+  elsif settings.best_seller_collection != blank
+    for product_collection in product.collections
+      if product_collection.id == settings.best_seller_collection.id
+        assign best_seller = true
+        break
+      endif
+    endfor
+  endif
+
+  assign limited = false
+  if settings.limited_edition_tag != blank and product.tags contains settings.limited_edition_tag
+    assign limited = true
+  endif
+
+  assign shown = 0
+-%}
+
+<div class="badges {{ class }}">
+  {%- if available == false and coming_soon == false and settings.show_sold_out_badge -%}
+    <span class="badge badge--muted">{{ 'products.badges.sold_out' | t }}</span>
+    {%- assign shown = shown | plus: 1 -%}
+  {%- endif -%}
+
+  {%- if coming_soon -%}
+    <span class="badge color-{{ settings.new_badge_color_scheme }}">{{ 'products.badges.coming_soon' | t }}</span>
+    {%- assign shown = shown | plus: 1 -%}
+  {%- endif -%}
+
+  {%- if compare > price and available -%}
+    <span class="badge color-{{ settings.sale_badge_color_scheme }}">
+      {%- case settings.sale_badge_display -%}
+        {%- when 'percentage' -%}
+          {%- assign saved_percent = compare | minus: price | times: 100.0 | divided_by: compare | round -%}
+          {{- 'products.badges.save_percent' | t: percent: saved_percent -}}
+        {%- when 'amount' -%}
+          {%- assign saved_amount = compare | minus: price | money_without_trailing_zeros -%}
+          {{- 'products.badges.save_amount' | t: amount: saved_amount -}}
+        {%- else -%}
+          {{- 'products.badges.sale' | t -}}
+      {%- endcase -%}
+    </span>
+    {%- assign shown = shown | plus: 1 -%}
+  {%- endif -%}
+
+  {%- if shown < 2 and is_new -%}
+    <span class="badge color-{{ settings.new_badge_color_scheme }}">{{ 'products.badges.new' | t }}</span>
+    {%- assign shown = shown | plus: 1 -%}
+  {%- endif -%}
+
+  {%- if shown < 2 and best_seller -%}
+    <span class="badge badge--outline">{{ 'products.badges.best_seller' | t }}</span>
+    {%- assign shown = shown | plus: 1 -%}
+  {%- endif -%}
+
+  {%- if shown < 2 and limited -%}
+    <span class="badge badge--outline">{{ 'products.badges.limited' | t }}</span>
+  {%- endif -%}
+</div>

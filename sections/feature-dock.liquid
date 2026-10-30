@@ -1,0 +1,256 @@
+{%- comment -%}
+  Feature dock: a pill-shaped bar of short service promises that can float
+  over the bottom edge of the section above it.
+{%- endcomment -%}
+
+{%- if section.settings.overlap -%}
+  {%- style -%}
+    #shopify-section-{{ section.id }} {
+      position: relative;
+      z-index: 5;
+    }
+  {%- endstyle -%}
+{%- endif -%}
+
+<div class="dock-section visibility-{{ section.settings.visibility }}{% if section.settings.overlap %} dock-section--overlap{% endif %}">
+  <div class="page-width section-spacing" style="--pt: {{ section.settings.padding_top }}px; --pb: {{ section.settings.padding_bottom }}px;">
+    <ul class="dock dock--{{ section.settings.style }} color-{{ section.settings.color_scheme }}" role="list" data-reveal>
+      {%- for block in section.blocks -%}
+        <li class="dock__item" {{ block.shopify_attributes }}>
+          {%- capture item_inner -%}
+            <span class="dock__icon">
+              {%- if block.settings.image != blank -%}
+                {{ block.settings.image | image_url: width: 96 | image_tag: loading: 'lazy', alt: '', width: 24, height: 24, widths: '24, 48, 96', sizes: '24px' }}
+              {%- else -%}
+                {% render 'icon', name: block.settings.icon %}
+              {%- endif -%}
+            </span>
+            <span class="dock__text">
+              <span class="dock__heading">{{ block.settings.heading }}</span>
+              {%- if block.settings.text != blank -%}
+                <span class="dock__description">{{ block.settings.text }}</span>
+              {%- endif -%}
+            </span>
+          {%- endcapture -%}
+          {%- if block.settings.link != blank -%}
+            <a href="{{ block.settings.link }}" class="dock__link">{{ item_inner }}</a>
+          {%- else -%}
+            <div class="dock__link">{{ item_inner }}</div>
+          {%- endif -%}
+        </li>
+      {%- endfor -%}
+    </ul>
+  </div>
+</div>
+
+{{ 'section-home.css' | asset_url | stylesheet_tag }}
+
+{% schema %}
+{
+  "name": "t:names.feature_dock",
+  "tag": "section",
+  "class": "section-feature-dock",
+  "max_blocks": 4,
+  "settings": [
+    {
+      "type": "select",
+      "id": "style",
+      "label": "t:labels.style",
+      "options": [
+        {
+          "value": "pill",
+          "label": "t:options.pill_bar"
+        },
+        {
+          "value": "cards",
+          "label": "t:options.cards"
+        }
+      ],
+      "default": "pill"
+    },
+    {
+      "type": "checkbox",
+      "id": "overlap",
+      "label": "t:labels.overlap_the_section_above",
+      "info": "t:info.increase_the_bottom_padding_of_the_section_above_449400",
+      "default": true
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:labels.color_scheme",
+      "default": "lavender"
+    },
+    {
+      "type": "select",
+      "id": "visibility",
+      "label": "t:labels.show_on",
+      "options": [
+        {
+          "value": "all",
+          "label": "t:options.all_devices"
+        },
+        {
+          "value": "mobile",
+          "label": "t:options.small_screens_only"
+        },
+        {
+          "value": "desktop",
+          "label": "t:options.large_screens_only"
+        }
+      ],
+      "default": "all"
+    },
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "t:labels.top",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "t:labels.bottom",
+      "default": 24
+    }
+  ],
+  "blocks": [
+    {
+      "type": "item",
+      "name": "t:names.feature",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "t:labels.icon",
+          "options": [
+            {
+              "value": "truck",
+              "label": "t:options.delivery_truck"
+            },
+            {
+              "value": "return",
+              "label": "t:options.return_arrow"
+            },
+            {
+              "value": "shield",
+              "label": "t:options.shield"
+            },
+            {
+              "value": "headset",
+              "label": "t:options.headset"
+            },
+            {
+              "value": "gift",
+              "label": "t:options.gift"
+            },
+            {
+              "value": "tag",
+              "label": "t:options.price_tag"
+            },
+            {
+              "value": "calendar",
+              "label": "t:options.calendar"
+            },
+            {
+              "value": "location",
+              "label": "t:options.location_pin"
+            },
+            {
+              "value": "star",
+              "label": "t:options.star"
+            },
+            {
+              "value": "check",
+              "label": "t:options.check_mark"
+            },
+            {
+              "value": "mail",
+              "label": "t:options.envelope"
+            },
+            {
+              "value": "phone",
+              "label": "t:options.phone"
+            }
+          ],
+          "default": "truck"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "t:labels.custom_icon",
+          "info": "t:info.replaces_the_icon_48_x_48px_png_or_svg_recommend_2b5dfe"
+        },
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "t:labels.heading",
+          "default": "Free shipping"
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "label": "t:labels.text",
+          "default": "On qualifying orders"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "t:labels.link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.feature_dock",
+      "blocks": [
+        {
+          "type": "item",
+          "settings": {
+            "icon": "truck",
+            "heading": "Free shipping",
+            "text": "On qualifying orders"
+          }
+        },
+        {
+          "type": "item",
+          "settings": {
+            "icon": "return",
+            "heading": "Easy returns",
+            "text": "Share your return window"
+          }
+        },
+        {
+          "type": "item",
+          "settings": {
+            "icon": "shield",
+            "heading": "Secure payment",
+            "text": "Encrypted checkout"
+          }
+        },
+        {
+          "type": "item",
+          "settings": {
+            "icon": "headset",
+            "heading": "Support",
+            "text": "Say when you can help"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

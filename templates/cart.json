@@ -1,0 +1,51 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-cart",
+      "blocks": {
+        "checkout": {
+          "type": "checkout",
+          "settings": {
+            "show_accelerated": true
+          }
+        },
+        "discounts": {
+          "type": "discounts",
+          "settings": {}
+        },
+        "options": {
+          "type": "options",
+          "settings": {
+            "show_gift_message": true
+          }
+        },
+        "shipping": {
+          "type": "shipping_estimator",
+          "settings": {}
+        },
+        "payment": {
+          "type": "payment_icons",
+          "settings": {}
+        }
+      },
+      "block_order": ["discounts", "options", "shipping", "checkout", "payment"],
+      "settings": {
+        "color_scheme": "cream",
+        "padding_top": 40,
+        "padding_bottom": 40
+      }
+    },
+    "upsell": {
+      "type": "cart-upsell",
+      "settings": {
+        "heading": "You may also like",
+        "limit": 4,
+        "card_style": "portrait",
+        "color_scheme": "cream",
+        "padding_top": 32,
+        "padding_bottom": 80
+      }
+    }
+  },
+  "order": ["main", "upsell"]
+}

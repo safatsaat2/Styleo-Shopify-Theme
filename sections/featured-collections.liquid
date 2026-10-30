@@ -1,0 +1,322 @@
+{%- liquid
+  assign columns = section.settings.columns
+  assign desktop_style = section.settings.card_style
+  if desktop_style == 'theme'
+    assign desktop_style = settings.collection_card_style
+  endif
+  assign mobile_style = section.settings.mobile_card_style
+  if mobile_style == 'same'
+    assign mobile_style = desktop_style
+  endif
+  assign card_count = section.blocks.size
+  if card_count == 0
+    assign card_count = 3
+  endif
+-%}
+
+<div class="featured-collections color-{{ section.settings.color_scheme }} visibility-{{ section.settings.visibility }}">
+  <div class="page-width section-spacing" style="--pt: {{ section.settings.padding_top }}px; --pb: {{ section.settings.padding_bottom }}px;">
+    {% render 'section-heading',
+      subheading: section.settings.subheading,
+      heading: section.settings.heading,
+      link_label: section.settings.link_label,
+      link_url: section.settings.link_url,
+      align: section.settings.heading_alignment
+    %}
+
+    <lc-carousel
+      class="collection-list collection-list--desktop-{{ section.settings.desktop_layout }} collection-list--mobile-{{ section.settings.mobile_layout }}"
+      style="--cols: {{ columns }}; --cols-mobile: {% if mobile_style == 'orb' %}3{% else %}2{% endif %};"
+    >
+      <ul class="collection-list__track" role="list" data-carousel-track>
+        {%- if section.blocks.size > 0 -%}
+          {%- for block in section.blocks -%}
+            <li class="collection-list__item" {{ block.shopify_attributes }}>
+              <div class="collection-list__card mobile-hidden">
+                {% render 'collection-card',
+                  collection: block.settings.collection,
+                  style: desktop_style,
+                  image: block.settings.image,
+                  title: block.settings.title,
+                  button_label: section.settings.card_button_label,
+                  sizes: '(min-width: 990px) 33vw, 50vw',
+                  index: forloop.index0
+                %}
+              </div>
+              <div class="collection-list__card desktop-hidden">
+                {% render 'collection-card',
+                  collection: block.settings.collection,
+                  style: mobile_style,
+                  image: block.settings.image,
+                  title: block.settings.title,
+                  button_label: section.settings.card_button_label,
+                  sizes: '33vw',
+                  index: forloop.index0
+                %}
+              </div>
+            </li>
+          {%- endfor -%}
+        {%- else -%}
+          {%- for i in (1..card_count) -%}
+            <li class="collection-list__item">
+              {% render 'collection-card', collection: blank, style: desktop_style, index: forloop.index0 %}
+            </li>
+          {%- endfor -%}
+        {%- endif -%}
+      </ul>
+      <button type="button" class="carousel__button carousel__button--prev" data-carousel-prev aria-label="{{ 'accessibility.previous' | t }}">
+        {% render 'icon', name: 'chevron-left' %}
+      </button>
+      <button type="button" class="carousel__button carousel__button--next" data-carousel-next aria-label="{{ 'accessibility.next' | t }}">
+        {% render 'icon', name: 'chevron-right' %}
+      </button>
+    </lc-carousel>
+  </div>
+</div>
+
+{{ 'section-home.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'carousel.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "t:names.featured_collections",
+  "tag": "section",
+  "class": "section-featured-collections",
+  "max_blocks": 12,
+  "settings": [
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "t:labels.subheading"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "t:labels.heading",
+      "default": "Featured collections"
+    },
+    {
+      "type": "select",
+      "id": "heading_alignment",
+      "label": "t:labels.heading_alignment",
+      "options": [
+        {
+          "value": "start",
+          "label": "t:options.left"
+        },
+        {
+          "value": "center",
+          "label": "t:options.center"
+        }
+      ],
+      "default": "start"
+    },
+    {
+      "type": "text",
+      "id": "link_label",
+      "label": "t:labels.link_label",
+      "default": "View all collections"
+    },
+    {
+      "type": "url",
+      "id": "link_url",
+      "label": "t:labels.link",
+      "default": "/collections"
+    },
+    {
+      "type": "header",
+      "content": "t:content.cards"
+    },
+    {
+      "type": "select",
+      "id": "card_style",
+      "label": "t:labels.card_style_on_large_screens",
+      "options": [
+        {
+          "value": "theme",
+          "label": "t:options.use_theme_setting"
+        },
+        {
+          "value": "arch",
+          "label": "t:options.arch"
+        },
+        {
+          "value": "orb",
+          "label": "t:options.circle"
+        },
+        {
+          "value": "minimal",
+          "label": "t:options.minimal"
+        }
+      ],
+      "default": "arch"
+    },
+    {
+      "type": "select",
+      "id": "mobile_card_style",
+      "label": "t:labels.card_style_on_small_screens",
+      "options": [
+        {
+          "value": "same",
+          "label": "t:options.same_as_large_screens"
+        },
+        {
+          "value": "arch",
+          "label": "t:options.arch"
+        },
+        {
+          "value": "orb",
+          "label": "t:options.circle"
+        },
+        {
+          "value": "minimal",
+          "label": "t:options.minimal"
+        }
+      ],
+      "default": "orb"
+    },
+    {
+      "type": "text",
+      "id": "card_button_label",
+      "label": "t:labels.card_button_label",
+      "default": "Shop now"
+    },
+    {
+      "type": "header",
+      "content": "t:content.layout"
+    },
+    {
+      "type": "select",
+      "id": "desktop_layout",
+      "label": "t:labels.layout_on_large_screens",
+      "options": [
+        {
+          "value": "grid",
+          "label": "t:options.grid"
+        },
+        {
+          "value": "carousel",
+          "label": "t:options.carousel"
+        }
+      ],
+      "default": "grid"
+    },
+    {
+      "type": "range",
+      "id": "columns",
+      "min": 2,
+      "max": 6,
+      "step": 1,
+      "label": "t:labels.collections_per_row_on_large_screens",
+      "default": 3
+    },
+    {
+      "type": "select",
+      "id": "mobile_layout",
+      "label": "t:labels.layout_on_small_screens",
+      "options": [
+        {
+          "value": "grid",
+          "label": "t:options.grid"
+        },
+        {
+          "value": "carousel",
+          "label": "t:options.carousel"
+        }
+      ],
+      "default": "grid"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:labels.color_scheme",
+      "default": "cream"
+    },
+    {
+      "type": "select",
+      "id": "visibility",
+      "label": "t:labels.show_on",
+      "options": [
+        {
+          "value": "all",
+          "label": "t:options.all_devices"
+        },
+        {
+          "value": "mobile",
+          "label": "t:options.small_screens_only"
+        },
+        {
+          "value": "desktop",
+          "label": "t:options.large_screens_only"
+        }
+      ],
+      "default": "all"
+    },
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "t:labels.top",
+      "default": 64
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "t:labels.bottom",
+      "default": 80
+    }
+  ],
+  "blocks": [
+    {
+      "type": "collection",
+      "name": "t:names.collection",
+      "settings": [
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "t:labels.collection"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "t:labels.image",
+          "info": "t:info.replaces_the_collection_image"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "t:labels.title",
+          "info": "t:info.replaces_the_collection_title"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.featured_collections",
+      "blocks": [
+        {
+          "type": "collection"
+        },
+        {
+          "type": "collection"
+        },
+        {
+          "type": "collection"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

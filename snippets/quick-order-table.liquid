@@ -1,0 +1,148 @@
+{%- comment -%}
+  Bulk order table: one row per variant with a quantity field, then every
+  row with a quantity is added to the cart in one request. Follows quantity
+  rules and shows volume pricing (quantity price breaks) from B2B catalogs.
+
+  Accepts:
+  - products {Array}: products to list
+  - product {Product}: a single product, used instead of products
+  - id {String}: unique id for this table
+  - show_images {Boolean}: default true
+  - show_sku {Boolean}: default true
+  - show_product_title {Boolean}: show product titles on each row (lists of several products)
+{%- endcomment -%}
+
+{%- liquid
+  assign show_images = show_images | default: true, allow_false: true
+  assign show_sku = show_sku | default: true, allow_false: true
+  assign product_count = 1
+  if products != blank
+    assign product_count = products.size
+  endif
+-%}
+
+<lc-quick-order class="quick-order" data-quick-order>
+  <form class="quick-order__form" novalidate data-quick-order-form>
+    <div class="quick-order__table-wrap">
+      <table class="quick-order__table">
+        <caption class="visually-hidden">{{ 'quick_order.caption' | t }}</caption>
+        <thead>
+          <tr>
+            <th scope="col">{{ 'quick_order.product' | t }}</th>
+            {%- if show_sku -%}
+              <th scope="col" class="quick-order__sku">{{ 'quick_order.sku' | t }}</th>
+            {%- endif -%}
+            <th scope="col">{{ 'quick_order.price' | t }}</th>
+            <th scope="col">{{ 'quick_order.quantity' | t }}</th>
+            <th scope="col" class="quick-order__num">{{ 'quick_order.total' | t }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {%- for i in (1..product_count) -%}
+            {%- if products != blank -%}
+              {%- assign product = products[forloop.index0] -%}
+            {%- endif -%}
+            {%- for variant in product.variants -%}
+              {%- liquid
+                assign rule = variant.quantity_rule
+                assign row_id = id | append: '-' | append: variant.id
+                assign row_title = variant.title
+                if product.has_only_default_variant
+                  assign row_title = product.title
+                elsif show_product_title
+                  assign row_title = product.title | append: ' – ' | append: variant.title
+                endif
+                assign row_image = variant.featured_image | default: product.featured_image
+                capture breaks
+                  for price_break in variant.quantity_price_breaks
+                    echo '[' | append: price_break.minimum_quantity | append: ',' | append: price_break.price | append: ']'
+                    unless forloop.last
+                      echo ','
+                    endunless
+                  endfor
+                endcapture
+              -%}
+              <tr
+                class="quick-order__row{% unless variant.available %} is-unavailable{% endunless %}"
+                data-variant-id="{{ variant.id }}"
+                data-price="{{ variant.price }}"
+                data-breaks="[{{ breaks }}]"
+              >
+                <th scope="row" class="quick-order__item">
+                  {%- if show_images -%}
+                    <span class="quick-order__media">
+                      {%- if row_image -%}
+                        {{ row_image | image_url: width: 120 | image_tag: loading: 'lazy', widths: '60, 120', sizes: '60px', alt: '' }}
+                      {%- endif -%}
+                    </span>
+                  {%- endif -%}
+                  <span class="quick-order__title">
+                    <a href="{{ variant.url }}" class="link">{{ row_title }}</a>
+                    {%- unless variant.available -%}
+                      <span class="badge badge--muted">{{ 'products.buttons.sold_out' | t }}</span>
+                    {%- endunless -%}
+                    {%- if rule.min > 1 or rule.increment > 1 -%}
+                      <span class="quick-order__rule">
+                        {%- if rule.min > 1 -%}{{ 'products.quantity.minimum' | t: quantity: rule.min }}{%- endif -%}
+                        {%- if rule.increment > 1 %} {{ 'products.quantity.increment' | t: quantity: rule.increment }}{%- endif -%}
+                      </span>
+                    {%- endif -%}
+                  </span>
+                </th>
+                {%- if show_sku -%}
+                  <td class="quick-order__sku" data-label="{{ 'quick_order.sku' | t }}">{{ variant.sku | default: '—' }}</td>
+                {%- endif -%}
+                <td data-label="{{ 'quick_order.price' | t }}">
+                  {% render 'price', product: product, variant: variant, show_unit: false %}
+                  {%- if variant.quantity_price_breaks.size > 0 -%}
+                    {%- assign lowest_break = variant.quantity_price_breaks | last -%}
+                    {%- assign lowest_price = lowest_break.price | money -%}
+                    <span class="quick-order__break">{{ 'quick_order.volume_from' | t: price: lowest_price, quantity: lowest_break.minimum_quantity }}</span>
+                  {%- endif -%}
+                </td>
+                <td data-label="{{ 'quick_order.quantity' | t }}">
+                  <label class="visually-hidden" for="QuickOrder-{{ row_id }}">{{ 'quick_order.quantity_for' | t: title: row_title }}</label>
+                  <input
+                    id="QuickOrder-{{ row_id }}"
+                    class="input quick-order__input"
+                    type="number"
+                    inputmode="numeric"
+                    name="quantity-{{ variant.id }}"
+                    value="0"
+                    min="0"
+                    step="{{ rule.increment }}"
+                    data-min="{{ rule.min }}"
+                    {% if rule.max %}max="{{ rule.max }}"{% endif %}
+                    {% unless variant.available %}disabled{% endunless %}
+                  >
+                </td>
+                <td class="quick-order__num" data-label="{{ 'quick_order.total' | t }}">
+                  <span data-line-total>{{ 0 | money }}</span>
+                </td>
+              </tr>
+            {%- endfor -%}
+          {%- endfor -%}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="quick-order__footer">
+      <p class="quick-order__summary">
+        <span data-quick-order-count>{{ 'quick_order.items' | t: count: 0 }}</span>
+        <span class="quick-order__subtotal">
+          {{ 'quick_order.subtotal' | t }}
+          <strong data-quick-order-subtotal>{{ 0 | money }}</strong>
+        </span>
+      </p>
+      <p class="field__hint">{{ 'quick_order.note' | t }}</p>
+      <p class="form-message form-message--error" role="alert" hidden data-quick-order-error></p>
+      <div class="button-row">
+        <button type="reset" class="button button--outline">{{ 'quick_order.reset' | t }}</button>
+        <button type="submit" class="button" disabled data-quick-order-submit>
+          {% render 'icon', name: 'bag' %}
+          <span>{{ 'quick_order.add' | t }}</span>
+        </button>
+      </div>
+    </div>
+  </form>
+</lc-quick-order>

@@ -1,0 +1,70 @@
+{%- comment -%}
+  Blog article card.
+
+  Accepts:
+  - article {Article}: when blank, a placeholder card renders
+  - show_image {Boolean}: default true
+  - show_date {Boolean}: default true
+  - show_author {Boolean}: default false
+  - show_excerpt {Boolean}: default true
+  - sizes {String}
+  - index {Number}
+  - heading_tag {String}: default 'h3'
+{%- endcomment -%}
+
+{%- liquid
+  assign title_tag = heading_tag | default: 'h3'
+  assign reveal_index = index | default: 0 | modulo: 4
+  assign image_sizes = sizes | default: '(min-width: 990px) 33vw, (min-width: 750px) 50vw, 100vw'
+-%}
+
+<article class="article-card" data-reveal style="--reveal-index: {{ reveal_index }};">
+  {%- if show_image != false -%}
+    <a href="{{ article.url | default: '#' }}" class="article-card__media media" style="--ratio: 3 / 2;" tabindex="-1" aria-hidden="true">
+      {%- if article.image -%}
+        {% render 'image',
+          image: article.image,
+          sizes: image_sizes,
+          widths: '360, 540, 720, 900, 1080',
+          alt: article.image.alt
+        %}
+      {%- else -%}
+        {{ 'lifestyle-2' | placeholder_svg_tag: 'placeholder-svg' }}
+      {%- endif -%}
+    </a>
+  {%- endif -%}
+
+  <div class="article-card__content">
+    {%- if article.tags.size > 0 -%}
+      <p class="subheading">{{ article.tags.first }}</p>
+    {%- endif -%}
+    <{{ title_tag }} class="article-card__title h4">
+      {%- if article -%}
+        <a href="{{ article.url }}" class="article-card__link">{{ article.title | escape }}</a>
+      {%- else -%}
+        {{ 'blogs.placeholder_title' | t }}
+      {%- endif -%}
+    </{{ title_tag }}>
+
+    {%- if show_date != false or show_author -%}
+      <p class="article-card__meta">
+        {%- if show_date != false and article.published_at -%}
+          <time datetime="{{ article.published_at | date: '%Y-%m-%d' }}">{{ article.published_at | date: format: 'date' }}</time>
+        {%- endif -%}
+        {%- if show_author and article.author != blank -%}
+          <span>{{ 'blogs.by_author' | t: author: article.author }}</span>
+        {%- endif -%}
+      </p>
+    {%- endif -%}
+
+    {%- if show_excerpt != false -%}
+      <p class="article-card__excerpt">
+        {%- if article -%}
+          {{ article.excerpt_or_content | strip_html | truncatewords: 24 }}
+        {%- else -%}
+          {{ 'blogs.placeholder_excerpt' | t }}
+        {%- endif -%}
+      </p>
+    {%- endif -%}
+  </div>
+</article>

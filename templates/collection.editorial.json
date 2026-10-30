@@ -1,0 +1,69 @@
+{
+  "sections": {
+    "banner": {
+      "type": "main-collection-banner",
+      "settings": {
+        "subheading": "The edit",
+        "show_description": true,
+        "show_image": true,
+        "layout": "overlay",
+        "image_shape": "frame",
+        "show_breadcrumbs": false,
+        "color_scheme": "dusk",
+        "padding_top": 96,
+        "padding_bottom": 56
+      }
+    },
+    "grid": {
+      "type": "main-collection",
+      "settings": {
+        "products_per_page": 24,
+        "columns_desktop": 3,
+        "columns_mobile": "2",
+        "pagination": "infinite",
+        "show_count": true,
+        "show_density": false,
+        "enable_filtering": true,
+        "filter_layout": "horizontal",
+        "enable_sorting": true,
+        "color_scheme": "cream",
+        "padding_top": 16,
+        "padding_bottom": 80
+      },
+      "blocks": {
+        "story": {
+          "type": "promo",
+          "settings": {
+            "position": 4,
+            "span": "2",
+            "subheading": "Styling note",
+            "heading": "How to wear it",
+            "text": "Share a styling idea or the story behind this collection.",
+            "button_label": "Read the story",
+            "color_scheme": "dusk"
+          }
+        }
+      },
+      "block_order": [
+        "story"
+      ]
+    },
+    "newsletter": {
+      "type": "newsletter",
+      "settings": {
+        "heading": "Join our style circle",
+        "text": "<p>Be the first to know when new pieces arrive.</p>",
+        "layout": "centered",
+        "full_width": false,
+        "color_scheme": "lavender",
+        "padding_top": 0,
+        "padding_bottom": 80
+      }
+    }
+  },
+  "order": [
+    "banner",
+    "grid",
+    "newsletter"
+  ]
+}

@@ -1,0 +1,90 @@
+{%- if block.settings.text != blank -%}
+  <div class="tb-text tb-text--{{ block.settings.style }} tb-align-{{ block.settings.alignment }} rte" style="--max-width: {{ block.settings.max_width }}ch;" {{ block.shopify_attributes }}>
+    {%- if block.settings.style == 'subheading' -%}
+      <p class="subheading">{{ block.settings.text | strip_html }}</p>
+    {%- else -%}
+      {{ block.settings.text }}
+    {%- endif -%}
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "t:names.text",
+  "tag": null,
+  "settings": [
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "t:labels.text",
+      "default": "<p>Share a short line about your brand, a collection, or an offer.</p>"
+    },
+    {
+      "type": "select",
+      "id": "style",
+      "label": "t:labels.style",
+      "options": [
+        {
+          "value": "body",
+          "label": "t:options.body"
+        },
+        {
+          "value": "large",
+          "label": "t:options.large"
+        },
+        {
+          "value": "muted",
+          "label": "t:options.muted"
+        },
+        {
+          "value": "subheading",
+          "label": "t:options.subheading"
+        }
+      ],
+      "default": "body"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "min": 20,
+      "max": 120,
+      "step": 5,
+      "unit": "ch",
+      "label": "t:labels.maximum_width",
+      "default": 60
+    },
+    {
+      "type": "select",
+      "id": "alignment",
+      "label": "t:labels.alignment",
+      "options": [
+        {
+          "value": "start",
+          "label": "t:options.left"
+        },
+        {
+          "value": "center",
+          "label": "t:options.center"
+        },
+        {
+          "value": "end",
+          "label": "t:options.right"
+        }
+      ],
+      "default": "start"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.text"
+    },
+    {
+      "name": "t:names.subheading",
+      "settings": {
+        "text": "<p>New season</p>",
+        "style": "subheading"
+      }
+    }
+  ]
+}
+{% endschema %}

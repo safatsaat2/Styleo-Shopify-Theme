@@ -1,0 +1,50 @@
+<div class="tb-social tb-align-{{ block.settings.alignment }}" {{ block.shopify_attributes }}>
+  {%- if block.settings.heading != blank -%}
+    <p class="subheading">{{ block.settings.heading }}</p>
+  {%- endif -%}
+  {% render 'social-icons' %}
+</div>
+
+{% schema %}
+{
+  "name": "t:names.social_media_links",
+  "tag": null,
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "t:content.add_your_accounts_in_theme_settings_under_social_dfd3a8"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "t:labels.heading",
+      "default": "Follow us"
+    },
+    {
+      "type": "select",
+      "id": "alignment",
+      "label": "t:labels.alignment",
+      "options": [
+        {
+          "value": "start",
+          "label": "t:options.left"
+        },
+        {
+          "value": "center",
+          "label": "t:options.center"
+        },
+        {
+          "value": "end",
+          "label": "t:options.right"
+        }
+      ],
+      "default": "start"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.social_media_links"
+    }
+  ]
+}
+{% endschema %}

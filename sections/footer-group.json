@@ -1,0 +1,61 @@
+{
+  "type": "footer",
+  "name": "t:names.footer_group",
+  "sections": {
+    "footer": {
+      "type": "footer",
+      "blocks": {
+        "brand": {
+          "type": "brand",
+          "settings": {
+            "show_logo": true,
+            "text": "<p>Tell customers what your brand stands for in a sentence or two.</p>",
+            "show_social": true
+          }
+        },
+        "menu": {
+          "type": "menu",
+          "settings": {
+            "heading": "Shop",
+            "menu": "footer"
+          }
+        },
+        "text": {
+          "type": "text",
+          "settings": {
+            "heading": "Help",
+            "text": "<p>Share how customers can reach you, such as an email address or store hours.</p>"
+          }
+        },
+        "newsletter": {
+          "type": "newsletter",
+          "settings": {
+            "heading": "Join our style circle",
+            "text": "<p>Be the first to hear about new arrivals, exclusive offers, and style ideas.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "brand",
+        "menu",
+        "text",
+        "newsletter"
+      ],
+      "settings": {
+        "color_scheme": "noir",
+        "show_payment_icons": true,
+        "show_country": true,
+        "show_language": true,
+        "show_follow_on_shop": true,
+        "show_policies": true,
+        "copyright_text": "",
+        "show_powered_by": true,
+        "padding_top": 64,
+        "padding_bottom": 56
+      }
+    }
+  },
+  "order": [
+    "footer"
+  ]
+}

@@ -1,0 +1,81 @@
+{%- comment -%}
+  Toolbar above a product grid: filter button, product count, grid density,
+  and sort. The sort form keeps applied filters as hidden fields so it
+  works without JavaScript.
+
+  Accepts:
+  - results {Collection|Search}
+  - section {Section}
+  - action {String}
+  - count {Number}
+  - terms {String}: search terms (search page)
+  - show_filter_button {Boolean}
+  - filter_button_desktop {Boolean}: show the filter button on large screens
+  - active_count {Number}
+  - sort_options {Array}
+  - sort_by {String}
+{%- endcomment -%}
+
+<div class="results-toolbar">
+  <div class="results-toolbar__start">
+    {%- if show_filter_button -%}
+      <button
+        type="button"
+        class="chip results-toolbar__filter{% unless filter_button_desktop %} results-toolbar__filter--mobile{% endunless %}"
+        data-dialog-open="FacetsDrawer-{{ section.id }}"
+        aria-haspopup="dialog"
+      >
+        {% render 'icon', name: 'filter' %}
+        {{ 'collections.filters.title' | t }}
+        <span class="results-toolbar__badge" data-facets-region="filter-count"{% if active_count == 0 %} hidden{% endif %}>{{ active_count }}</span>
+      </button>
+    {%- endif -%}
+    {%- if section.settings.show_count -%}
+      <p class="results-toolbar__count" data-facets-region="count">
+        {{- 'collections.product_count' | t: count: count -}}
+      </p>
+    {%- endif -%}
+  </div>
+
+  <div class="results-toolbar__end">
+    {%- if section.settings.show_density -%}
+      <div class="density" role="group" aria-label="{{ 'collections.density.label' | t }}">
+        <button type="button" class="icon-button density__button" data-density="comfortable" aria-pressed="true" aria-label="{{ 'collections.density.comfortable' | t }}">
+          {% render 'icon', name: 'grid' %}
+        </button>
+        <button type="button" class="icon-button density__button" data-density="compact" aria-pressed="false" aria-label="{{ 'collections.density.compact' | t }}">
+          {% render 'icon', name: 'list' %}
+        </button>
+      </div>
+    {%- endif -%}
+
+    {%- if section.settings.enable_sorting and sort_options.size > 0 -%}
+      <form class="results-toolbar__sort mobile-hidden" action="{{ action }}" method="get" data-sort-form>
+        {%- if terms != blank -%}
+          <input type="hidden" name="q" value="{{ terms | escape }}">
+          <input type="hidden" name="options[prefix]" value="last">
+          <input type="hidden" name="type" value="product">
+        {%- endif -%}
+        {%- for filter in results.filters -%}
+          {%- for value in filter.active_values -%}
+            <input type="hidden" name="{{ value.param_name }}" value="{{ value.value | escape }}">
+          {%- endfor -%}
+          {%- if filter.type == 'price_range' -%}
+            {%- if filter.min_value.value != blank -%}<input type="hidden" name="{{ filter.min_value.param_name }}" value="{{ filter.min_value.value | divided_by: 100.0 }}">{%- endif -%}
+            {%- if filter.max_value.value != blank -%}<input type="hidden" name="{{ filter.max_value.param_name }}" value="{{ filter.max_value.value | divided_by: 100.0 }}">{%- endif -%}
+          {%- endif -%}
+        {%- endfor -%}
+        <label class="results-toolbar__sort-label" for="SortBy-{{ section.id }}">{{ 'collections.sort.label' | t }}</label>
+        <div class="select-wrapper">
+          <select id="SortBy-{{ section.id }}" class="select" name="sort_by" data-sort-select>
+            {%- for option in sort_options -%}
+              <option value="{{ option.value | escape }}"{% if option.value == sort_by %} selected{% endif %}>{{ option.name | escape }}</option>
+            {%- endfor -%}
+          </select>
+          {% render 'icon', name: 'chevron-down' %}
+        </div>
+        <noscript><button type="submit" class="button button--small">{{ 'collections.sort.apply' | t }}</button></noscript>
+      </form>
+    {%- endif -%}
+  </div>
+</div>

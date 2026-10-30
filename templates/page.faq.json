@@ -1,0 +1,116 @@
+{
+  "sections": {
+    "main": {
+      "type": "faq",
+      "blocks": {
+        "g1": {
+          "type": "group",
+          "settings": {
+            "heading": "Orders and shipping"
+          }
+        },
+        "q1": {
+          "type": "question",
+          "settings": {
+            "question": "How long does shipping take?",
+            "answer": "<p>Share your processing time and delivery estimates by region.</p>",
+            "open": true
+          }
+        },
+        "q2": {
+          "type": "question",
+          "settings": {
+            "question": "Do you ship internationally?",
+            "answer": "<p>List the countries you ship to and how duties are handled.</p>"
+          }
+        },
+        "g2": {
+          "type": "group",
+          "settings": {
+            "heading": "Returns and exchanges"
+          }
+        },
+        "q3": {
+          "type": "question",
+          "settings": {
+            "question": "What is your return policy?",
+            "answer": "<p>Summarize your return window and link to the full policy.</p>"
+          }
+        },
+        "q4": {
+          "type": "question",
+          "settings": {
+            "question": "How do I start a return?",
+            "answer": "<p>Explain the steps, or link to your returns page.</p>"
+          }
+        },
+        "g3": {
+          "type": "group",
+          "settings": {
+            "heading": "Products and care"
+          }
+        },
+        "q5": {
+          "type": "question",
+          "settings": {
+            "question": "How do I find my size?",
+            "answer": "<p>Point customers to your size guide.</p>"
+          }
+        },
+        "q6": {
+          "type": "question",
+          "settings": {
+            "question": "How should I care for my pieces?",
+            "answer": "<p>Share general care advice for your materials.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "g1",
+        "q1",
+        "q2",
+        "g2",
+        "q3",
+        "q4",
+        "g3",
+        "q5",
+        "q6"
+      ],
+      "settings": {
+        "subheading": "Help center",
+        "heading": "Frequently asked questions",
+        "show_search": true,
+        "color_scheme": "cream",
+        "padding_top": 56,
+        "padding_bottom": 56
+      }
+    },
+    "contact": {
+      "type": "contact-form",
+      "blocks": {
+        "message": {
+          "type": "message",
+          "settings": {
+            "label": "Your question",
+            "required": true
+          }
+        }
+      },
+      "block_order": [
+        "message"
+      ],
+      "settings": {
+        "color_scheme": "cream",
+        "padding_top": 16,
+        "padding_bottom": 80,
+        "heading": "Still have a question?",
+        "form_name": "FAQ question",
+        "button_label": "Ask us"
+      }
+    }
+  },
+  "order": [
+    "main",
+    "contact"
+  ]
+}

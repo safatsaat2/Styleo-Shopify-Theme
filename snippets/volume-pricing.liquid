@@ -1,0 +1,45 @@
+{%- comment -%}
+  Quantity rules and volume pricing (quantity price breaks) for the
+  selected variant. Price breaks come from B2B catalogs in Shopify admin.
+
+  Accepts:
+  - variant {Variant}
+{%- endcomment -%}
+
+{%- assign rule = variant.quantity_rule -%}
+<div class="volume-pricing" data-product-part="volume">
+  {%- if rule.min > 1 or rule.increment > 1 or rule.max -%}
+    <p class="volume-pricing__rules">
+      {% render 'icon', name: 'info' %}
+      <span>
+        {%- if rule.min > 1 -%}{{ 'products.quantity.minimum' | t: quantity: rule.min }}{%- endif -%}
+        {%- if rule.increment > 1 %} {{ 'products.quantity.increment' | t: quantity: rule.increment }}{%- endif -%}
+        {%- if rule.max %} {{ 'products.quantity.maximum' | t: quantity: rule.max }}{%- endif -%}
+      </span>
+    </p>
+  {%- endif -%}
+
+  {%- if variant.quantity_price_breaks.size > 0 -%}
+    <table class="volume-pricing__table">
+      <caption class="volume-pricing__caption">{{ 'products.quantity.volume_pricing' | t }}</caption>
+      <thead>
+        <tr>
+          <th scope="col">{{ 'products.quantity.quantity' | t }}</th>
+          <th scope="col">{{ 'products.quantity.price_each' | t }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>{{ rule.min }}+</td>
+          <td>{{ variant.price | money }}</td>
+        </tr>
+        {%- for price_break in variant.quantity_price_breaks -%}
+          <tr>
+            <td>{{ price_break.minimum_quantity }}+</td>
+            <td>{{ price_break.price | money }}</td>
+          </tr>
+        {%- endfor -%}
+      </tbody>
+    </table>
+  {%- endif -%}
+</div>

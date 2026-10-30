@@ -1,0 +1,89 @@
+{%- comment -%}
+  Gift card recipient fields. Rendered inside the product form for gift
+  card products so customers can send the card to someone else on a
+  chosen date.
+
+  Accepts:
+  - form {Form}: the product form object
+  - section_id {String}
+{%- endcomment -%}
+
+{%- assign recipient_id = 'Recipient-' | append: section_id -%}
+<lc-gift-recipient class="gift-recipient">
+  <label class="checkbox gift-recipient__toggle" for="{{ recipient_id }}-checkbox">
+    <input
+      type="checkbox"
+      id="{{ recipient_id }}-checkbox"
+      name="properties[__shopify_send_gift_card_to_recipient]"
+      value="on"
+      data-recipient-toggle
+      {% if form.email != blank %}
+        checked
+      {% endif %}
+    >
+    <span>{{ 'products.gift_card.send_to_recipient' | t }}</span>
+  </label>
+
+  {%- if form.errors -%}
+    <div class="form-message form-message--error" role="alert">
+      {% render 'icon', name: 'error' %}
+      <ul>
+        {%- for field in form.errors -%}
+          <li>{{ form.errors.translated_fields[field] | capitalize }} {{ form.errors.messages[field] }}</li>
+        {%- endfor -%}
+      </ul>
+    </div>
+  {%- endif -%}
+
+  <div class="gift-recipient__fields" data-recipient-fields{% if form.email == blank %} hidden{% endif %}>
+    <div class="field">
+      <label class="field__label" for="{{ recipient_id }}-email">{{ 'products.gift_card.email' | t }}</label>
+      <input
+        id="{{ recipient_id }}-email"
+        class="input"
+        type="email"
+        name="properties[Recipient email]"
+        value="{{ form.email }}"
+        autocomplete="email"
+        placeholder="{{ 'products.gift_card.email_placeholder' | t }}"
+        data-recipient-required
+      >
+    </div>
+    <div class="field">
+      <label class="field__label" for="{{ recipient_id }}-name">{{ 'products.gift_card.name' | t }}</label>
+      <input
+        id="{{ recipient_id }}-name"
+        class="input"
+        type="text"
+        name="properties[Recipient name]"
+        value="{{ form.name }}"
+        autocomplete="name"
+      >
+    </div>
+    <div class="field">
+      <label class="field__label" for="{{ recipient_id }}-message">{{ 'products.gift_card.message' | t }}</label>
+      <textarea
+        id="{{ recipient_id }}-message"
+        class="textarea"
+        name="properties[Message]"
+        maxlength="200"
+        rows="3"
+      >{{ form.message }}</textarea>
+      <span class="field__hint">{{ 'products.gift_card.message_hint' | t: count: 200 }}</span>
+    </div>
+    <div class="field">
+      <label class="field__label" for="{{ recipient_id }}-send-on">{{ 'products.gift_card.send_on' | t }}</label>
+      <input
+        id="{{ recipient_id }}-send-on"
+        class="input"
+        type="date"
+        name="properties[Send on]"
+        value="{{ form.send_on }}"
+        pattern="\d{4}-\d{2}-\d{2}"
+        data-recipient-date
+      >
+      <span class="field__hint">{{ 'products.gift_card.send_on_hint' | t }}</span>
+    </div>
+    <input type="hidden" name="properties[__shopify_offset]" value="" data-recipient-offset>
+  </div>
+</lc-gift-recipient>

@@ -1,0 +1,88 @@
+<!doctype html>
+<html class="no-js" lang="{{ request.locale.iso_code }}">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    {% render 'meta-tags' %}
+    {% render 'head-assets' %}
+
+    {{ content_for_header }}
+  </head>
+
+  <body
+    class="color-{{ settings.body_color_scheme.id }} template-{{ request.page_type | handle }}"
+    data-cart-type="{{ settings.cart_type }}"
+    data-button-hover="{{ settings.button_hover }}"
+    data-secondary-button="{{ settings.secondary_button_style }}"
+    data-card-zoom="{{ settings.card_hover_zoom }}"
+    data-badge-position="{{ settings.badge_position }}"
+  >
+    <a class="skip-link button" href="#MainContent">{{ 'general.skip_to_content' | t }}</a>
+
+    {% sections 'header-group' %}
+
+    <main id="MainContent" class="main" role="main" tabindex="-1">
+      {{ content_for_layout }}
+    </main>
+
+    {% sections 'footer-group' %}
+    {% sections 'overlay-group' %}
+
+    <div id="LilacLiveRegion" class="visually-hidden" role="status" aria-live="polite" aria-atomic="true"></div>
+
+    {%- if settings.card_quick_view or settings.card_quick_add != 'none' -%}
+      <template id="QuickViewTemplate">
+        <lc-dialog id="QuickViewDialog">
+          <dialog class="dialog dialog--modal quick-view color-{{ settings.overlay_color_scheme }}" aria-label="{{ 'products.quick_view' | t }}" style="--dialog-width: 60rem;">
+            <button type="button" class="icon-button quick-view__close" data-dialog-close aria-label="{{ 'general.close' | t }}">
+              {% render 'icon', name: 'close' %}
+            </button>
+            <div class="quick-view__body" data-quick-view-body></div>
+            <template data-quick-view-loading>
+              <div class="quick-view__loading" aria-busy="true">
+                <div class="skeleton quick-view__skeleton-media"></div>
+                <div class="quick-view__skeleton-text">
+                  <div class="skeleton" style="height: 2rem; width: 70%;"></div>
+                  <div class="skeleton" style="height: 1.25rem; width: 30%;"></div>
+                  <div class="skeleton" style="height: 3rem;"></div>
+                  <span class="visually-hidden">{{ 'general.loading' | t }}</span>
+                </div>
+              </div>
+            </template>
+          </dialog>
+        </lc-dialog>
+      </template>
+      <script src="{{ 'quick-view.js' | asset_url }}" defer></script>
+    {%- endif -%}
+
+    {%- if settings.back_to_top -%}
+      <lc-back-to-top class="back-to-top" hidden>
+        <button type="button" class="back-to-top__button" aria-label="{{ 'general.back_to_top' | t }}">
+          {% render 'icon', name: 'arrow-up' %}
+        </button>
+      </lc-back-to-top>
+    {%- endif -%}
+
+    {%- if settings.whatsapp_number != blank -%}
+      {%- liquid
+        assign whatsapp_digits = settings.whatsapp_number | remove: '+' | remove: ' ' | remove: '-' | remove: '(' | remove: ')' | remove: '.'
+        assign whatsapp_url = 'https://wa.me/' | append: whatsapp_digits
+        if settings.whatsapp_message != blank
+          assign encoded_message = settings.whatsapp_message | url_encode
+          assign whatsapp_url = whatsapp_url | append: '?text=' | append: encoded_message
+        endif
+      -%}
+      <a
+        class="whatsapp-chat whatsapp-chat--{{ settings.whatsapp_position }}"
+        href="{{ whatsapp_url }}"
+        target="_blank"
+        rel="noopener"
+        aria-label="{{ 'general.whatsapp_chat' | t }} ({{ 'accessibility.opens_new_window' | t }})"
+      >
+        {% render 'icon', name: 'whatsapp' %}
+      </a>
+    {%- endif -%}
+  </body>
+</html>

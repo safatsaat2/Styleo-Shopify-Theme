@@ -1,0 +1,49 @@
+{%- comment -%}
+  Free shipping progress based on the real cart total and the threshold in
+  theme settings (store currency). When the customer shops in another
+  currency, cart.js converts the threshold with the live currency rate.
+{%- endcomment -%}
+
+{%- if settings.free_shipping_enabled and settings.free_shipping_threshold > 0 and cart.requires_shipping -%}
+  {%- liquid
+    assign threshold = settings.free_shipping_threshold | times: 100 | round
+    assign total = cart.total_price
+    assign convert = true
+    if cart.currency.iso_code == shop.currency
+      assign convert = false
+    endif
+    assign remaining = threshold | minus: total | at_least: 0
+    assign percent = total | times: 100 | divided_by: threshold | at_most: 100
+    assign remaining_money = remaining | money
+  -%}
+  <div
+    class="free-shipping{% if remaining == 0 %} is-complete{% endif %}"
+    data-free-shipping
+    data-threshold="{{ threshold }}"
+    data-total="{{ total }}"
+    data-convert="{{ convert }}"
+    data-template-remaining="{{ 'cart.free_shipping.remaining' | t: amount: '[amount]' | escape }}"
+    data-template-complete="{{ 'cart.free_shipping.complete' | t | escape }}"
+  >
+    <p class="free-shipping__text" data-free-shipping-text>
+      {%- if convert -%}
+        {{ 'cart.free_shipping.calculating' | t }}
+      {%- elsif remaining > 0 -%}
+        {{ 'cart.free_shipping.remaining' | t: amount: remaining_money }}
+      {%- else -%}
+        {{ 'cart.free_shipping.complete' | t }}
+      {%- endif -%}
+    </p>
+    <span
+      class="free-shipping__bar"
+      role="progressbar"
+      aria-label="{{ 'cart.free_shipping.label' | t }}"
+      aria-valuemin="0"
+      aria-valuemax="100"
+      aria-valuenow="{{ percent }}"
+      data-free-shipping-bar
+    >
+      <span style="width: {{ percent }}%;"></span>
+    </span>
+  </div>
+{%- endif -%}

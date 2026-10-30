@@ -1,0 +1,176 @@
+<div class="logo-list-section color-{{ section.settings.color_scheme }} visibility-{{ section.settings.visibility }}">
+  <div class="page-width section-spacing" style="--pt: {{ section.settings.padding_top }}px; --pb: {{ section.settings.padding_bottom }}px;">
+    {% render 'section-heading',
+      subheading: section.settings.subheading,
+      heading: section.settings.heading,
+      align: 'center',
+      heading_size: 'h3'
+    %}
+
+    <ul
+      class="logo-list{% if section.settings.monochrome %} logo-list--mono{% endif %}"
+      role="list"
+      style="--logo-height: {{ section.settings.logo_height }}px;"
+    >
+      {%- for block in section.blocks -%}
+        <li class="logo-list__item" {{ block.shopify_attributes }}>
+          {%- capture logo_inner -%}
+            {%- if block.settings.image != blank -%}
+              {%- assign logo_alt = block.settings.name | default: block.settings.image.alt -%}
+              {{
+                block.settings.image
+                | image_url: height: 160
+                | image_tag: loading: 'lazy', alt: logo_alt, class: 'logo-list__image', sizes: '160px'
+              }}
+            {%- else -%}
+              {{ 'logo' | placeholder_svg_tag: 'placeholder-svg logo-list__placeholder' }}
+            {%- endif -%}
+          {%- endcapture -%}
+          {%- if block.settings.link != blank -%}
+            <a href="{{ block.settings.link }}" class="logo-list__link">{{ logo_inner }}</a>
+          {%- else -%}
+            <span class="logo-list__link">{{ logo_inner }}</span>
+          {%- endif -%}
+        </li>
+      {%- endfor -%}
+    </ul>
+  </div>
+</div>
+
+{{ 'section-home.css' | asset_url | stylesheet_tag }}
+
+{% schema %}
+{
+  "name": "t:names.logo_list",
+  "tag": "section",
+  "class": "section-logo-list",
+  "max_blocks": 16,
+  "settings": [
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "t:labels.subheading"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "t:labels.heading",
+      "default": "As featured in"
+    },
+    {
+      "type": "range",
+      "id": "logo_height",
+      "min": 24,
+      "max": 96,
+      "step": 4,
+      "unit": "px",
+      "label": "t:labels.logo_height",
+      "default": 40
+    },
+    {
+      "type": "checkbox",
+      "id": "monochrome",
+      "label": "t:labels.show_logos_in_one_color",
+      "default": true
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:labels.color_scheme",
+      "default": "cream"
+    },
+    {
+      "type": "select",
+      "id": "visibility",
+      "label": "t:labels.show_on",
+      "options": [
+        {
+          "value": "all",
+          "label": "t:options.all_devices"
+        },
+        {
+          "value": "mobile",
+          "label": "t:options.small_screens_only"
+        },
+        {
+          "value": "desktop",
+          "label": "t:options.large_screens_only"
+        }
+      ],
+      "default": "all"
+    },
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "t:labels.top",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "t:labels.bottom",
+      "default": 48
+    }
+  ],
+  "blocks": [
+    {
+      "type": "logo",
+      "name": "t:names.logo",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "t:labels.logo",
+          "info": "t:info.transparent_png_or_svg_recommended"
+        },
+        {
+          "type": "text",
+          "id": "name",
+          "label": "t:labels.brand_name",
+          "info": "t:info.read_by_screen_readers"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "t:labels.link",
+          "info": "t:info.for_example_a_vendor_collection"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.logo_list",
+      "blocks": [
+        {
+          "type": "logo"
+        },
+        {
+          "type": "logo"
+        },
+        {
+          "type": "logo"
+        },
+        {
+          "type": "logo"
+        },
+        {
+          "type": "logo"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

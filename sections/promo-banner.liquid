@@ -1,0 +1,238 @@
+{%- liquid
+  assign media_loading = 'lazy'
+  assign media_priority = 'auto'
+  if section.index == 1
+    assign media_loading = 'eager'
+    assign media_priority = 'high'
+  endif
+-%}
+<div class="promo-section visibility-{{ section.settings.visibility }}">
+  <div class="{% if section.settings.full_width %}page-width--full{% else %}page-width{% endif %} section-spacing" style="--pt: {{ section.settings.padding_top }}px; --pb: {{ section.settings.padding_bottom }}px;">
+    <div class="promo promo--media-{{ section.settings.media_position }}{% unless section.settings.full_width %} promo--inset{% endunless %} color-{{ section.settings.color_scheme }}" data-reveal>
+      <span class="glow promo__glow" aria-hidden="true"></span>
+      <div class="promo__content">
+        {%- if section.settings.subheading != blank -%}
+          <p class="subheading">{{ section.settings.subheading }}</p>
+        {%- endif -%}
+        <h2 class="promo__heading h1 text-balance">
+          {{- section.settings.heading -}}
+          {%- if section.settings.accent_line != blank -%}
+            <span class="promo__accent">{{ section.settings.accent_line }}</span>
+          {%- endif -%}
+        </h2>
+        {%- if section.settings.text != blank -%}
+          <div class="rte promo__text">{{ section.settings.text }}</div>
+        {%- endif -%}
+        {%- if section.settings.end_date != blank -%}
+          <div class="promo__countdown" data-countdown-wrapper>
+            {% render 'countdown',
+              end_date: section.settings.end_date,
+              end_time: section.settings.end_time,
+              label: section.settings.countdown_label
+            %}
+          </div>
+        {%- endif -%}
+        <div class="button-row">
+          {% render 'button', label: section.settings.button_label, url: section.settings.button_link, arrow: true, size: 'large' %}
+        </div>
+      </div>
+      <div class="promo__media">
+        {% render 'media-halo',
+          image: section.settings.image,
+          shape: section.settings.halo_shape,
+          ratio: '4 / 5',
+          sizes: '(min-width: 990px) 40vw, 90vw',
+          loading: media_loading,
+          fetchpriority: media_priority,
+          placeholder: 'lifestyle-1'
+        %}
+      </div>
+    </div>
+  </div>
+</div>
+
+{{ 'section-home.css' | asset_url | stylesheet_tag }}
+{%- if section.settings.end_date != blank -%}
+  <script src="{{ 'countdown.js' | asset_url }}" defer></script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "t:names.promotion_banner",
+  "tag": "section",
+  "class": "section-promo-banner",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "t:labels.image"
+    },
+    {
+      "type": "select",
+      "id": "halo_shape",
+      "label": "t:labels.image_shape",
+      "options": [
+        {
+          "value": "frame",
+          "label": "t:options.rounded_frame"
+        },
+        {
+          "value": "arch",
+          "label": "t:options.arch"
+        },
+        {
+          "value": "orb",
+          "label": "t:options.orb_behind_a_cut_out_image"
+        }
+      ],
+      "default": "orb"
+    },
+    {
+      "type": "select",
+      "id": "media_position",
+      "label": "t:labels.image_position_on_large_screens",
+      "options": [
+        {
+          "value": "end",
+          "label": "t:options.right"
+        },
+        {
+          "value": "start",
+          "label": "t:options.left"
+        }
+      ],
+      "default": "end"
+    },
+    {
+      "type": "header",
+      "content": "t:content.text"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "t:labels.subheading"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "t:labels.heading",
+      "default": "Timeless looks."
+    },
+    {
+      "type": "inline_richtext",
+      "id": "accent_line",
+      "label": "t:labels.accent_line",
+      "default": "Endless confidence."
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "t:labels.text",
+      "default": "<p>Point customers to a collection, campaign, or limited offer.</p>"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "t:labels.button_label",
+      "default": "Explore now"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "t:labels.button_link"
+    },
+    {
+      "type": "header",
+      "content": "t:content.countdown"
+    },
+    {
+      "type": "paragraph",
+      "content": "t:content.optional_counts_down_to_a_real_date_and_disappea_307ee6"
+    },
+    {
+      "type": "text",
+      "id": "countdown_label",
+      "label": "t:labels.label",
+      "default": "Ends in"
+    },
+    {
+      "type": "text",
+      "id": "end_date",
+      "label": "t:labels.end_date",
+      "info": "t:info.format_yyyy_mm_dd"
+    },
+    {
+      "type": "text",
+      "id": "end_time",
+      "label": "t:labels.end_time",
+      "info": "t:info.n_24_hour_format_hh_mm_in_your_store_s_time_zone",
+      "default": "23:59"
+    },
+    {
+      "type": "header",
+      "content": "t:content.layout"
+    },
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "t:labels.make_section_full_width",
+      "default": false
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:labels.color_scheme",
+      "default": "dusk"
+    },
+    {
+      "type": "select",
+      "id": "visibility",
+      "label": "t:labels.show_on",
+      "options": [
+        {
+          "value": "all",
+          "label": "t:options.all_devices"
+        },
+        {
+          "value": "mobile",
+          "label": "t:options.small_screens_only"
+        },
+        {
+          "value": "desktop",
+          "label": "t:options.large_screens_only"
+        }
+      ],
+      "default": "all"
+    },
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "t:labels.top",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "t:labels.bottom",
+      "default": 80
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.promotion_banner"
+    }
+  ]
+}
+{% endschema %}

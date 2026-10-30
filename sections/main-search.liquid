@@ -1,0 +1,343 @@
+{%- comment -%}
+  Search results: search field, result type tabs, product filters and
+  sorting, mixed results (products, articles, pages) using object_type,
+  and suggestions when nothing matches.
+{%- endcomment -%}
+
+{%- liquid
+  assign terms = search.terms | escape
+  assign sort_by = search.sort_by | default: search.default_sort_by
+  assign products_only = false
+  if search.types.size == 1 and search.types.first == 'product'
+    assign products_only = true
+  endif
+
+  assign encoded_terms = search.terms | url_encode
+  assign all_url = routes.search_url | append: '?q=' | append: encoded_terms | append: '&options%5Bprefix%5D=last'
+  assign product_url = all_url | append: '&type=product'
+  assign article_url = all_url | append: '&type=article'
+  assign page_url = all_url | append: '&type=page'
+  assign clear_url = product_url | append: '&sort_by=' | append: sort_by
+
+  assign active_count = 0
+  for filter in search.filters
+    assign active_count = active_count | plus: filter.active_values.size
+  endfor
+
+  assign columns = section.settings.columns_desktop
+  assign mobile_columns = section.settings.columns_mobile | plus: 0
+  assign show_facets = false
+  if products_only and section.settings.enable_filtering
+    assign show_facets = true
+  endif
+-%}
+
+<div class="search-header color-{{ section.settings.color_scheme }}">
+  <div class="page-width section-spacing" style="--pt: {{ section.settings.padding_top }}px; --pb: 24px;">
+    <p class="subheading">{{ 'general.search' | t }}</p>
+    <h1 class="h1 search-header__title">
+      {%- if search.performed -%}
+        {{ 'search.results_for' | t: terms: search.terms }}
+      {%- else -%}
+        {{ 'search.title' | t }}
+      {%- endif -%}
+    </h1>
+
+    <form action="{{ routes.search_url }}" method="get" role="search" class="search-header__form">
+      <label for="SearchPageInput" class="visually-hidden">{{ 'search.label' | t }}</label>
+      <div class="inline-field search-header__field">
+        {% render 'icon', name: 'search' %}
+        <input
+          id="SearchPageInput"
+          class="input"
+          type="search"
+          name="q"
+          value="{{ terms }}"
+          placeholder="{{ 'search.placeholder' | t }}"
+          autocomplete="off"
+          autocorrect="off"
+          autocapitalize="off"
+          spellcheck="false"
+        >
+        <input type="hidden" name="options[prefix]" value="last">
+        {%- if products_only -%}<input type="hidden" name="type" value="product">{%- endif -%}
+        <button type="submit" class="button button--secondary">{{ 'search.submit' | t }}</button>
+      </div>
+    </form>
+
+    {%- if search.performed -%}
+      <nav class="search-header__tabs" aria-label="{{ 'search.result_types' | t }}">
+        <ul class="cluster" role="list">
+          <li><a href="{{ all_url }}" class="chip"{% if search.types.size > 1 %} aria-current="page"{% endif %}>{{ 'search.tabs.all' | t }}</a></li>
+          <li><a href="{{ product_url }}" class="chip"{% if products_only %} aria-current="page"{% endif %}>{{ 'search.tabs.products' | t }}</a></li>
+          <li><a href="{{ article_url }}" class="chip"{% if search.types.size == 1 and search.types.first == 'article' %} aria-current="page"{% endif %}>{{ 'search.tabs.articles' | t }}</a></li>
+          <li><a href="{{ page_url }}" class="chip"{% if search.types.size == 1 and search.types.first == 'page' %} aria-current="page"{% endif %}>{{ 'search.tabs.pages' | t }}</a></li>
+        </ul>
+      </nav>
+    {%- endif -%}
+  </div>
+</div>
+
+{%- if search.performed -%}
+  {%- paginate search.results by section.settings.results_per_page -%}
+    <lc-facets
+      class="results color-{{ section.settings.color_scheme }}"
+      data-section-id="{{ section.id }}"
+      data-pagination="{{ section.settings.pagination }}"
+      data-columns="{{ columns }}"
+      data-columns-mobile="{{ mobile_columns }}"
+    >
+      <div class="page-width section-spacing" style="--pt: 0px; --pb: {{ section.settings.padding_bottom }}px;">
+        {%- if products_only -%}
+          {% render 'results-toolbar',
+            results: search,
+            section: section,
+            action: routes.search_url,
+            count: search.results_count,
+            terms: search.terms,
+            show_filter_button: section.settings.enable_filtering,
+            filter_button_desktop: true,
+            active_count: active_count,
+            sort_options: search.sort_options,
+            sort_by: sort_by
+          %}
+          {% render 'active-filters', results: search, clear_url: clear_url %}
+        {%- else -%}
+          <p class="results-toolbar__count" data-facets-region="count">{{ 'search.results_count' | t: count: search.results_count, terms: search.terms }}</p>
+        {%- endif -%}
+
+        {%- if search.results_count == 0 -%}
+          <div class="empty-state search-empty" data-facets-region="grid">
+            {% render 'icon', name: 'search', class: 'empty-state__icon' %}
+            <h2 class="h3">{{ 'search.no_results' | t: terms: search.terms }}</h2>
+            <p class="empty-state__text">{{ 'search.no_results_text' | t }}</p>
+            {%- assign popular = settings.popular_searches | split: ',' -%}
+            {%- if popular.size > 0 -%}
+              <ul class="cluster search-empty__chips" role="list">
+                {%- for term in popular -%}
+                  {%- assign clean_term = term | strip -%}
+                  {%- if clean_term != blank -%}
+                    <li><a class="chip" href="{{ routes.search_url }}?q={{ clean_term | url_encode }}">{{ clean_term }}</a></li>
+                  {%- endif -%}
+                {%- endfor -%}
+              </ul>
+            {%- endif -%}
+          </div>
+
+          {%- assign suggestion_collection = section.settings.suggestion_collection -%}
+          {%- if suggestion_collection != blank and suggestion_collection.products_count > 0 -%}
+            <div class="search-suggestions">
+              {% render 'section-heading', heading: section.settings.suggestion_heading, link_label: section.settings.suggestion_link_label, link_url: suggestion_collection.url %}
+              <ul class="results-grid" role="list" style="--cols: 4; --cols-mobile: 2;">
+                {%- for product in suggestion_collection.products limit: 4 -%}
+                  <li class="results-grid__item">{% render 'product-card', product: product, index: forloop.index0, section_id: section.id %}</li>
+                {%- endfor -%}
+              </ul>
+            </div>
+          {%- endif -%}
+        {%- else -%}
+          <div class="results__layout{% if show_facets %} results__layout--drawer{% endif %}">
+            <div class="results__main">
+              <ul
+                id="ResultsGrid-{{ section.id }}"
+                class="results-grid{% unless products_only %} results-grid--mixed{% endunless %}"
+                role="list"
+                data-facets-region="grid"
+                data-results-grid
+                style="--cols: {{ columns }}; --cols-mobile: {{ mobile_columns }};"
+              >
+                {%- for item in search.results -%}
+                  {%- case item.object_type -%}
+                    {%- when 'product' -%}
+                      <li class="results-grid__item" data-grid-item>
+                        {% render 'product-card', product: item, index: forloop.index0, section_id: section.id %}
+                      </li>
+                    {%- when 'article' -%}
+                      <li class="results-grid__item results-grid__item--content" data-grid-item>
+                        {% render 'article-card', article: item, show_author: false, index: forloop.index0 %}
+                      </li>
+                    {%- when 'page' -%}
+                      <li class="results-grid__item results-grid__item--content" data-grid-item>
+                        <article class="search-page-card">
+                          <p class="subheading">{{ 'search.page_label' | t }}</p>
+                          <h2 class="h4"><a href="{{ item.url }}" class="article-card__link">{{ item.title | escape }}</a></h2>
+                          <p class="article-card__excerpt">{{ item.content | strip_html | truncatewords: 24 }}</p>
+                        </article>
+                      </li>
+                  {%- endcase -%}
+                {%- endfor -%}
+              </ul>
+
+              {%- assign results_noun = 'search.results_noun' | t -%}
+              {% render 'pagination', paginate: paginate, style: section.settings.pagination, item_label: results_noun %}
+            </div>
+          </div>
+        {%- endif -%}
+      </div>
+
+      {%- if show_facets -%}
+        {% render 'facets-drawer',
+          results: search,
+          section: section,
+          action: routes.search_url,
+          sort_options: search.sort_options,
+          sort_by: sort_by,
+          terms: search.terms,
+          count: search.results_count,
+          clear_url: clear_url
+        %}
+      {%- endif -%}
+    </lc-facets>
+  {%- endpaginate -%}
+{%- endif -%}
+
+{{ 'section-collection.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'facets.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "t:names.search_results",
+  "tag": "section",
+  "class": "section-main-search",
+  "settings": [
+    {
+      "type": "range",
+      "id": "results_per_page",
+      "min": 8,
+      "max": 48,
+      "step": 4,
+      "label": "t:labels.results_per_page",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "min": 2,
+      "max": 5,
+      "step": 1,
+      "label": "t:labels.columns_on_large_screens",
+      "default": 4
+    },
+    {
+      "type": "select",
+      "id": "columns_mobile",
+      "label": "t:labels.columns_on_small_screens",
+      "options": [
+        {
+          "value": "1",
+          "label": "t:options.one"
+        },
+        {
+          "value": "2",
+          "label": "t:options.two"
+        }
+      ],
+      "default": "2"
+    },
+    {
+      "type": "select",
+      "id": "pagination",
+      "label": "t:labels.pagination",
+      "options": [
+        {
+          "value": "pages",
+          "label": "t:options.page_numbers"
+        },
+        {
+          "value": "load_more",
+          "label": "t:options.load_more_button"
+        },
+        {
+          "value": "infinite",
+          "label": "t:options.infinite_scroll"
+        }
+      ],
+      "default": "load_more"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_count",
+      "label": "t:labels.show_result_count",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_density",
+      "label": "t:labels.show_grid_size_buttons",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "t:content.filtering_and_sorting"
+    },
+    {
+      "type": "paragraph",
+      "content": "t:content.filters_and_sorting_appear_when_customers_view_p_e11de6"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_filtering",
+      "label": "t:labels.enable_filtering",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_sorting",
+      "label": "t:labels.enable_sorting",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "t:content.no_results"
+    },
+    {
+      "type": "text",
+      "id": "suggestion_heading",
+      "label": "t:labels.suggestions_heading",
+      "default": "You might like these"
+    },
+    {
+      "type": "collection",
+      "id": "suggestion_collection",
+      "label": "t:labels.suggested_collection",
+      "info": "t:info.shown_when_a_search_has_no_results"
+    },
+    {
+      "type": "text",
+      "id": "suggestion_link_label",
+      "label": "t:labels.suggestions_link_label",
+      "default": "Shop all"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:labels.color_scheme",
+      "default": "cream"
+    },
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "t:labels.top",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "t:labels.bottom",
+      "default": 80
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,77 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-article",
+      "blocks": {
+        "title": {
+          "type": "title",
+          "settings": {
+            "show_date": true,
+            "show_author": true,
+            "show_reading_time": true,
+            "show_breadcrumbs": false
+          }
+        },
+        "image": {
+          "type": "image",
+          "settings": {
+            "shape": "frame"
+          }
+        },
+        "content": {
+          "type": "content",
+          "settings": {
+            "show_toc": true
+          }
+        },
+        "tags": {
+          "type": "tags",
+          "settings": {}
+        },
+        "share": {
+          "type": "share",
+          "settings": {}
+        },
+        "author": {
+          "type": "author",
+          "settings": {}
+        },
+        "products": {
+          "type": "products",
+          "settings": {
+            "heading": "Shop the story"
+          }
+        },
+        "related": {
+          "type": "related",
+          "settings": {
+            "heading": "Keep reading"
+          }
+        },
+        "comments": {
+          "type": "comments",
+          "settings": {}
+        }
+      },
+      "block_order": [
+        "title",
+        "image",
+        "content",
+        "tags",
+        "share",
+        "author",
+        "products",
+        "related",
+        "comments"
+      ],
+      "settings": {
+        "color_scheme": "cream",
+        "padding_top": 40,
+        "padding_bottom": 80
+      }
+    }
+  },
+  "order": [
+    "main"
+  ]
+}

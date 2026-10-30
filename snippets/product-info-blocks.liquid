@@ -1,0 +1,472 @@
+{%- comment -%}
+  Renders the product information blocks of a product section.
+  Used by main-product and featured-product so both share every block.
+  Blocks that depend on the selected variant carry data-product-part so
+  product.js can swap them after an option change.
+
+  Accepts:
+  - product {Product}
+  - section {Section}
+  - form_id {String}: id of the product form that blocks submit with
+  - context {String}: 'main' or 'featured'
+{%- endcomment -%}
+
+{%- liquid
+  assign variant = product.selected_or_first_available_variant
+  assign coming_soon = false
+  if settings.coming_soon_tag != blank and product.tags contains settings.coming_soon_tag
+    assign coming_soon = true
+  endif
+  assign digital = false
+  if variant.requires_shipping == false
+    assign digital = true
+  endif
+-%}
+
+{%- for block in section.blocks -%}
+  {%- case block.type -%}
+    {%- when '@app' -%}
+      <div class="product__block product__block--app" {{ block.shopify_attributes }}>{% render block %}</div>
+
+    {%- when 'text' -%}
+      <div class="product__block product__text rte {{ block.settings.style }}" {{ block.shopify_attributes }}>
+        {{- block.settings.text -}}
+      </div>
+
+    {%- when 'title' -%}
+      <div class="product__block product__heading" {{ block.shopify_attributes }}>
+        {%- if context == 'featured' -%}
+          <h2 class="product__title {{ block.settings.size }}">
+            <a href="{{ product.url }}" class="product__title-link">{{ product.title | escape }}</a>
+          </h2>
+        {%- else -%}
+          <h1 class="product__title {{ block.settings.size }}">{{ product.title | escape }}</h1>
+        {%- endif -%}
+        {%- if product.metafields.descriptors.subtitle.value != blank -%}
+          <p class="product__subtitle">{{ product.metafields.descriptors.subtitle.value }}</p>
+        {%- endif -%}
+      </div>
+
+    {%- when 'vendor' -%}
+      {%- if product.vendor != blank -%}
+        <p class="product__block product__vendor subheading" {{ block.shopify_attributes }}>
+          {{- product.vendor | link_to_vendor -}}
+        </p>
+      {%- endif -%}
+
+    {%- when 'price' -%}
+      <div class="product__block product__price-block" {{ block.shopify_attributes }}>
+        {% render 'product-price-block',
+          product: product,
+          section_id: section.id,
+          show_saving: block.settings.show_saving,
+          show_installments: block.settings.show_installments
+        %}
+      </div>
+
+    {%- when 'rating' -%}
+      <div class="product__block" {{ block.shopify_attributes }}>
+        {% render 'rating', product: product, class: 'product__rating' %}
+      </div>
+
+    {%- when 'sku' -%}
+      <p class="product__block product__sku" data-product-part="sku" {{ block.shopify_attributes }}{% if variant.sku == blank and variant.barcode == blank %} hidden{% endif %}>
+        {%- if variant.sku != blank -%}
+          <span>{{ 'products.sku' | t }} {{ variant.sku }}</span>
+        {%- endif -%}
+        {%- if block.settings.show_barcode and variant.barcode != blank -%}
+          <span>{{ 'products.barcode' | t }} {{ variant.barcode }}</span>
+        {%- endif -%}
+      </p>
+
+    {%- when 'inventory' -%}
+      <div class="product__block" {{ block.shopify_attributes }}>
+        {% render 'inventory-status', product: product, variant: variant, show_count: block.settings.show_count %}
+      </div>
+
+    {%- when 'badges' -%}
+      <div class="product__block" data-product-part="badges" {{ block.shopify_attributes }}>
+        {% render 'badges', product: product, variant: variant, class: 'product__badges' %}
+      </div>
+
+    {%- when 'description' -%}
+      {%- if product.description != blank -%}
+        <div class="product__block product__description rte" {{ block.shopify_attributes }}>
+          {{- product.description -}}
+        </div>
+      {%- endif -%}
+
+    {%- when 'variant_picker' -%}
+      <div class="product__block" {{ block.shopify_attributes }}>
+        {% render 'variant-picker',
+          product: product,
+          section_id: section.id,
+          style: block.settings.picker_style,
+          show_swatches: block.settings.show_swatches
+        %}
+      </div>
+
+    {%- when 'quantity' -%}
+      <div class="product__block" {{ block.shopify_attributes }}>
+        {% render 'product-quantity', product: product, section_id: section.id, form_id: form_id %}
+      </div>
+
+    {%- when 'volume_pricing' -%}
+      <div class="product__block" {{ block.shopify_attributes }}>
+        {% render 'volume-pricing', variant: variant %}
+      </div>
+
+    {%- when 'conditional_message' -%}
+      <div class="product__block" {{ block.shopify_attributes }}>
+        {% render 'conditional-message', settings: block.settings, product: product %}
+      </div>
+
+    {%- when 'quick_order' -%}
+      <div class="product__block product__block--quick-order" {{ block.shopify_attributes }}>
+        {%- if block.settings.heading != blank -%}
+          <h2 class="h5 product__block-title">{{ block.settings.heading }}</h2>
+        {%- endif -%}
+        {% render 'quick-order-table',
+          product: product,
+          id: block.id,
+          show_images: block.settings.show_images,
+          show_sku: block.settings.show_sku
+        %}
+      </div>
+      {{ 'section-customer.css' | asset_url | stylesheet_tag }}
+      <script src="{{ 'quick-order.js' | asset_url }}" defer></script>
+
+    {%- when 'buy_buttons' -%}
+      <div class="product__block" {{ block.shopify_attributes }}>
+        {% render 'product-buy-buttons',
+          product: product,
+          section_id: section.id,
+          form_id: form_id,
+          show_dynamic_checkout: block.settings.show_dynamic_checkout,
+          show_gift_card_recipient: block.settings.show_gift_card_recipient,
+          preorder_note: block.settings.preorder_note
+        %}
+      </div>
+
+    {%- when 'selling_plans' -%}
+      <div class="product__block" {{ block.shopify_attributes }}>
+        {% render 'selling-plans', product: product, variant: variant, form_id: form_id, section_id: section.id %}
+      </div>
+
+    {%- when 'pickup' -%}
+      <lc-pickup-availability
+        class="product__block pickup"
+        data-product-part="pickup"
+        data-variant-id="{{ variant.id }}"
+        data-root-url="{{ routes.root_url }}"
+        {% unless variant.available and digital == false %}
+          hidden
+        {% endunless %}
+        {{ block.shopify_attributes }}
+      ></lc-pickup-availability>
+
+    {%- when 'delivery_estimate' -%}
+      <lc-delivery-estimate
+        class="product__block delivery-estimate"
+        data-product-part="delivery"
+        data-min="{{ settings.delivery_min_days }}"
+        data-max="{{ settings.delivery_max_days }}"
+        data-cutoff="{{ settings.delivery_cutoff_hour }}"
+        data-skip-weekends="{{ settings.delivery_skip_weekends }}"
+        data-locale="{{ request.locale.iso_code }}"
+        data-template-range="{{ 'products.delivery.range' | t: start: '[start]', end: '[end]' | escape }}"
+        data-template-cutoff="{{ 'products.delivery.cutoff' | t: time: '[time]' | escape }}"
+        {% if digital or variant.available == false or coming_soon %}
+          hidden
+        {% endif %}
+        {{ block.shopify_attributes }}
+      >
+        {% render 'icon', name: 'truck' %}
+        <div>
+          <p class="delivery-estimate__label">{{ 'products.delivery.label' | t }}</p>
+          <p class="delivery-estimate__text" data-delivery-text>{{ 'products.delivery.fallback' | t: min: settings.delivery_min_days, max: settings.delivery_max_days }}</p>
+          <p class="delivery-estimate__cutoff" data-delivery-cutoff hidden></p>
+        </div>
+      </lc-delivery-estimate>
+
+    {%- when 'shipping_info' -%}
+      {%- unless digital -%}
+        <div class="product__block shipping-info" {{ block.shopify_attributes }}>
+          {% render 'icon', name: 'truck' %}
+          <div class="rte">
+            {{- block.settings.text -}}
+            {%- if block.settings.show_policy_link and shop.shipping_policy.body != blank -%}
+              <a href="{{ shop.shipping_policy.url }}" class="link">{{ 'products.shipping_policy' | t }}</a>
+            {%- endif -%}
+          </div>
+        </div>
+      {%- endunless -%}
+
+    {%- when 'digital_note' -%}
+      {%- if digital -%}
+        <div class="product__block notice" {{ block.shopify_attributes }}>
+          {% render 'icon', name: 'download' %}
+          <span>{{ block.settings.text }}</span>
+        </div>
+      {%- endif -%}
+
+    {%- when 'trust' -%}
+      <ul class="product__block trust-strip" role="list" {{ block.shopify_attributes }}>
+        {%- for i in (1..3) -%}
+          {%- liquid
+            assign icon_key = 'icon_' | append: i
+            assign text_key = 'text_' | append: i
+          -%}
+          {%- if block.settings[text_key] != blank -%}
+            <li class="trust-strip__item">
+              {% render 'icon', name: block.settings[icon_key] %}
+              <span>{{ block.settings[text_key] }}</span>
+            </li>
+          {%- endif -%}
+        {%- endfor -%}
+      </ul>
+
+    {%- when 'collapsible_tab' -%}
+      <details class="product__block accordion"{% if block.settings.open %} open{% endif %} {{ block.shopify_attributes }}>
+        <summary class="accordion__summary">
+          <span class="accordion__title">
+            {%- if block.settings.icon != 'none' -%}{% render 'icon', name: block.settings.icon %}{%- endif -%}
+            {{ block.settings.heading }}
+          </span>
+          {% render 'icon', name: 'chevron-down' %}
+        </summary>
+        <div class="accordion__content rte">
+          {{- block.settings.content -}}
+          {%- if block.settings.page != blank -%}{{ block.settings.page.content }}{%- endif -%}
+        </div>
+      </details>
+
+    {%- when 'care' -%}
+      {%- assign care_text = block.settings.text | default: product.metafields.descriptors.care_guide.value -%}
+      {%- if care_text != blank -%}
+        <details class="product__block accordion"{% if block.settings.open %} open{% endif %} {{ block.shopify_attributes }}>
+          <summary class="accordion__summary">
+            <span class="accordion__title">{% render 'icon', name: 'info' %} {{ block.settings.heading }}</span>
+            {% render 'icon', name: 'chevron-down' %}
+          </summary>
+          <div class="accordion__content rte">{{ care_text | newline_to_br }}</div>
+        </details>
+      {%- endif -%}
+
+    {%- when 'specs' -%}
+      {%- if block.settings.content != blank -%}
+        <details class="product__block accordion"{% if block.settings.open %} open{% endif %} {{ block.shopify_attributes }}>
+          <summary class="accordion__summary">
+            <span class="accordion__title">{% render 'icon', name: 'list' %} {{ block.settings.heading }}</span>
+            {% render 'icon', name: 'chevron-down' %}
+          </summary>
+          <div class="accordion__content rte product__specs">{{ block.settings.content }}</div>
+        </details>
+      {%- endif -%}
+
+    {%- when 'size_guide' -%}
+      {%- assign guide_dialog = 'SizeGuide-' | append: block.id -%}
+      <div class="product__block" {{ block.shopify_attributes }}>
+        <button type="button" class="size-guide__trigger link-arrow" data-dialog-open="{{ guide_dialog }}" aria-haspopup="dialog">
+          {% render 'icon', name: 'info' %}
+          {{ block.settings.label }}
+        </button>
+        <lc-dialog id="{{ guide_dialog }}">
+          <dialog class="dialog dialog--modal color-{{ settings.overlay_color_scheme }}" aria-labelledby="{{ guide_dialog }}-title" style="--dialog-width: 48rem;">
+            <div class="dialog__panel">
+              <div class="dialog__header">
+                <h2 id="{{ guide_dialog }}-title" class="dialog__title">{{ block.settings.label }}</h2>
+                <button type="button" class="icon-button" data-dialog-close aria-label="{{ 'general.close' | t }}">{% render 'icon', name: 'close' %}</button>
+              </div>
+              <div class="dialog__body rte size-guide__content">
+                {%- if block.settings.page != blank -%}
+                  {{ block.settings.page.content }}
+                {%- else -%}
+                  {{ block.settings.content }}
+                {%- endif -%}
+              </div>
+            </div>
+          </dialog>
+        </lc-dialog>
+      </div>
+
+    {%- when 'custom_field' -%}
+      {%- liquid
+        assign field_id = 'Field-' | append: block.id
+        assign field_name = 'properties[' | append: block.settings.label | append: ']'
+      -%}
+      <div
+        class="product__block field custom-field"
+        {% if block.settings.condition_option != blank and block.settings.condition_value != blank %}
+          data-show-when-option="{{ block.settings.condition_option | escape }}"
+          data-show-when-value="{{ block.settings.condition_value | escape }}"
+        {% endif %}
+        {{ block.shopify_attributes }}
+      >
+        {%- case block.settings.field_type -%}
+          {%- when 'checkbox' -%}
+            <label class="checkbox" for="{{ field_id }}">
+              <input type="checkbox" id="{{ field_id }}" name="{{ field_name }}" value="{{ 'general.yes' | t }}" form="{{ form_id }}"{% if block.settings.required %} required{% endif %}>
+              <span>{{ block.settings.label }}</span>
+            </label>
+          {%- when 'select' -%}
+            <label class="field__label" for="{{ field_id }}">{{ block.settings.label }}{% if block.settings.required %} *{% endif %}</label>
+            <div class="select-wrapper">
+              <select id="{{ field_id }}" class="select" name="{{ field_name }}" form="{{ form_id }}"{% if block.settings.required %} required{% endif %}>
+                <option value="">{{ 'products.custom_field.choose' | t }}</option>
+                {%- assign field_options = block.settings.options | split: ',' -%}
+                {%- for field_option in field_options -%}
+                  <option value="{{ field_option | strip | escape }}">{{ field_option | strip }}</option>
+                {%- endfor -%}
+              </select>
+              {% render 'icon', name: 'chevron-down' %}
+            </div>
+          {%- when 'textarea' -%}
+            <label class="field__label" for="{{ field_id }}">{{ block.settings.label }}{% if block.settings.required %} *{% endif %}</label>
+            <textarea id="{{ field_id }}" class="textarea" name="{{ field_name }}" form="{{ form_id }}" maxlength="{{ block.settings.max_length }}" rows="3"{% if block.settings.required %} required{% endif %}></textarea>
+          {%- else -%}
+            <label class="field__label" for="{{ field_id }}">{{ block.settings.label }}{% if block.settings.required %} *{% endif %}</label>
+            <input id="{{ field_id }}" class="input" type="text" name="{{ field_name }}" form="{{ form_id }}" maxlength="{{ block.settings.max_length }}"{% if block.settings.required %} required{% endif %}>
+        {%- endcase -%}
+        {%- if block.settings.hint != blank -%}
+          <span class="field__hint">{{ block.settings.hint }}</span>
+        {%- endif -%}
+      </div>
+
+    {%- when 'gift_wrap' -%}
+      {%- assign wrap_product = settings.gift_wrap_product -%}
+      {%- if wrap_product != blank and wrap_product.available -%}
+        {%- assign wrap_variant = wrap_product.selected_or_first_available_variant -%}
+        <lc-gift-wrap class="product__block gift-wrap" {{ block.shopify_attributes }}>
+          <label class="checkbox" for="GiftWrap-{{ block.id }}">
+            <input type="checkbox" id="GiftWrap-{{ block.id }}" data-gift-wrap="{{ wrap_variant.id }}">
+            <span>
+              {%- render 'icon', name: 'gift' -%}
+              {{ block.settings.label }} (+{{ wrap_variant.price | money }})
+            </span>
+          </label>
+          {%- if block.settings.show_message -%}
+            <div class="field gift-wrap__message" data-gift-message hidden>
+              <label class="field__label" for="GiftMessage-{{ block.id }}">{{ 'products.gift_wrap.message' | t }}</label>
+              <textarea id="GiftMessage-{{ block.id }}" class="textarea" name="properties[{{ 'products.gift_wrap.message' | t }}]" form="{{ form_id }}" maxlength="200" rows="2" disabled></textarea>
+            </div>
+          {%- endif -%}
+        </lc-gift-wrap>
+      {%- endif -%}
+
+    {%- when 'notify_me' -%}
+      <div class="product__block notify" data-product-part="notify" {{ block.shopify_attributes }}>
+        {%- if variant.available == false or coming_soon -%}
+          {%- assign notify_id = 'Notify-' | append: block.id -%}
+          {%- form 'contact', id: notify_id, class: 'notify__form' -%}
+            {%- if form.posted_successfully? -%}
+              <p class="form-message form-message--success" role="status">{% render 'icon', name: 'check' %} {{ 'products.notify.success' | t }}</p>
+            {%- else -%}
+              <p class="notify__heading">{{ block.settings.heading }}</p>
+              <input type="hidden" name="contact[{{ 'products.notify.request_label' | t }}]" value="{{ product.title | escape }}{% unless product.has_only_default_variant %} / {{ variant.title | escape }}{% endunless %}">
+              <input type="hidden" name="contact[{{ 'products.notify.url_label' | t }}]" value="{{ request.origin }}{{ product.url }}?variant={{ variant.id }}">
+              <div class="inline-field">
+                <label for="{{ notify_id }}-email" class="visually-hidden">{{ 'newsletter.email_label' | t }}</label>
+                <input id="{{ notify_id }}-email" class="input" type="email" name="contact[email]" required autocomplete="email" placeholder="{{ 'newsletter.placeholder' | t }}">
+                <button type="submit" class="button button--secondary">{{ 'products.notify.submit' | t }}</button>
+              </div>
+              {%- if form.errors -%}
+                <p class="form-message form-message--error" role="alert">{{ form.errors.translated_fields.email | capitalize }} {{ form.errors.messages.email }}</p>
+              {%- endif -%}
+              <p class="field__hint">{{ 'products.notify.hint' | t }}</p>
+            {%- endif -%}
+          {%- endform -%}
+        {%- endif -%}
+      </div>
+
+    {%- when 'complementary' -%}
+      <lc-recommendations
+        class="product__block complementary"
+        data-url="{{ routes.product_recommendations_url }}?section_id={{ section.id }}&product_id={{ product.id }}&limit={{ block.settings.limit }}&intent=complementary"
+        data-target="[data-complementary='{{ block.id }}']"
+        {{ block.shopify_attributes }}
+      >
+        <div data-complementary="{{ block.id }}"></div>
+      </lc-recommendations>
+
+    {%- when 'frequently_bought' -%}
+      {%- assign fbt_products = block.settings.products -%}
+      {%- if fbt_products.size > 0 -%}
+        <lc-bundle class="product__block bundle" data-currency="{{ cart.currency.iso_code }}" {{ block.shopify_attributes }}>
+          <p class="bundle__heading h5">{{ block.settings.heading }}</p>
+          <ul class="bundle__list" role="list">
+            <li class="bundle__item">
+              <input type="checkbox" id="Bundle-{{ block.id }}-main" checked disabled data-bundle-price="{{ variant.price }}" data-bundle-variant="{{ variant.id }}" data-bundle-main>
+              <label for="Bundle-{{ block.id }}-main" class="bundle__label">
+                <span class="bundle__media media" style="--ratio: 1 / 1;">
+                  {%- if product.featured_media -%}{{ product.featured_media | image_url: width: 160 | image_tag: loading: 'lazy', alt: '', widths: '80, 160', sizes: '80px' }}{%- endif -%}
+                </span>
+                <span class="bundle__text">
+                  <span class="bundle__title">{{ 'products.bundle.this_item' | t }}: {{ product.title | escape }}</span>
+                  <span class="bundle__price">{{ variant.price | money }}</span>
+                </span>
+              </label>
+            </li>
+            {%- for item in fbt_products limit: 4 -%}
+              {%- if item.id == product.id or item.available == false -%}{%- continue -%}{%- endif -%}
+              {%- assign item_variant = item.selected_or_first_available_variant -%}
+              <li class="bundle__item">
+                <input type="checkbox" id="Bundle-{{ block.id }}-{{ item.id }}" checked data-bundle-price="{{ item_variant.price }}" data-bundle-variant="{{ item_variant.id }}">
+                <label for="Bundle-{{ block.id }}-{{ item.id }}" class="bundle__label">
+                  <span class="bundle__media media" style="--ratio: 1 / 1;">
+                    {%- if item.featured_media -%}{{ item.featured_media | image_url: width: 160 | image_tag: loading: 'lazy', alt: '', widths: '80, 160', sizes: '80px' }}{%- endif -%}
+                  </span>
+                  <span class="bundle__text">
+                    <a href="{{ item.url }}" class="bundle__title">{{ item.title | escape }}</a>
+                    <span class="bundle__price">{{ item_variant.price | money }}</span>
+                  </span>
+                </label>
+                {%- unless item.has_only_default_variant -%}
+                  <div class="select-wrapper bundle__variant">
+                    <label for="BundleVariant-{{ block.id }}-{{ item.id }}" class="visually-hidden">{{ 'products.bundle.choose_variant' | t: title: item.title | escape }}</label>
+                    <select id="BundleVariant-{{ block.id }}-{{ item.id }}" class="select" data-bundle-select>
+                      {%- for option_variant in item.variants -%}
+                        <option value="{{ option_variant.id }}" data-price="{{ option_variant.price }}"{% unless option_variant.available %} disabled{% endunless %}{% if option_variant.id == item_variant.id %} selected{% endif %}>
+                          {{- option_variant.title }} - {{ option_variant.price | money -}}
+                        </option>
+                      {%- endfor -%}
+                    </select>
+                    {% render 'icon', name: 'chevron-down' %}
+                  </div>
+                {%- endunless -%}
+              </li>
+            {%- endfor -%}
+          </ul>
+          <div class="bundle__footer">
+            <p class="bundle__total">
+              {{ 'products.bundle.total' | t }}
+              <strong data-bundle-total>{{ variant.price | money }}</strong>
+            </p>
+            <button type="button" class="button" data-bundle-add>{{ block.settings.button_label }}</button>
+          </div>
+          <p class="form-message form-message--error" role="alert" data-bundle-error hidden></p>
+        </lc-bundle>
+      {%- endif -%}
+
+    {%- when 'share' -%}
+      <div class="product__block" {{ block.shopify_attributes }}>
+        {%- assign share_url = request.origin | append: product.url -%}
+        {% render 'share-buttons', url: share_url, title: product.title, image: product.featured_media %}
+      </div>
+
+    {%- when 'quote' -%}
+      {%- if block.settings.page != blank -%}
+        <div class="product__block" {{ block.shopify_attributes }}>
+          <a href="{{ block.settings.page.url }}?product={{ product.title | url_encode }}{% unless product.has_only_default_variant %}&amp;variant={{ variant.title | url_encode }}{% endunless %}" class="button button--outline button--full">
+            {{ block.settings.label }}
+          </a>
+        </div>
+      {%- endif -%}
+
+    {%- when 'divider' -%}
+      <hr class="product__block divider" {{ block.shopify_attributes }}>
+
+    {%- when 'custom_liquid' -%}
+      <div class="product__block" {{ block.shopify_attributes }}>{{ block.settings.custom_liquid }}</div>
+  {%- endcase -%}
+{%- endfor -%}

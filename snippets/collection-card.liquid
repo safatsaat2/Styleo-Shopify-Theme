@@ -1,0 +1,76 @@
+{%- comment -%}
+  Collection card. Uses collection.featured_image, which falls back to the
+  first product's image when the collection has no image.
+
+  Accepts:
+  - collection {Collection}: when blank, a placeholder card renders
+  - style {String}: 'arch', 'orb', or 'minimal'; defaults to the theme setting
+  - text_position {String}: 'inside' or 'below'; defaults to the theme setting
+  - image {Image}: optional override
+  - title {String}: optional override
+  - button_label {String}: label for the pill on arch cards
+  - sizes {String}
+  - loading {String}
+  - index {Number}
+{%- endcomment -%}
+
+{%- liquid
+  assign card_style = style | default: settings.collection_card_style
+  assign position = text_position | default: settings.collection_card_text_position
+  if card_style == 'orb'
+    assign position = 'below'
+    assign ratio = '1 / 1'
+  else
+    case settings.collection_card_ratio
+      when 'square'
+        assign ratio = '1 / 1'
+      when 'landscape'
+        assign ratio = '4 / 3'
+      else
+        assign ratio = '3 / 4'
+    endcase
+  endif
+  assign card_image = image | default: collection.featured_image
+  assign card_title = title | default: collection.title
+  if card_title == blank
+    assign card_title = 'collections.placeholder_title' | t
+  endif
+  assign card_url = collection.url | default: routes.collections_url
+  assign reveal_index = index | default: 0 | modulo: 4
+  assign placeholder_number = reveal_index | modulo: 3 | plus: 1
+  assign placeholder_name = 'collection-' | append: placeholder_number
+-%}
+
+<div class="collection-card collection-card--{{ card_style }} collection-card--text-{{ position }}" data-reveal style="--reveal-index: {{ reveal_index }};">
+  <a href="{{ card_url }}" class="collection-card__link">
+    <span class="collection-card__media media" style="--ratio: {{ ratio }};">
+      {%- if card_image != blank -%}
+        {% render 'image',
+          image: card_image,
+          sizes: sizes,
+          widths: '240, 360, 480, 600, 720, 900, 1080, 1296',
+          loading: loading,
+          alt: card_title,
+          class: 'collection-card__image'
+        %}
+      {%- else -%}
+        {{ placeholder_name | placeholder_svg_tag: 'placeholder-svg collection-card__image' }}
+      {%- endif -%}
+    </span>
+
+    <span class="collection-card__content">
+      <span class="collection-card__title{% if card_style == 'orb' %} collection-card__title--small{% else %} h3{% endif %}">
+        {{- card_title | escape -}}
+      </span>
+      {%- if settings.collection_card_show_count and collection.products_count -%}
+        <span class="collection-card__count">{{ 'collections.product_count' | t: count: collection.products_count }}</span>
+      {%- endif -%}
+      {%- if card_style == 'arch' and position == 'inside' -%}
+        <span class="collection-card__button button button--small button--surface">
+          {%- assign default_label = 'collections.shop_now' | t -%}
+          {{- button_label | default: default_label -}}
+        </span>
+      {%- endif -%}
+    </span>
+  </a>
+</div>

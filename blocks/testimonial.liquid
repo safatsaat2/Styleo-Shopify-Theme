@@ -1,0 +1,90 @@
+<figure class="tb-quote tb-align-{{ block.settings.alignment }}" {{ block.shopify_attributes }}>
+  {%- if block.settings.rating > 0 -%}
+    <p class="tb-quote__stars" aria-label="{{ 'blocks.testimonial.rating' | t: rating: block.settings.rating }}">
+      {%- for i in (1..block.settings.rating) -%}{% render 'icon', name: 'star' %}{%- endfor -%}
+    </p>
+  {%- endif -%}
+  <blockquote class="tb-quote__text">{{ block.settings.quote }}</blockquote>
+  {%- if block.settings.author != blank -%}
+    <figcaption class="tb-quote__author">
+      {%- if block.settings.avatar -%}
+        {{ block.settings.avatar | image_url: width: 96 | image_tag: loading: 'lazy', class: 'tb-quote__avatar', alt: '', widths: '48, 96', sizes: '48px' }}
+      {%- endif -%}
+      <span>
+        <strong>{{ block.settings.author }}</strong>
+        {%- if block.settings.detail != blank %}<span class="text-muted">{{ block.settings.detail }}</span>{% endif -%}
+      </span>
+    </figcaption>
+  {%- endif -%}
+</figure>
+
+{% schema %}
+{
+  "name": "t:names.testimonial",
+  "tag": null,
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "t:content.only_publish_quotes_from_real_customers_with_the_d2d2e3"
+    },
+    {
+      "type": "richtext",
+      "id": "quote",
+      "label": "t:labels.quote",
+      "default": "<p>Add a customer's words here.</p>"
+    },
+    {
+      "type": "text",
+      "id": "author",
+      "label": "t:labels.name",
+      "default": "Customer name"
+    },
+    {
+      "type": "text",
+      "id": "detail",
+      "label": "t:labels.detail",
+      "info": "t:info.for_example_a_city_or_the_product_they_bought_47c088"
+    },
+    {
+      "type": "image_picker",
+      "id": "avatar",
+      "label": "t:labels.photo"
+    },
+    {
+      "type": "range",
+      "id": "rating",
+      "min": 0,
+      "max": 5,
+      "step": 1,
+      "label": "t:labels.stars",
+      "default": 5,
+      "info": "t:info.use_the_rating_the_customer_gave_set_to_0_to_hid_994de6"
+    },
+    {
+      "type": "select",
+      "id": "alignment",
+      "label": "t:labels.alignment",
+      "options": [
+        {
+          "value": "start",
+          "label": "t:options.left"
+        },
+        {
+          "value": "center",
+          "label": "t:options.center"
+        },
+        {
+          "value": "end",
+          "label": "t:options.right"
+        }
+      ],
+      "default": "start"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.testimonial"
+    }
+  ]
+}
+{% endschema %}

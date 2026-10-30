@@ -1,0 +1,48 @@
+{%- comment -%}
+  Stock message from real inventory data. Counts only show for tracked
+  inventory at or below the merchant's low stock threshold.
+
+  Accepts:
+  - product {Product}
+  - variant {Variant}
+  - show_count {Boolean}: show the remaining quantity when stock is low
+{%- endcomment -%}
+
+{%- liquid
+  assign status = 'in_stock'
+  if settings.coming_soon_tag != blank and product.tags contains settings.coming_soon_tag
+    assign status = 'coming_soon'
+  elsif variant.available == false
+    assign status = 'sold_out'
+  elsif variant.inventory_management == 'shopify'
+    if variant.inventory_quantity <= 0 and variant.inventory_policy == 'continue'
+      assign status = 'backorder'
+    elsif variant.inventory_quantity <= settings.low_stock_threshold
+      assign status = 'low'
+    endif
+  endif
+-%}
+
+<p class="inventory inventory--{{ status }}" data-product-part="inventory">
+  {%- case status -%}
+    {%- when 'in_stock' -%}
+      <span class="status-dot status-dot--success" aria-hidden="true"></span>
+      {{ 'products.inventory.in_stock' | t }}
+    {%- when 'low' -%}
+      <span class="status-dot status-dot--warning" aria-hidden="true"></span>
+      {%- if show_count -%}
+        {{ 'products.inventory.low_stock_count' | t: count: variant.inventory_quantity }}
+      {%- else -%}
+        {{ 'products.inventory.low_stock' | t }}
+      {%- endif -%}
+    {%- when 'backorder' -%}
+      <span class="status-dot status-dot--warning" aria-hidden="true"></span>
+      {{ 'products.inventory.backorder' | t }}
+    {%- when 'coming_soon' -%}
+      <span class="status-dot status-dot--muted" aria-hidden="true"></span>
+      {{ 'products.inventory.coming_soon' | t }}
+    {%- else -%}
+      <span class="status-dot status-dot--muted" aria-hidden="true"></span>
+      {{ 'products.inventory.sold_out' | t }}
+  {%- endcase -%}
+</p>

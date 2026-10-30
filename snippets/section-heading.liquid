@@ -1,0 +1,43 @@
+{%- comment -%}
+  Section heading row: optional subheading, heading, text, and a
+  "view all" link aligned to the baseline.
+
+  Accepts:
+  - subheading {String}
+  - heading {String}
+  - text {String}: rich text
+  - link_label {String}
+  - link_url {String}
+  - align {String}: 'start' (default) or 'center'
+  - heading_size {String}: CSS class such as 'h2' (default) or 'h1'
+{%- endcomment -%}
+
+{%- liquid
+  assign heading_class = heading_size | default: 'h2'
+  assign has_link = false
+  if link_label != blank and link_url != blank
+    assign has_link = true
+  endif
+-%}
+
+{%- if heading != blank or subheading != blank or text != blank or has_link -%}
+  <div class="section-heading{% if align == 'center' %} section-heading--center{% endif %}" data-reveal>
+    <div class="section-heading__text">
+      {%- if subheading != blank -%}
+        <p class="subheading">{{ subheading }}</p>
+      {%- endif -%}
+      {%- if heading != blank -%}
+        <h2 class="{{ heading_class }} text-balance">{{ heading }}</h2>
+      {%- endif -%}
+      {%- if text != blank -%}
+        <div class="rte text-muted">{{ text }}</div>
+      {%- endif -%}
+    </div>
+    {%- if has_link -%}
+      <a href="{{ link_url }}" class="link-arrow section-heading__link">
+        {{- link_label | escape -}}
+        {% render 'icon', name: 'arrow-right' %}
+      </a>
+    {%- endif -%}
+  </div>
+{%- endif -%}

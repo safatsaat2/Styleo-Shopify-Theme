@@ -1,0 +1,157 @@
+{%- comment -%}
+  Cart drawer. Lives in the overlay section group and re-renders through
+  the Section Rendering API after every cart change.
+{%- endcomment -%}
+
+{%- assign form_id = 'CartDrawerForm' -%}
+
+{%- if settings.cart_type == 'drawer' -%}
+  <lc-dialog id="CartDrawer">
+    <dialog
+      class="dialog dialog--drawer cart-drawer color-{{ settings.overlay_color_scheme }}"
+      aria-labelledby="CartDrawerTitle"
+      style="--dialog-width: 28rem;"
+    >
+      <lc-cart-items class="dialog__panel" data-cart-section="{{ section.id }}" data-section-id="{{ section.id }}">
+        <div class="dialog__header">
+          <h2 id="CartDrawerTitle" class="dialog__title">
+            {% render 'icon', name: 'bag' %}
+            {{ 'cart.title' | t }}
+            <span class="cart-drawer__count" data-cart-count-pill{% if cart.item_count == 0 %} hidden{% endif %}>
+              <span class="visually-hidden">{{ 'header.cart_count' | t: count: cart.item_count }}</span>
+              <span aria-hidden="true">{{ cart.item_count }}</span>
+            </span>
+          </h2>
+          <button type="button" class="icon-button" data-dialog-close aria-label="{{ 'general.close' | t }}">
+            {% render 'icon', name: 'close' %}
+          </button>
+        </div>
+
+        <div class="cart-drawer__content" data-cart-content>
+          {%- if cart.item_count > 0 -%}
+            <div class="cart-drawer__strip">{% render 'cart-free-shipping' %}</div>
+
+            <div class="dialog__body cart-drawer__body">
+              <form action="{{ routes.cart_url }}" method="post" id="{{ form_id }}" novalidate>
+                <ul class="cart-items" role="list" aria-label="{{ 'cart.items' | t }}">
+                  {%- for item in cart.items -%}
+                    {% render 'cart-line-item', item: item, index: forloop.index, section_id: section.id, image_width: 80 %}
+                  {%- endfor -%}
+                </ul>
+              </form>
+
+              {%- if section.settings.show_upsell -%}
+                {%- assign first_item = cart.items.first -%}
+                <lc-recommendations
+                  class="cart-drawer__upsell"
+                  data-url="{{ routes.product_recommendations_url }}?section_id=cart-upsell&product_id={{ first_item.product_id }}&limit=10&intent=related"
+                  data-target="[data-cart-upsell-content]"
+                >
+                  <div data-cart-upsell-content></div>
+                </lc-recommendations>
+              {%- endif -%}
+
+              {%- for block in section.blocks -%}
+                <div class="cart-drawer__block" {{ block.shopify_attributes }}>
+                  {%- case block.type -%}
+                    {%- when '@app' -%}
+                      {% render block %}
+                    {%- when 'custom_liquid' -%}
+                      {{ block.settings.custom_liquid }}
+                  {%- endcase -%}
+                </div>
+              {%- endfor -%}
+            </div>
+
+            <div class="dialog__footer cart-drawer__footer">
+              <div class="cart-drawer__extras">
+                {% render 'cart-options', id: 'CartDrawer', form_id: form_id, show_gift_message: section.settings.show_gift_message %}
+                {% render 'cart-discounts', id: 'CartDrawer' %}
+              </div>
+              {% render 'cart-checkout',
+                id: 'CartDrawer',
+                form_id: form_id,
+                show_accelerated: section.settings.show_accelerated,
+                show_view_cart: true
+              %}
+            </div>
+          {%- else -%}
+            <div class="dialog__body empty-state cart-drawer__empty">
+              {% render 'icon', name: 'bag', class: 'empty-state__icon' %}
+              <p class="h4">{{ 'cart.empty' | t }}</p>
+              <p class="empty-state__text">{{ 'cart.empty_text' | t }}</p>
+              <a href="{{ routes.all_products_collection_url }}" class="button">
+                {{- 'general.continue_shopping' | t -}}
+              </a>
+            </div>
+          {%- endif -%}
+        </div>
+
+        <template
+          data-cart-meta
+          data-count="{{ cart.item_count }}"
+          data-label="{{ 'header.cart_count' | t: count: cart.item_count | escape }}"
+        ></template>
+      </lc-cart-items>
+    </dialog>
+  </lc-dialog>
+  <script src="{{ 'recommendations.js' | asset_url }}" defer></script>
+{%- else -%}
+  <template
+    data-cart-meta
+    data-cart-section="{{ section.id }}"
+    data-count="{{ cart.item_count }}"
+    data-label="{{ 'header.cart_count' | t: count: cart.item_count | escape }}"
+  ></template>
+{%- endif -%}
+
+{{ 'section-cart.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'cart.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "t:names.cart_drawer",
+  "class": "section-cart-drawer",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "t:content.choose_between_a_drawer_and_a_cart_page_in_theme_882c4a"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_upsell",
+      "label": "t:labels.show_product_suggestions",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_gift_message",
+      "label": "t:labels.show_gift_message_field",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_accelerated",
+      "label": "t:labels.show_accelerated_checkout_buttons",
+      "default": false
+    }
+  ],
+  "blocks": [
+    {
+      "type": "@app"
+    },
+    {
+      "type": "custom_liquid",
+      "name": "t:names.custom_liquid",
+      "settings": [
+        {
+          "type": "liquid",
+          "id": "custom_liquid",
+          "label": "t:labels.custom_liquid",
+          "info": "t:info.add_app_snippets_or_other_liquid_code"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

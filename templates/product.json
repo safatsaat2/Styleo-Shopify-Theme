@@ -1,0 +1,183 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-product",
+      "blocks": {
+        "badges": {
+          "type": "badges",
+          "settings": {}
+        },
+        "title": {
+          "type": "title",
+          "settings": {
+            "size": "h1"
+          }
+        },
+        "rating": {
+          "type": "rating",
+          "settings": {}
+        },
+        "price": {
+          "type": "price",
+          "settings": {
+            "show_saving": true,
+            "show_installments": true
+          }
+        },
+        "description": {
+          "type": "description",
+          "settings": {}
+        },
+        "picker": {
+          "type": "variant_picker",
+          "settings": {
+            "picker_style": "buttons",
+            "show_swatches": true
+          }
+        },
+        "size_guide": {
+          "type": "size_guide",
+          "settings": {
+            "label": "Size guide"
+          }
+        },
+        "inventory": {
+          "type": "inventory",
+          "settings": {
+            "show_count": true
+          }
+        },
+        "quantity": {
+          "type": "quantity",
+          "settings": {}
+        },
+        "buy": {
+          "type": "buy_buttons",
+          "settings": {
+            "show_dynamic_checkout": true,
+            "show_gift_card_recipient": true,
+            "preorder_note": "Ships when back in stock"
+          }
+        },
+        "notify": {
+          "type": "notify_me",
+          "settings": {
+            "heading": "Get an email when it's available"
+          }
+        },
+        "pickup": {
+          "type": "pickup",
+          "settings": {}
+        },
+        "delivery": {
+          "type": "delivery_estimate",
+          "settings": {}
+        },
+        "trust": {
+          "type": "trust",
+          "settings": {
+            "icon_1": "truck",
+            "text_1": "Free shipping on qualifying orders",
+            "icon_2": "return",
+            "text_2": "Easy returns",
+            "icon_3": "shield",
+            "text_3": "Secure checkout"
+          }
+        },
+        "care": {
+          "type": "care",
+          "settings": {
+            "heading": "Fabric and care",
+            "open": false
+          }
+        },
+        "fit": {
+          "type": "collapsible_tab",
+          "settings": {
+            "heading": "Fit",
+            "icon": "info",
+            "content": "<p>Describe the fit, the model's size, and how to choose a size.</p>",
+            "open": false
+          }
+        },
+        "shipping": {
+          "type": "collapsible_tab",
+          "settings": {
+            "heading": "Shipping and returns",
+            "icon": "truck",
+            "content": "<p>Share delivery times and your return window.</p>",
+            "open": false
+          }
+        },
+        "complementary": {
+          "type": "complementary",
+          "settings": {
+            "heading": "Pairs well with",
+            "limit": 3
+          }
+        },
+        "share": {
+          "type": "share",
+          "settings": {}
+        }
+      },
+      "block_order": [
+        "badges",
+        "title",
+        "rating",
+        "price",
+        "description",
+        "picker",
+        "size_guide",
+        "inventory",
+        "quantity",
+        "buy",
+        "notify",
+        "pickup",
+        "delivery",
+        "trust",
+        "care",
+        "fit",
+        "shipping",
+        "complementary",
+        "share"
+      ],
+      "settings": {
+        "gallery_layout": "thumbnails_bottom",
+        "media_width": "half",
+        "media_ratio": "portrait",
+        "zoom": "hover",
+        "loop_video": true,
+        "sticky_info": true,
+        "show_breadcrumbs": true,
+        "sticky_add_to_cart": true,
+        "sticky_color_scheme": "noir",
+        "color_scheme": "cream",
+        "padding_top": 32,
+        "padding_bottom": 64
+      }
+    },
+    "recommendations": {
+      "type": "product-recommendations",
+      "settings": {
+        "heading": "You may also like",
+        "intent": "related",
+        "limit": 4,
+        "columns": 4,
+        "desktop_layout": "grid",
+        "color_scheme": "cream",
+        "padding_top": 48,
+        "padding_bottom": 80
+      }
+    },
+    "recently_viewed": {
+      "type": "recently-viewed",
+      "settings": {}
+    }
+  },
+  "order": [
+    "main",
+    "recommendations",
+    "recently_viewed"
+  ]
+}
